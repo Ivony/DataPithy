@@ -3,7 +3,6 @@ using Ivony.Data.MySqlClient;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -17,22 +16,6 @@ namespace Ivony.Data
   /// </summary>
   public static class MySqlDb
   {
-
-    /// <summary>
-    /// 从配置文件中读取连接字符串并创建 MySql 数据库访问器
-    /// </summary>
-    /// <param name="name">连接字符串配置名称</param>
-    /// <param name="configuration">MySql 配置</param>
-    /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor FromConfiguration( string name, MySqlDbConfiguration configuration = null )
-    {
-      var setting = ConfigurationManager.ConnectionStrings[name];
-      if ( setting == null )
-        throw new InvalidOperationException();
-
-      return Connect( setting.ConnectionString, configuration );
-    }
-
 
     /// <summary>
     /// 通过指定的连接字符串并创建 MySql 数据库访问器
