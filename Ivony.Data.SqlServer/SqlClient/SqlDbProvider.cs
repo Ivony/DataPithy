@@ -5,11 +5,44 @@ using System.Text;
 
 namespace Ivony.Data.SqlClient
 {
+  /// <summary>
+  /// 基于 SQL Server 数据库访问的 IDbProvider 实现
+  /// </summary>
   public class SqlDbProvider : IDbProvider
   {
-    public IDbExecutor<T> GetDbExecutor<T>( string connectionString ) where T : IDbQuery
+
+
+    private string _connectionString;
+
+    /// <summary>
+    /// 创建 SqlDbProvider 对象
+    /// </summary>
+    /// <param name="connectionString">SQL Server 连接字符串</param>
+    public SqlDbProvider( string connectionString )
     {
-      return SqlServer.Connect( connectionString ) as IDbExecutor<T>;
+      _connectionString = connectionString;
+    }
+
+    /// <summary>
+    /// 获取指定类型查询的执行器
+    /// </summary>
+    /// <typeparam name="T">要执行的查询类型</typeparam>
+    /// <returns>数据库查询执行器</returns>
+    public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
+    {
+      return SqlServer.Connect( _connectionString ) as IDbExecutor<T>;
+    }
+
+
+    /// <summary>
+    /// 获取指定类型查询的异步执行器
+    /// </summary>
+    /// <typeparam name="T">要执行的查询类型</typeparam>
+    /// <returns>异步查询执行器</returns>
+
+    public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
+    {
+      return SqlServer.Connect( _connectionString ) as IAsyncDbExecutor<T>;
     }
   }
 }

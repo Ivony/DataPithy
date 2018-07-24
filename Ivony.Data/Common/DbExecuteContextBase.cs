@@ -282,7 +282,6 @@ namespace Ivony.Data.Common
       }
     }
 
-#if !NET40
 
     /// <summary>
     /// 尝试异步读取下一个结果集
@@ -327,7 +326,6 @@ namespace Ivony.Data.Common
         } );
 
     }
-#endif
   }
 
 

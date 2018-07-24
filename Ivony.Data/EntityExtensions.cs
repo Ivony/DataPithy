@@ -32,7 +32,6 @@ namespace Ivony.Data
     }
 
 
-#if !NET40
     /// <summary>
     /// 查询数据库并将第一个结果集填充实体类型
     /// </summary>
@@ -45,7 +44,6 @@ namespace Ivony.Data
       var data = await query.ExecuteDataTableAsync( token );
       return data.GetRows().Select( dataItem => dataItem.ToEntity<T>() ).ToArray();
     }
-#endif
 
 
     /// <summary>
@@ -61,7 +59,6 @@ namespace Ivony.Data
       return data.GetRows().Select( dataItem => dataItem.ToEntity( converter ) ).ToArray();
     }
 
-#if !NET40
 
     /// <summary>
     /// 查询数据库并将第一个结果集填充实体类型
@@ -76,7 +73,6 @@ namespace Ivony.Data
       var data = await query.ExecuteDataTableAsync( token );
       return data.GetRows().Select( dataItem => dataItem.ToEntity<T>( converter ) ).ToArray();
     }
-#endif
 
 
     /// <summary>
@@ -92,7 +88,6 @@ namespace Ivony.Data
       return data.GetRows().Select( dataItem => converter( dataItem ) ).ToArray();
     }
 
-#if !NET40
 
     /// <summary>
     /// 查询数据库并将第一个结果集填充实体类型
@@ -131,7 +126,6 @@ namespace Ivony.Data
       return result.ToArray();
 
     }
-#endif
 
 
     /// <summary>
@@ -147,7 +141,6 @@ namespace Ivony.Data
 
     }
 
-#if !NET40
     /// <summary>
     /// 查询数据库并将结果首行填充实体
     /// </summary>
@@ -161,7 +154,6 @@ namespace Ivony.Data
       return dataItem.ToEntity<T>();
 
     }
-#endif
 
 
     /// <summary>
@@ -178,7 +170,6 @@ namespace Ivony.Data
 
     }
 
-#if !NET40
 
     /// <summary>
     /// 查询数据库并将结果首行填充实体
@@ -194,7 +185,6 @@ namespace Ivony.Data
       return dataItem.ToEntity<T>( converter );
 
     }
-#endif
 
     /// <summary>
     /// 查询数据库并将结果首行填充实体
@@ -209,7 +199,6 @@ namespace Ivony.Data
       return converter( dataItem );
     }
 
-#if !NET40
     /// <summary>
     /// 异步查询数据库并将结果首行填充实体
     /// </summary>
@@ -238,7 +227,6 @@ namespace Ivony.Data
       var dataItem = await query.ExecuteFirstRowAsync( token );
       return await converter( dataItem, token );
     }
-#endif
 
 
 

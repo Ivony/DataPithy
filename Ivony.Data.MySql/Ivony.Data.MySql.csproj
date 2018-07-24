@@ -5,12 +5,13 @@
     <RootNamespace>Ivony.Data</RootNamespace>
     <Product />
     <Authors>Ivony</Authors>
-    <Version>4.0.0</Version>
+    <Version>4.0.0.1</Version>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
     <Company />
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>DataPithy for MySQL</Description>
   </PropertyGroup>
 
   <ItemGroup>

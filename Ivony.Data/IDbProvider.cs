@@ -13,12 +13,18 @@ namespace Ivony.Data
   {
 
     /// <summary>
-    /// 获取指定类型查询的查询器
+    /// 获取指定类型查询的执行器
     /// </summary>
-    /// <typeparam name="T">指定类型的查询</typeparam>
-    /// <param name="connectionString">连接字符串</param>
-    /// <returns>数据库查询器</returns>
-    IDbExecutor<T> GetDbExecutor<T>( string connectionString ) where T : IDbQuery;
+    /// <typeparam name="T">要执行的查询类型</typeparam>
+    /// <returns>数据库查询执行器</returns>
+    IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery;
+
+    /// <summary>
+    /// 获取指定类型查询的异步执行器
+    /// </summary>
+    /// <typeparam name="T">要执行的查询类型</typeparam>
+    /// <returns>异步查询执行器</returns>
+    IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery;
 
   }
 }

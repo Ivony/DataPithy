@@ -129,7 +129,6 @@ namespace Ivony.Data
       return Executor.Execute( Query );
     }
 
-#if !NET40
     /// <summary>
     /// 异步执行查询
     /// </summary>
@@ -139,6 +138,5 @@ namespace Ivony.Data
     {
       return Executor.ExecuteAsync( Query, token );
     }
-#endif
   }
 }
