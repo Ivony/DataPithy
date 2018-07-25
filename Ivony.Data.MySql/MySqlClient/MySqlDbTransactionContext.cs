@@ -26,10 +26,10 @@ namespace Ivony.Data.MySqlClient
 
 
 
-    internal MySqlDbTransactionContext( string connectionString, MySqlDbConfiguration configuration )
+    internal MySqlDbTransactionContext( string connectionString, IServiceProvider serviceProvider )
     {
       Connection = new MySqlConnection( connectionString );
-      _executor = new MySqlDbExecutorWithTransaction( this, configuration );
+      _executor = new MySqlDbExecutorWithTransaction( this, serviceProvider );
     }
 
 
@@ -62,8 +62,8 @@ namespace Ivony.Data.MySqlClient
     private class MySqlDbExecutorWithTransaction : MySqlDbExecutor
     {
 
-      public MySqlDbExecutorWithTransaction( MySqlDbTransactionContext transaction, MySqlDbConfiguration configuration )
-        : base( transaction.Connection.ConnectionString, configuration )
+      public MySqlDbExecutorWithTransaction( MySqlDbTransactionContext transaction, IServiceProvider serviceProvider )
+        : base( serviceProvider, transaction.Connection.ConnectionString )
       {
         _transaction = transaction;
       }

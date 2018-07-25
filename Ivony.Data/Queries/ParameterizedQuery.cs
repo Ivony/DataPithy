@@ -19,6 +19,9 @@ namespace Ivony.Data.Queries
 
 
 
+    internal IServiceProvider Services { get; }
+
+
     private class ParameterizedQueryFormattableString : FormattableString
     {
 
@@ -26,7 +29,7 @@ namespace Ivony.Data.Queries
 
       public ParameterizedQueryFormattableString( ParameterizedQuery query )
       {
-        _query = query;
+        _query = query ?? throw new ArgumentNullException( nameof( query ) );
       }
 
       public override int ArgumentCount => _query.ParameterValues.Length;
@@ -39,7 +42,7 @@ namespace Ivony.Data.Queries
 
       public override string ToString( IFormatProvider formatProvider )
       {
-        throw new NotImplementedException();
+        return _query.ToString();
       }
     }
 
@@ -80,16 +83,16 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    internal ParameterizedQuery( string template, object[] values )
+    internal ParameterizedQuery( IServiceProvider services, string template, object[] values )
     {
+      Services = services ?? throw new ArgumentNullException( nameof( services ) );
 
-      if ( template == null )
-        throw new ArgumentNullException( "template" );
+      TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
+
 
       if ( values == null )
-        throw new ArgumentNullException( "values" );
+        throw new ArgumentNullException( nameof( values ) );
 
-      TextTemplate = template;
       ParameterValues = new object[values.Length];
       values.CopyTo( ParameterValues, 0 );
     }
@@ -107,7 +110,7 @@ namespace Ivony.Data.Queries
     /// 将参数化查询解析为另一个参数化查询的一部分。
     /// </summary>
     /// <param name="builder">参数化查询构建器</param>
-    public void AppendTo( ParameterizedQueryBuilder builder )
+    public void AppendTo( IParameterizedQueryBuilder builder )
     {
 
       int index = 0;
@@ -117,7 +120,7 @@ namespace Ivony.Data.Queries
 
         var length = match.Index - index;
         if ( length > 0 )
-          builder.AppendText( TextTemplate.Substring( index, length ) );
+          builder.Append( TextTemplate.Substring( index, length ) );
 
 
         var parameterIndex = int.Parse( match.Groups["index"].Value );
@@ -126,7 +129,7 @@ namespace Ivony.Data.Queries
         index = match.Index + match.Length;
       }
 
-      builder.AppendText( TextTemplate.Substring( index, TextTemplate.Length - index ) );
+      builder.Append( TextTemplate.Substring( index, TextTemplate.Length - index ) );
     }
 
 
@@ -170,7 +173,7 @@ namespace Ivony.Data.Queries
     /// <returns>参数化查询对象</returns>
     public static implicit operator ParameterizedQuery( string text )
     {
-      return new ParameterizedQuery( text, new object[0] );
+      return new ParameterizedQuery( DbEnv.Default.Services, text, new object[0] );
     }
 
 

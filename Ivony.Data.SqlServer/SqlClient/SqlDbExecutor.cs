@@ -14,6 +14,8 @@ using System.Linq;
 using System.Threading;
 using System.Data.Common;
 using Ivony.Data.Common;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Ivony.Data.SqlClient
 {
@@ -38,41 +40,45 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 创建 SqlServer 数据库查询执行程序
     /// </summary>
+    /// <param name="serviceProvider">当前要使用的数据库配置信息</param>
     /// <param name="connectionString">连接字符串</param>
-    /// <param name="configuration">当前要使用的数据库配置信息</param>
-    public SqlDbExecutor( string connectionString, SqlDbConfiguration configuration )
-      : base( configuration )
+    public SqlDbExecutor( IServiceProvider serviceProvider, string connectionString )
+      : base( serviceProvider )
     {
       if ( connectionString == null )
         throw new ArgumentNullException( "connectionString" );
 
-      if ( configuration == null )
+      if ( serviceProvider == null )
         throw new ArgumentNullException( "configuration" );
 
 
 
       ConnectionString = connectionString;
-      Configuration = configuration;
+      Services = serviceProvider;
+
+      Configuration = Services.GetService<IOptions<SqlDbConfiguration>>().Value;
+
     }
 
 
     /// <summary>
     /// 当前要使用的数据库配置信息
     /// </summary>
-    protected SqlDbConfiguration Configuration
-    {
-      get;
-      private set;
-    }
+    protected IServiceProvider Services { get; }
+
+
+    protected SqlDbConfiguration Configuration { get; }
+
+    DbEnv IDbExecutor<ParameterizedQuery>.Environment => Services.GetService<DbEnv>();
 
 
     /// <summary>
     /// 创建数据库事务上下文
     /// </summary>
     /// <returns>数据库事务上下文</returns>
-    public SqlDbTransactionContext CreateTransaction( IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+    public SqlDbTransactionContext CreateTransaction( IsolationLevel isolationLevel = IsolationLevel.Unspecified )
     {
-      return new SqlDbTransactionContext( ConnectionString, Configuration, isolationLevel );
+      return new SqlDbTransactionContext( Services, ConnectionString, isolationLevel );
     }
 
 

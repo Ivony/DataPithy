@@ -6,6 +6,7 @@ using System.Text;
 using Ivony.Data.Queries;
 using System.Text.RegularExpressions;
 using Ivony.Data.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data
 {
@@ -24,7 +25,7 @@ namespace Ivony.Data
     /// <returns>参数化查询实例</returns>
     public static DbExecutableQuery<ParameterizedQuery> Template( this IDbExecutor<ParameterizedQuery> executor, FormattableString template )
     {
-      return new DbExecutableQuery<ParameterizedQuery>( executor, Db.Template( template ) );
+      return new DbExecutableQuery<ParameterizedQuery>( executor, executor.Environment.Template( template ) );
     }
 
 
@@ -48,7 +49,7 @@ namespace Ivony.Data
     /// <returns>参数化查询实例</returns>
     public static AsyncDbExecutableQuery<ParameterizedQuery> Template( this IAsyncDbExecutor<ParameterizedQuery> executor, FormattableString template )
     {
-      return new AsyncDbExecutableQuery<ParameterizedQuery>( executor, Db.Template( template ) );
+      return new AsyncDbExecutableQuery<ParameterizedQuery>( executor, executor.Environment.Template( template ) );
     }
 
 
@@ -77,7 +78,7 @@ namespace Ivony.Data
     /// <returns>参数化查询实例</returns>
     public static DbExecutableQuery<ParameterizedQuery> T( this IDbExecutor<ParameterizedQuery> executor, FormattableString template )
     {
-      return new DbExecutableQuery<ParameterizedQuery>( executor, Db.Template( template ) );
+      return new DbExecutableQuery<ParameterizedQuery>( executor, executor.Environment.Template( template ) );
     }
 
 
@@ -239,22 +240,18 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery ConcatQueries( this ParameterizedQuery firstQuery, params ParameterizedQuery[] otherQueries )
     {
-      var builder = new ParameterizedQueryBuilder();
+      var builder = firstQuery.Services.GetService<IParameterizedQueryBuilder>();
 
       firstQuery.AppendTo( builder );
       foreach ( var query in otherQueries )
       {
-
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
           continue;
-
-        if ( !builder.IsEndWithWhiteSpace() && !query.IsStartWithWhiteSpace() && Db.AddWhiteSpaceOnConcat )
-          builder.Append( ' ' );
 
         query.AppendTo( builder );
       }
 
-      return builder.CreateQuery();
+      return builder.BuildQuery();
     }
 
 
@@ -320,7 +317,7 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static DbExecutableQuery<ParameterizedQuery> Concat( this DbExecutableQuery<ParameterizedQuery> firstQuery, FormattableString template )
     {
-      return Concat( firstQuery, Db.T( template ) );
+      return Concat( firstQuery, firstQuery.Executor.Environment.T( template ) );
     }
 
 
@@ -333,7 +330,7 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static AsyncDbExecutableQuery<ParameterizedQuery> Concat( this AsyncDbExecutableQuery<ParameterizedQuery> firstQuery, FormattableString template )
     {
-      return Concat( firstQuery, Db.T( template ) );
+      return Concat( firstQuery, firstQuery.Executor.Environment.T( template ) );
     }
 
   }

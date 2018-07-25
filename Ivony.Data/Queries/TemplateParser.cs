@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ivony.Data.Queries;
 using Ivony.Data.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data
 {
@@ -14,17 +15,24 @@ namespace Ivony.Data
   /// <summary>
   /// SQL模板解析器
   /// </summary>
-  public class TemplateParser
+  public class TemplateParser : ITemplateParser
   {
+
+
+    private IServiceProvider _services;
+
+    public TemplateParser( IServiceProvider services )
+    {
+      _services = services;
+    }
 
     private static Regex numberRegex = new Regex( @"\G\{(?<index>[0-9]+)\}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
 
 
 
-    public static ParameterizedQuery ParseTemplate( FormattableString template )
+    public ParameterizedQuery ParseTemplate( FormattableString template )
     {
-      var builder = new ParameterizedQueryBuilder();
-      return ParseTemplate( builder, template );
+      return ParseTemplate( _services.GetService<IParameterizedQueryBuilder>(), template );
     }
 
 
@@ -36,7 +44,7 @@ namespace Ivony.Data
     /// <param name="templateText">模板文本</param>
     /// <param name="args">模板参数</param>
     /// <returns>解析结果</returns>
-    public static ParameterizedQuery ParseTemplate( ParameterizedQueryBuilder builder, FormattableString template )
+    private ParameterizedQuery ParseTemplate( IParameterizedQueryBuilder builder, FormattableString template )
     {
       if ( builder == null )
         throw new ArgumentNullException( nameof( builder ) );
@@ -114,7 +122,7 @@ namespace Ivony.Data
         }
 
 
-        return builder.CreateQuery();
+        return builder.BuildQuery();
       }
     }
 
@@ -123,7 +131,7 @@ namespace Ivony.Data
       return new FormatException( string.Format( "解析字符串 \"{0}\" 时在字符 {1} 处出现问题。", templateText, i ) );
     }
 
-    private static void AddParameter( ParameterizedQueryBuilder builder, object value )
+    private static void AddParameter( IParameterizedQueryBuilder builder, object value )
     {
 
       var array = value as Array;

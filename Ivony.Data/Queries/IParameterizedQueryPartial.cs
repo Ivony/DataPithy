@@ -15,6 +15,6 @@ namespace Ivony.Data.Queries
     /// 将该片段添加到正在构建的参数化查询的末尾
     /// </summary>
     /// <param name="builder">参数化查询构建器</param>
-    void AppendTo( ParameterizedQueryBuilder builder );
+    void AppendTo( IParameterizedQueryBuilder builder );
   }
 }

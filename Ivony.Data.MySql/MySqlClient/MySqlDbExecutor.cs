@@ -7,8 +7,8 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Ivony.Data.MySqlClient
 {
@@ -20,18 +20,14 @@ namespace Ivony.Data.MySqlClient
 
 
 
-    public MySqlDbExecutor( string connectionString, MySqlDbConfiguration configuration )
-      : base( configuration )
+    public MySqlDbExecutor( IServiceProvider serviceProvider, string connectionString )
+      : base( serviceProvider )
     {
 
-      if ( connectionString == null )
-        throw new ArgumentNullException( "connectionString" );
 
-      if ( configuration == null )
-        throw new ArgumentNullException( "configuration" );
-
-      ConnectionString = connectionString;
-      Configuration = configuration;
+      ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
+      Services = serviceProvider ?? throw new ArgumentNullException( nameof( serviceProvider ) );
+      Configuration = Services.GetService<IOptions<MySqlDbConfiguration>>().Value;
 
     }
 
@@ -43,12 +39,19 @@ namespace Ivony.Data.MySqlClient
     }
 
 
+    /// <summary>
+    /// 获取当前执行上下文服务提供程序
+    /// </summary>
+    public IServiceProvider Services { get; }
 
-    protected MySqlDbConfiguration Configuration
-    {
-      get;
-      private set;
-    }
+
+    /// <summary>
+    /// 获取当前配置
+    /// </summary>
+    protected MySqlDbConfiguration Configuration { get; }
+
+
+    DbEnv IDbExecutor<ParameterizedQuery>.Environment => Services.GetService<DbEnv>();
 
     public IDbExecuteContext Execute( ParameterizedQuery query )
     {
@@ -95,7 +98,12 @@ namespace Ivony.Data.MySqlClient
 
     IDbTransactionContext<MySqlDbExecutor> IDbTransactionProvider<MySqlDbExecutor>.CreateTransaction()
     {
-      return new MySqlDbTransactionContext( ConnectionString, Configuration );
+      return new MySqlDbTransactionContext( ConnectionString, Services );
+    }
+
+    IDbExecuteContext IDbExecutor<ParameterizedQuery>.Execute( ParameterizedQuery query )
+    {
+      throw new NotImplementedException();
     }
   }
 }

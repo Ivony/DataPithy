@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Ivony.Data
 {
@@ -21,11 +23,11 @@ namespace Ivony.Data
     /// <param name="database">数据库名称或者数据库文件路径</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlDbExecutor ConnectLocalDB( string database, SqlDbConfiguration configuration = null )
+    public static SqlDbExecutor ConnectLocalDB( IServiceProvider serviceProvider, string database )
     {
 
-      configuration = configuration ?? SqlServerExpress.Configuration;
-      return Connect( database, @"(LocalDB)\" + configuration.LocalDBInstanceName, configuration );
+      var configuration = serviceProvider.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpress.Configuration;
+      return Connect( serviceProvider, database, @"(LocalDB)\" + configuration.LocalDBInstanceName );
 
     }
 
@@ -37,10 +39,10 @@ namespace Ivony.Data
     /// <param name="database">数据库名称或者数据库文件路径</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlDbExecutor Connect( string database, SqlDbConfiguration configuration = null )
+    public static SqlDbExecutor Connect( IServiceProvider serviceProvider, string database )
     {
-      configuration = configuration ?? SqlServerExpress.Configuration;
-      return Connect( database, @"(local)\" + configuration.ExpressInstanceName, configuration );
+      var configuration = serviceProvider.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpress.Configuration;
+      return Connect( serviceProvider, database, @"(local)\" + configuration.ExpressInstanceName );
     }
 
 
@@ -51,7 +53,7 @@ namespace Ivony.Data
     /// <param name="datasource">SQL Server 实例名称</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    private static SqlDbExecutor Connect( string database, string datasource, SqlDbConfiguration configuration = null )
+    private static SqlDbExecutor Connect( IServiceProvider serviceProvider, string database, string datasource )
     {
       var builder = new SqlConnectionStringBuilder()
       {
@@ -67,7 +69,7 @@ namespace Ivony.Data
         builder.InitialCatalog = database;
 
 
-      return SqlServer.Connect( builder.ConnectionString, configuration );
+      return SqlServer.Connect( serviceProvider, builder.ConnectionString );
     }
 
 

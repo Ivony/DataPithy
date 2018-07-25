@@ -10,7 +10,7 @@ namespace Ivony.Data.Queries
   /// <summary>
   /// 辅助构建 ParameterizedQuery 对象
   /// </summary>
-  public sealed class ParameterizedQueryBuilder
+  public sealed class ParameterizedQueryBuilder : IParameterizedQueryBuilder
   {
 
     private StringBuilder textBuilder = new StringBuilder();
@@ -18,25 +18,36 @@ namespace Ivony.Data.Queries
     private List<object> values = new List<object>();
 
 
-    private object _sync = new object();
+
+    /// <summary>
+    /// 获取当前的服务提供程序
+    /// </summary>
+    internal IServiceProvider Services { get; }
+
+
+
+    public ParameterizedQueryBuilder( IServiceProvider serviceProvider )
+    {
+      Services = serviceProvider;
+    }
+
+
+
 
 
     /// <summary>
     /// 用于同步的对象
     /// </summary>
-    public object SyncRoot
-    {
-      get { return _sync; }
-    }
+    public object SyncRoot { get; } = new object();
 
 
     /// <summary>
     /// 添加一段查询文本
     /// </summary>
     /// <param name="text">要添加到末尾的查询文本</param>
-    public void AppendText( string text )
+    public void Append( string text )
     {
-      lock ( _sync )
+      lock ( SyncRoot )
       {
         textBuilder.Append( text.Replace( "#", "##" ) );
       }
@@ -49,7 +60,7 @@ namespace Ivony.Data.Queries
     /// <param name="ch">要添加到查询文本末尾的字符</param>
     public void Append( char ch )
     {
-      lock ( _sync )
+      lock ( SyncRoot )
       {
         if ( ch == '#' )
           textBuilder.Append( "##" );
@@ -81,7 +92,7 @@ namespace Ivony.Data.Queries
       }
 
 
-      lock ( _sync )
+      lock ( SyncRoot )
       {
         values.Add( value );
         textBuilder.AppendFormat( "#{0}#", values.Count - 1 );
@@ -93,11 +104,11 @@ namespace Ivony.Data.Queries
     /// 创建参数化查询对象实例
     /// </summary>
     /// <returns>参数化查询对象</returns>
-    public ParameterizedQuery CreateQuery()
+    public ParameterizedQuery BuildQuery()
     {
-      lock ( _sync )
+      lock ( SyncRoot )
       {
-        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray() );
+        return new ParameterizedQuery( Services, textBuilder.ToString(), values.ToArray() );
       }
     }
 
@@ -108,21 +119,12 @@ namespace Ivony.Data.Queries
     /// <param name="partial">要添加的部分查询对象</param>
     public void AppendPartial( IParameterizedQueryPartial partial )
     {
-      lock ( _sync )
+      lock ( SyncRoot )
       {
         partial.AppendTo( this );
       }
 
     }
 
-
-
-    internal bool IsEndWithWhiteSpace()
-    {
-      lock ( _sync )
-      {
-        return char.IsWhiteSpace( textBuilder[textBuilder.Length - 1] );
-      }
-    }
   }
 }

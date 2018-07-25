@@ -24,6 +24,12 @@ namespace Ivony.Data
     /// <returns>查询执行上下文</returns>
     IDbExecuteContext Execute( T query );
 
+
+    /// <summary>
+    /// 获取当前执行环境
+    /// </summary>
+    DbEnv Environment { get; }
+
   }
 
 

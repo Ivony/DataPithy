@@ -16,10 +16,16 @@ namespace Ivony.Data.MySqlClient
     /// 创建 MySqlDbProvider 对象
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
-    public MySqlDbProvider( string connectionString )
+    public MySqlDbProvider( IServiceProvider serviceProvider, string connectionString )
     {
       _connectionString = connectionString;
     }
+
+    /// <summary>
+    /// 获取当前上下文服务
+    /// </summary>
+    public IServiceProvider Services { get; }
+
 
     /// <summary>
     /// 获取可以执行指定类型查询的异步查询执行器
@@ -28,7 +34,7 @@ namespace Ivony.Data.MySqlClient
     /// <returns>数据库查询执行器</returns>
     public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
     {
-      return MySqlDb.Connect( _connectionString ) as IAsyncDbExecutor<T>;
+      return MySqlDb.Connect( Services, _connectionString ) as IAsyncDbExecutor<T>;
     }
 
 
@@ -39,7 +45,7 @@ namespace Ivony.Data.MySqlClient
     /// <returns>数据库查询执行器</returns>
     public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
     {
-      return MySqlDb.Connect( _connectionString ) as IDbExecutor<T>;
+      return MySqlDb.Connect( Services, _connectionString ) as IDbExecutor<T>;
     }
   }
 }

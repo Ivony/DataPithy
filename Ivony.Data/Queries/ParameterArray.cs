@@ -37,7 +37,7 @@ namespace Ivony.Data.Queries
     /// 实现 AppendTo 方法，将自身加入到参数化查询中
     /// </summary>
     /// <param name="builder"></param>
-    public void AppendTo( ParameterizedQueryBuilder builder )
+    public void AppendTo( IParameterizedQueryBuilder builder )
     {
 
       for ( int i = 0; i < _parameters.Length; i++ )
@@ -45,7 +45,7 @@ namespace Ivony.Data.Queries
         builder.AppendParameter( _parameters.GetValue( i ) );
 
         if ( i < _parameters.Length - 1 )
-          builder.AppendText( _separator );
+          builder.Append( _separator );
 
       }
     }

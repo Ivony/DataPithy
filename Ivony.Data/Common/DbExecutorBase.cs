@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data.Common
 {
@@ -14,17 +15,17 @@ namespace Ivony.Data.Common
   {
 
 
-    private DbConfiguration _configuration;
+    internal IServiceProvider Services { get; }
 
 
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
     /// <param name="configuration">当前要使用的数据库配置</param>
-    protected DbExecutorBase( DbConfiguration configuration )
+    protected DbExecutorBase( IServiceProvider services )
     {
-      _configuration = configuration;
-      TraceService = configuration.TraceService;
+      Services = services;
+      TraceService = Services.GetService<IDbTraceService>();
     }
 
 
