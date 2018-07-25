@@ -18,20 +18,13 @@ namespace Ivony.Data
   {
 
     private static Regex numberRegex = new Regex( @"\G\{(?<index>[0-9]+)\}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
-    private static Regex rangeRegex = new Regex( @"\G\{(?<begin>[0-9]+)..(?<end>[0-9]+)?\}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
-    private static Regex allRegex = new Regex( @"\G\{...\}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
 
 
-    /// <summary>
-    /// 解析查询模板
-    /// </summary>
-    /// <param name="templateText">模板文本</param>
-    /// <param name="args">模板参数</param>
-    /// <returns>解析结果</returns>
-    public static ParameterizedQuery ParseTemplate( string templateText, object[] args )
+
+    public static ParameterizedQuery ParseTemplate( FormattableString template )
     {
       var builder = new ParameterizedQueryBuilder();
-      return ParseTemplate( builder, templateText, args );
+      return ParseTemplate( builder, template );
     }
 
 
@@ -43,14 +36,19 @@ namespace Ivony.Data
     /// <param name="templateText">模板文本</param>
     /// <param name="args">模板参数</param>
     /// <returns>解析结果</returns>
-    public static ParameterizedQuery ParseTemplate( ParameterizedQueryBuilder builder, string templateText, object[] args )
+    public static ParameterizedQuery ParseTemplate( ParameterizedQueryBuilder builder, FormattableString template )
     {
+      if ( builder == null )
+        throw new ArgumentNullException( nameof( builder ) );
 
-      if ( args == null )
-        throw new ArgumentNullException( "parameters" );
+      if ( template == null )
+        throw new ArgumentNullException( nameof( template ) );
+
+
 
       lock ( builder.SyncRoot )
       {
+        var templateText = template.Format;
 
         for ( var i = 0; i < templateText.Length; i++ )
         {
@@ -85,39 +83,7 @@ namespace Ivony.Data
                 if ( !int.TryParse( match.Groups["index"].Value, out parameterIndex ) )
                   throw FormatError( templateText, i );
 
-                AddParameter( builder, args[parameterIndex] );
-                break;
-              }
-
-              match = rangeRegex.Match( templateText, i );
-              if ( match.Success )
-              {
-                int begin, end;
-                if ( !int.TryParse( match.Groups["begin"].Value, out begin ) )
-                  throw FormatError( templateText, i );
-
-                if ( match.Groups["end"] != null )
-                {
-                  if ( !int.TryParse( match.Groups["end"].Value, out end ) )
-                    throw FormatError( templateText, i );
-                }
-                else
-                  end = args.Length - 1;
-
-
-                if ( begin > end || end >= args.Length )
-                  throw FormatError( templateText, i );
-
-
-                AddParameters( builder, args, begin, end );
-                break;
-              }
-
-
-              match = allRegex.Match( templateText, i );
-              if ( match.Success )
-              {
-                AddParameters( builder, args, 0, args.Length - 1 );
+                AddParameter( builder, template.GetArgument( parameterIndex ) );
                 break;
               }
             } while ( false );
@@ -155,15 +121,6 @@ namespace Ivony.Data
     private static FormatException FormatError( string templateText, int i )
     {
       return new FormatException( string.Format( "解析字符串 \"{0}\" 时在字符 {1} 处出现问题。", templateText, i ) );
-    }
-
-    private static void AddParameters( ParameterizedQueryBuilder builder, object[] parameters, int begin, int end )
-    {
-      var length = end - begin + 1;
-      var array = new object[length];
-      parameters.CopyTo( array, begin );
-
-      AddParameter( builder, new ParameterArray( array ) );
     }
 
     private static void AddParameter( ParameterizedQueryBuilder builder, object value )

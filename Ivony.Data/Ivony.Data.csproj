@@ -13,4 +13,8 @@
     <Description>DataPithy is a light database accesser</Description>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.1\Ivony.Data.xml</DocumentationFile>
+  </PropertyGroup>
+
 </Project>

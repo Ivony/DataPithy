@@ -17,12 +17,42 @@ namespace Ivony.Data.Queries
   public class ParameterizedQuery : IDbQuery, IParameterizedQueryPartial
   {
 
+
+
+    private class ParameterizedQueryFormattableString : FormattableString
+    {
+
+      private ParameterizedQuery _query;
+
+      public ParameterizedQueryFormattableString( ParameterizedQuery query )
+      {
+        _query = query;
+      }
+
+      public override int ArgumentCount => _query.ParameterValues.Length;
+
+      public override string Format => _query.TextTemplate;
+
+      public override object GetArgument( int index ) => _query.ParameterValues.GetValue( index );
+
+      public override object[] GetArguments() => _query.ParameterValues;
+
+      public override string ToString( IFormatProvider formatProvider )
+      {
+        throw new NotImplementedException();
+      }
+    }
+
+
     /// <summary>
     /// 定义匹配参数占位符的正则表达式
     /// </summary>
     public static readonly Regex ParameterPlaceholdRegex = new Regex( @"#(?<index>[0-9]+)#", RegexOptions.Compiled );
 
-
+    /// <summary>
+    /// 定义系统参数占位符的正则表达式
+    /// </summary>
+    public static readonly Regex SystemParameterPlaceholdRegex = new Regex( @"{(?<index>[0-9]+)}", RegexOptions.Compiled );
 
     /// <summary>
     /// 获取查询文本模板
@@ -50,7 +80,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    public ParameterizedQuery( string template, object[] values )
+    internal ParameterizedQuery( string template, object[] values )
     {
 
       if ( template == null )
@@ -65,16 +95,11 @@ namespace Ivony.Data.Queries
     }
 
 
-    /// <summary>
-    /// 构建参数化查询对象
-    /// </summary>
-    /// <param name="formatTemplate">查询文本模板</param>
-    public ParameterizedQuery( FormattableString formatTemplate )
+
+
+    private string ConvertTextTemplate( string format )
     {
-      TextTemplate = formatTemplate.Format;
-      var values = formatTemplate.GetArguments();
-      ParameterValues = new object[values.Length];
-      values.CopyTo( ParameterValues, 0 );
+      return SystemParameterPlaceholdRegex.Replace( format, match => $"#{match.Groups["index"]}#" );
     }
 
 
@@ -145,7 +170,7 @@ namespace Ivony.Data.Queries
     /// <returns>参数化查询对象</returns>
     public static implicit operator ParameterizedQuery( string text )
     {
-      return TemplateParser.ParseTemplate( text, new object[0] );
+      return new ParameterizedQuery( text, new object[0] );
     }
 
 

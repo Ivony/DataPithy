@@ -21,58 +21,24 @@ namespace Ivony.Data
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
     /// </summary>
-    /// <param name="formatTemplate">参数化模板</param>
+    /// <param name="template">参数化模板</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery Template( FormattableString formatTemplate )
+    public static ParameterizedQuery Template( FormattableString template )
     {
-      return new ParameterizedQuery( formatTemplate );
+      return TemplateParser.ParseTemplate( template );
     }
 
-
-    /// <summary>
-    /// 解析模板表达式，创建参数化查询对象
-    /// </summary>
-    /// <param name="templateText">模板文本</param>
-    /// <param name="args">模板参数</param>
-    /// <returns>参数化查询</returns>
-    public static ParameterizedQuery Template( string templateText, params object[] args )
-    {
-      if ( args == null )
-        args = new object[] { null };
-
-      if ( AllowNonObjectArrayAsArgs )
-      {
-        if ( args.Length == 1 )
-        {
-          var array = args[0] as Array;
-          if ( array != null )
-          {
-            args = new object[array.Length];
-            array.CopyTo( args, 0 );
-          }
-        }
-      }
-      else
-      {
-        if ( args.GetType() != typeof( object[] ) )
-          args = new object[] { args };
-      }
-
-
-      return TemplateParser.ParseTemplate( templateText, args );
-    }
 
 
 
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
     /// </summary>
-    /// <param name="templateText">模板文本</param>
-    /// <param name="args">模板参数</param>
+    /// <param name="template">参数化模板</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery T( string templateText, params object[] args )
+    public static ParameterizedQuery T( FormattableString template )
     {
-      return Template( templateText, args );
+      return Template( template );
     }
 
 

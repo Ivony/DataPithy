@@ -8,6 +8,9 @@ namespace Ivony.Data
 {
 
 
+  /// <summary>
+  /// 定义数据库事务上下文
+  /// </summary>
   public interface IDbTransactionContext : IDisposable
   {
     /// <summary>

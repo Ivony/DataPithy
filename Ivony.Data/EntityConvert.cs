@@ -70,7 +70,6 @@ namespace Ivony.Data
     /// <summary>
     /// 获取实体填充方法
     /// </summary>
-    /// <typeparam name="T">实体类型</typeparam>
     /// <returns>针对指定实体的转换方法</returns>
     internal static Action<DataRow, T> GetFillMethod()
     {
@@ -225,8 +224,7 @@ namespace Ivony.Data
     /// <summary>
     /// 创建实体转换器
     /// </summary>
-    /// <param name="type">实体类型</param>
-    /// <returns></returns>
+    /// <returns>实体转换器</returns>
     private static IEntityConverter<T> CreateConverter()
     {
 
@@ -315,7 +313,6 @@ namespace Ivony.Data
     /// <summary>
     /// 提供默认的 EntityConverter 对象，这个对象什么都不做，并且被设置为可重用和需要预转换。
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     private class DefaultEntityConverter : IEntityConverter<T>
     {
       public T Convert( DataRow dataItem )
