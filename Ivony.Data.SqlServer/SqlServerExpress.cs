@@ -26,7 +26,7 @@ namespace Ivony.Data
     public static SqlDbExecutor LocalDB( this DbEnv environment, string database )
     {
 
-      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpressDb.Configuration;
+      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? ActivatorUtilities.CreateInstance<SqlDbConfiguration>( environment.Services );
       return SqlExpress( environment, database, @"(LocalDB)\" + configuration.LocalDBInstanceName );
 
     }
@@ -37,11 +37,11 @@ namespace Ivony.Data
     /// 通过连接 SQL Server Express 默认实例，创建 SQL Server 数据库访问器
     /// </summary>
     /// <param name="database">数据库名称或者数据库文件路径</param>
-    /// <param name="configuration">SQL Server 配置</param>
+    /// <param name="environment">数据库访问环境配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
     public static SqlDbExecutor SqlExpress( this DbEnv environment, string database )
     {
-      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpressDb.Configuration;
+      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? ActivatorUtilities.CreateInstance<SqlDbConfiguration>( environment.Services );
       return SqlExpress( environment, database, @"(local)\" + configuration.ExpressInstanceName );
     }
 
@@ -70,15 +70,6 @@ namespace Ivony.Data
 
 
       return SqlServerDb.SqlServer( environment, builder.ConnectionString );
-    }
-
-
-    /// <summary>
-    /// 获取或修改 SQL Server 默认配置
-    /// </summary>
-    public static SqlDbConfiguration Configuration
-    {
-      get { return SqlServerDb.Configuration; }
     }
   }
 }

@@ -97,17 +97,6 @@ namespace Ivony.Data
 
 
 
-    private static SqlDbConfiguration _defaultConfiguration = new SqlDbConfiguration();
-
-    /// <summary>
-    /// 获取或设置默认配置
-    /// </summary>
-    public static SqlDbConfiguration Configuration
-    {
-      get { return _defaultConfiguration; }
-    }
-
-
     static SqlServerDb()
     {
       LocalDBInstanceName = "v11.0";

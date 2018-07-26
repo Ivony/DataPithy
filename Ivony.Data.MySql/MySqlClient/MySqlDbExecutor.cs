@@ -26,7 +26,7 @@ namespace Ivony.Data.MySqlClient
 
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      Configuration = Environment.Services.GetService<IOptions<MySqlDbConfiguration>>().Value;
+      Configuration = Environment.Services.GetService<IOptions<MySqlDbConfiguration>>()?.Value ?? ActivatorUtilities.CreateInstance<MySqlDbConfiguration>( environment.Services );
 
     }
 
@@ -91,11 +91,6 @@ namespace Ivony.Data.MySqlClient
     IDbTransactionContext<MySqlDbExecutor> IDbTransactionProvider<MySqlDbExecutor>.CreateTransaction()
     {
       return new MySqlDbTransactionContext( Environment, ConnectionString );
-    }
-
-    IDbExecuteContext IDbExecutor<ParameterizedQuery>.Execute( ParameterizedQuery query )
-    {
-      throw new NotImplementedException();
     }
   }
 }

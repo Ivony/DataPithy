@@ -48,7 +48,7 @@ namespace Ivony.Data.SqlClient
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
 
-      Configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value;
+      Configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>()?.Value ?? ActivatorUtilities.CreateInstance<SqlDbConfiguration>( environment.Services );
 
     }
 

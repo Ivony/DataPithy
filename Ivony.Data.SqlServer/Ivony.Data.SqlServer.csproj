@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
     <Company />
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-    <Version>4.0.1</Version>
+    <Version>4.0.1.1</Version>
     <Description>DataPithy for SQL Server</Description>
   </PropertyGroup>
 

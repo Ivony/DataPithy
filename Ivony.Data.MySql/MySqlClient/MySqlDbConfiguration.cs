@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Ivony.Data.MySqlClient
 {
-  public class MySqlDbConfiguration : DbConfiguration
+  public class MySqlDbConfiguration
   {
 
     public MySqlDbConfiguration() { }
+
+    public TimeSpan? QueryExecutingTimeout { get; set; }
   }
 }
