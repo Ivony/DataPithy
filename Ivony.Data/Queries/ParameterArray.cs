@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace Ivony.Data.Queries
   /// <summary>
   /// 定义参数列表
   /// </summary>
-  public class ParameterArray : IParameterizedQueryPartial
+  public class ParameterList : IParameterizedQueryPartial
   {
 
 
@@ -18,12 +19,24 @@ namespace Ivony.Data.Queries
     private string _separator;
 
 
+
+    public static ParameterList Create( ITuple tuple )
+    {
+
+      var array = new object[tuple.Length];
+      for ( int i = 0; i < tuple.Length; i++ )
+        array[i] = tuple[i];
+
+      return new ParameterList( array );
+    }
+
+
     /// <summary>
     /// 创建 ParameterArray 对象
     /// </summary>
     /// <param name="parameters">参数列表</param>
     /// <param name="separator">分隔符</param>
-    public ParameterArray( Array parameters, string separator = ", " )
+    public ParameterList( Array parameters, string separator = ", " )
     {
       if ( parameters.Rank != 1 )
         throw new ArgumentException( "参数列表必须是一维数组", "parameters" );

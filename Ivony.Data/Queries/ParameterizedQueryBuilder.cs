@@ -10,7 +10,7 @@ namespace Ivony.Data.Queries
   /// <summary>
   /// 辅助构建 ParameterizedQuery 对象
   /// </summary>
-  public sealed class ParameterizedQueryBuilder : IParameterizedQueryBuilder
+  public class ParameterizedQueryBuilder : IParameterizedQueryBuilder
   {
 
     private StringBuilder textBuilder = new StringBuilder();
@@ -22,13 +22,13 @@ namespace Ivony.Data.Queries
     /// <summary>
     /// 获取当前的服务提供程序
     /// </summary>
-    internal IServiceProvider Services { get; }
+    internal DbEnv Environment { get; }
 
 
 
-    public ParameterizedQueryBuilder( IServiceProvider serviceProvider )
+    public ParameterizedQueryBuilder( DbEnv environment )
     {
-      Services = serviceProvider;
+      Environment = environment;
     }
 
 
@@ -108,7 +108,7 @@ namespace Ivony.Data.Queries
     {
       lock ( SyncRoot )
       {
-        return new ParameterizedQuery( Services, textBuilder.ToString(), values.ToArray() );
+        return new ParameterizedQuery( Environment, textBuilder.ToString(), values.ToArray() );
       }
     }
 
@@ -117,7 +117,7 @@ namespace Ivony.Data.Queries
     /// 在当前位置添加一个部分查询
     /// </summary>
     /// <param name="partial">要添加的部分查询对象</param>
-    public void AppendPartial( IParameterizedQueryPartial partial )
+    protected virtual void AppendPartial( IParameterizedQueryPartial partial )
     {
       lock ( SyncRoot )
       {

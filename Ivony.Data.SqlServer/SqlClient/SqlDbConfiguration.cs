@@ -38,8 +38,8 @@ namespace Ivony.Data.SqlClient
     /// </remarks>
     public string LocalDBInstanceName
     {
-      get { return SqlServer.LocalDBInstanceName; }
-      set { SqlServer.LocalDBInstanceName = value; }
+      get { return SqlServerDb.LocalDBInstanceName; }
+      set { SqlServerDb.LocalDBInstanceName = value; }
     }
 
     /// <summary>
@@ -47,8 +47,8 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     public string ExpressInstanceName
     {
-      get { return SqlServer.ExpressInstanceName; }
-      set { SqlServer.ExpressInstanceName = value; }
+      get { return SqlServerDb.ExpressInstanceName; }
+      set { SqlServerDb.ExpressInstanceName = value; }
     }
 
 

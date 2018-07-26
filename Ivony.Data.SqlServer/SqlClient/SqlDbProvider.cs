@@ -15,17 +15,17 @@ namespace Ivony.Data.SqlClient
     private string _connectionString;
 
 
-    public IServiceProvider Services { get; }
+    public DbEnv Environment { get; }
 
     /// <summary>
     /// 创建 SqlDbProvider 对象
     /// </summary>
     /// <param name="connectionString">SQL Server 连接字符串</param>
-    public SqlDbProvider( IServiceProvider serviceProvider, string connectionString )
+    public SqlDbProvider( DbEnv environment, string connectionString )
     {
-      _connectionString = connectionString;
+      Environment = environment ?? throw new ArgumentNullException( nameof( environment ) );
 
-      Services = serviceProvider;
+      _connectionString = connectionString ?? throw new ArgumentNullException( nameof( _connectionString ) );
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ namespace Ivony.Data.SqlClient
     /// <returns>数据库查询执行器</returns>
     public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
     {
-      return SqlServer.Connect( Services, _connectionString ) as IDbExecutor<T>;
+      return SqlServerDb.SqlServer( Environment, _connectionString ) as IDbExecutor<T>;
     }
 
 
@@ -47,7 +47,7 @@ namespace Ivony.Data.SqlClient
 
     public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
     {
-      return SqlServer.Connect( Services, _connectionString ) as IAsyncDbExecutor<T>;
+      return SqlServerDb.SqlServer( Environment, _connectionString ) as IAsyncDbExecutor<T>;
     }
   }
 }

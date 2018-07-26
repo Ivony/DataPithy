@@ -240,7 +240,7 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery ConcatQueries( this ParameterizedQuery firstQuery, params ParameterizedQuery[] otherQueries )
     {
-      var builder = firstQuery.Services.GetService<IParameterizedQueryBuilder>();
+      var builder = firstQuery.Environment.Services.GetService<IParameterizedQueryBuilder>();
 
       firstQuery.AppendTo( builder );
       foreach ( var query in otherQueries )

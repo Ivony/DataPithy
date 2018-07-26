@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Ivony.Data.Queries;
 using Ivony.Data.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.CompilerServices;
 
 namespace Ivony.Data
 {
@@ -131,12 +132,20 @@ namespace Ivony.Data
       return new FormatException( string.Format( "解析字符串 \"{0}\" 时在字符 {1} 处出现问题。", templateText, i ) );
     }
 
-    private static void AddParameter( IParameterizedQueryBuilder builder, object value )
+    private void AddParameter( IParameterizedQueryBuilder builder, object value )
     {
 
       var array = value as Array;
       if ( array != null && !(array is byte[]) )
-        value = new ParameterArray( array );
+        value = new ParameterList( array );
+
+      var tuple = value as ITuple;
+      if ( tuple != null )
+        value = ParameterList.Create( tuple );
+
+      var template = value as FormattableString;
+      if ( template != null )
+        value = ParseTemplate( template );
 
       builder.AppendParameter( value );
     }

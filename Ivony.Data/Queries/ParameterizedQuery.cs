@@ -19,7 +19,7 @@ namespace Ivony.Data.Queries
 
 
 
-    internal IServiceProvider Services { get; }
+    internal DbEnv Environment { get; }
 
 
     private class ParameterizedQueryFormattableString : FormattableString
@@ -83,9 +83,9 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    internal ParameterizedQuery( IServiceProvider services, string template, object[] values )
+    internal ParameterizedQuery( DbEnv environment, string template, object[] values )
     {
-      Services = services ?? throw new ArgumentNullException( nameof( services ) );
+      Environment = environment ?? throw new ArgumentNullException( nameof( environment ) );
 
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
 
@@ -164,17 +164,6 @@ namespace Ivony.Data.Queries
     }
 
 
-
-
-    /// <summary>
-    /// 提供从字符串到 ParameterizedQuery 的隐式类型转换
-    /// </summary>
-    /// <param name="text">要转换为参数化查询的查询字符串</param>
-    /// <returns>参数化查询对象</returns>
-    public static implicit operator ParameterizedQuery( string text )
-    {
-      return new ParameterizedQuery( DbEnv.Default.Services, text, new object[0] );
-    }
 
 
     /// <summary>

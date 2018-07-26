@@ -23,9 +23,9 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">MySql 配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, string connectionString )
+    public static MySqlDbExecutor MySql( this DbEnv environment, string connectionString )
     {
-      return new MySqlDbExecutor( serviceProvider, connectionString );
+      return new MySqlDbExecutor( environment, connectionString );
     }
 
 
@@ -36,9 +36,9 @@ namespace Ivony.Data
     /// <param name="builder">连接字符串构建器</param>
     /// <param name="configuration">MySql 配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, MySqlConnectionStringBuilder builder )
+    public static MySqlDbExecutor MySql( this DbEnv environment, MySqlConnectionStringBuilder builder )
     {
-      return Connect( serviceProvider, builder.ConnectionString );
+      return MySql( environment, builder.ConnectionString );
     }
 
 
@@ -53,7 +53,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, string server, string database, string userID, string password, bool pooling = true )
+    public static MySqlDbExecutor MySql( this DbEnv environment, string server, string database, string userID, string password, bool pooling = true )
     {
       var builder = new MySqlConnectionStringBuilder()
       {
@@ -65,7 +65,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( serviceProvider, builder.ConnectionString );
+      return MySql( environment, builder.ConnectionString );
     }
 
 
@@ -80,7 +80,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, string server, uint port, string database, string userID, string password, bool pooling = true )
+    public static MySqlDbExecutor MySql( this DbEnv environment, string server, uint port, string database, string userID, string password, bool pooling = true )
     {
       var builder = new MySqlConnectionStringBuilder()
       {
@@ -92,7 +92,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( serviceProvider, builder.ConnectionString );
+      return MySql( environment, builder.ConnectionString );
     }
 
 
@@ -104,7 +104,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, string server, string database, bool pooling = true )
+    public static MySqlDbExecutor MySql( this DbEnv environment, string server, string database, bool pooling = true )
     {
 
       var builder = new MySqlConnectionStringBuilder()
@@ -115,7 +115,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( serviceProvider, builder.ConnectionString );
+      return MySql( environment, builder.ConnectionString );
     }
 
 
@@ -130,7 +130,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDbExecutor Connect( IServiceProvider serviceProvider, string server, uint port, string database, bool pooling = true )
+    public static MySqlDbExecutor MySql( this DbEnv environment, string server, uint port, string database, bool pooling = true )
     {
 
       var builder = new MySqlConnectionStringBuilder()
@@ -142,7 +142,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( serviceProvider, builder.ConnectionString );
+      return MySql( environment, builder.ConnectionString );
     }
 
 

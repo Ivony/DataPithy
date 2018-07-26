@@ -18,7 +18,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取服务提供程序
     /// </summary>
-    internal IServiceProvider Services { get; private set; }
+    public IServiceProvider Services { get; private set; }
 
     /// <summary>
     /// 创建 DbEnv 对象
@@ -66,7 +66,7 @@ namespace Ivony.Data
     {
       return CreateEnvironment( services =>
       {
-        services.AddSingleton( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
+        services.AddTransient( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
         services.AddSingleton( typeof( ITemplateParser ), typeof( TemplateParser ) );
       } );
 
@@ -82,15 +82,17 @@ namespace Ivony.Data
       var services = new ServiceCollection();
       configureServices( services );
 
-      var instance = new DbEnv();
+      return CreateEnvironment( services );
 
+    }
+
+    public static DbEnv CreateEnvironment( IServiceCollection services )
+    {
+      var instance = new DbEnv();
       services.AddSingleton<DbEnv>( instance );
       instance.Services = services.BuildServiceProvider();
 
       return instance;
     }
-
-
-
   }
 }

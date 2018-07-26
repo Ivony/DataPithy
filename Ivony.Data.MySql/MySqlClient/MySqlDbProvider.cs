@@ -12,12 +12,15 @@ namespace Ivony.Data.MySqlClient
 
     private string _connectionString;
 
+    public DbEnv Environment { get; }
+
     /// <summary>
     /// 创建 MySqlDbProvider 对象
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
-    public MySqlDbProvider( IServiceProvider serviceProvider, string connectionString )
+    public MySqlDbProvider( DbEnv environment, string connectionString )
     {
+      Environment = environment;
       _connectionString = connectionString;
     }
 
@@ -34,7 +37,7 @@ namespace Ivony.Data.MySqlClient
     /// <returns>数据库查询执行器</returns>
     public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
     {
-      return MySqlDb.Connect( Services, _connectionString ) as IAsyncDbExecutor<T>;
+      return Environment.MySql( _connectionString ) as IAsyncDbExecutor<T>;
     }
 
 
@@ -45,7 +48,7 @@ namespace Ivony.Data.MySqlClient
     /// <returns>数据库查询执行器</returns>
     public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
     {
-      return MySqlDb.Connect( Services, _connectionString ) as IDbExecutor<T>;
+      return Environment.MySql( _connectionString ) as IDbExecutor<T>;
     }
   }
 }

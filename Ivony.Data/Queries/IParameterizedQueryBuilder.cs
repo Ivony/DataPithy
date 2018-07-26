@@ -34,13 +34,6 @@
 
 
     /// <summary>
-    /// 在当前位置添加一个部分查询
-    /// </summary>
-    /// <param name="partial">要添加的部分查询对象</param>
-    void AppendPartial( IParameterizedQueryPartial partial );
-
-
-    /// <summary>
     /// 创建参数化查询对象实例
     /// </summary>
     /// <returns>参数化查询对象</returns>

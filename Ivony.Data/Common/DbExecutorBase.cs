@@ -15,17 +15,20 @@ namespace Ivony.Data.Common
   {
 
 
-    internal IServiceProvider Services { get; }
+    /// <summary>
+    /// 获取当前数据库访问基础环境
+    /// </summary>
+    public DbEnv Environment { get; }
 
 
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
-    /// <param name="configuration">当前要使用的数据库配置</param>
-    protected DbExecutorBase( IServiceProvider services )
+    /// <param name="environment">当前数据库访问环境</param>
+    protected DbExecutorBase( DbEnv environment )
     {
-      Services = services;
-      TraceService = Services.GetService<IDbTraceService>();
+      Environment = environment;
+      TraceService = Environment.Services.GetService<IDbTraceService>();
     }
 
 

@@ -20,14 +20,13 @@ namespace Ivony.Data.MySqlClient
 
 
 
-    public MySqlDbExecutor( IServiceProvider serviceProvider, string connectionString )
-      : base( serviceProvider )
+    public MySqlDbExecutor( DbEnv environment, string connectionString )
+      : base( environment )
     {
 
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      Services = serviceProvider ?? throw new ArgumentNullException( nameof( serviceProvider ) );
-      Configuration = Services.GetService<IOptions<MySqlDbConfiguration>>().Value;
+      Configuration = Environment.Services.GetService<IOptions<MySqlDbConfiguration>>().Value;
 
     }
 
@@ -39,19 +38,12 @@ namespace Ivony.Data.MySqlClient
     }
 
 
-    /// <summary>
-    /// 获取当前执行上下文服务提供程序
-    /// </summary>
-    public IServiceProvider Services { get; }
-
 
     /// <summary>
     /// 获取当前配置
     /// </summary>
     protected MySqlDbConfiguration Configuration { get; }
 
-
-    DbEnv IDbExecutor<ParameterizedQuery>.Environment => Services.GetService<DbEnv>();
 
     public IDbExecuteContext Execute( ParameterizedQuery query )
     {
@@ -98,7 +90,7 @@ namespace Ivony.Data.MySqlClient
 
     IDbTransactionContext<MySqlDbExecutor> IDbTransactionProvider<MySqlDbExecutor>.CreateTransaction()
     {
-      return new MySqlDbTransactionContext( ConnectionString, Services );
+      return new MySqlDbTransactionContext( Environment, ConnectionString );
     }
 
     IDbExecuteContext IDbExecutor<ParameterizedQuery>.Execute( ParameterizedQuery query )

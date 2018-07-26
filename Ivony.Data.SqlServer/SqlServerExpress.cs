@@ -15,7 +15,7 @@ namespace Ivony.Data
   /// <summary>
   /// 提供 SQL Server Express 支持
   /// </summary>
-  public static class SqlServerExpress
+  public static class SqlServerExpressDb
   {
     /// <summary>
     /// 通过连接 SQL Server Express LocalDB 实例，创建 SQL Server 数据库访问器
@@ -23,11 +23,11 @@ namespace Ivony.Data
     /// <param name="database">数据库名称或者数据库文件路径</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlDbExecutor ConnectLocalDB( IServiceProvider serviceProvider, string database )
+    public static SqlDbExecutor LocalDB( this DbEnv environment, string database )
     {
 
-      var configuration = serviceProvider.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpress.Configuration;
-      return Connect( serviceProvider, database, @"(LocalDB)\" + configuration.LocalDBInstanceName );
+      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpressDb.Configuration;
+      return SqlExpress( environment, database, @"(LocalDB)\" + configuration.LocalDBInstanceName );
 
     }
 
@@ -39,10 +39,10 @@ namespace Ivony.Data
     /// <param name="database">数据库名称或者数据库文件路径</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlDbExecutor Connect( IServiceProvider serviceProvider, string database )
+    public static SqlDbExecutor SqlExpress( this DbEnv environment, string database )
     {
-      var configuration = serviceProvider.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpress.Configuration;
-      return Connect( serviceProvider, database, @"(local)\" + configuration.ExpressInstanceName );
+      var configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>().Value ?? SqlServerExpressDb.Configuration;
+      return SqlExpress( environment, database, @"(local)\" + configuration.ExpressInstanceName );
     }
 
 
@@ -53,7 +53,7 @@ namespace Ivony.Data
     /// <param name="datasource">SQL Server 实例名称</param>
     /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    private static SqlDbExecutor Connect( IServiceProvider serviceProvider, string database, string datasource )
+    private static SqlDbExecutor SqlExpress( this DbEnv environment, string database, string datasource )
     {
       var builder = new SqlConnectionStringBuilder()
       {
@@ -69,7 +69,7 @@ namespace Ivony.Data
         builder.InitialCatalog = database;
 
 
-      return SqlServer.Connect( serviceProvider, builder.ConnectionString );
+      return SqlServerDb.SqlServer( environment, builder.ConnectionString );
     }
 
 
@@ -78,7 +78,7 @@ namespace Ivony.Data
     /// </summary>
     public static SqlDbConfiguration Configuration
     {
-      get { return SqlServer.Configuration; }
+      get { return SqlServerDb.Configuration; }
     }
   }
 }
