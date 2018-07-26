@@ -18,7 +18,7 @@ namespace Ivony.Data.Test
 
       var env = DbEnv.CreateEnvironment( services =>
       {
-        services.AddSingleton<IDbTraceService>( new TestTraceService() );
+        services.AddSingleton<IDbTraceService>( traceService = new TestTraceService() );
       } );
 
       db = env.MySql( "localhost", "Test", "root", "" );

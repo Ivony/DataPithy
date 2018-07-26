@@ -17,6 +17,7 @@ namespace Ivony.Data
   public static class MySqlDb
   {
 
+
     /// <summary>
     /// 通过指定的连接字符串并创建 MySql 数据库访问器
     /// </summary>

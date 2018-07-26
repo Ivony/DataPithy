@@ -23,7 +23,6 @@ namespace Ivony.Data
     /// <summary>
     /// 创建 DbEnv 对象
     /// </summary>
-    /// <param name="services">服务提供程序</param>
     private DbEnv() { }
 
 
@@ -62,34 +61,36 @@ namespace Ivony.Data
     /// </summary>
     public static DbEnv Default { get; } = CreateDefault();
 
-    private static DbEnv CreateDefault()
-    {
-      return CreateEnvironment( services =>
-      {
-        services.AddTransient( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
-        services.AddSingleton( typeof( ITemplateParser ), typeof( TemplateParser ) );
-      } );
-
-    }
+    private static DbEnv CreateDefault() => CreateEnvironment( services => { } );
 
     /// <summary>
     /// 创建一个新的数据库访问环境
     /// </summary>
-    /// <param name="configureServices"></param>
     /// <returns></returns>
     public static DbEnv CreateEnvironment( Action<ServiceCollection> configureServices )
     {
       var services = new ServiceCollection();
+
+      services.AddTransient( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
+      services.AddSingleton( typeof( ITemplateParser ), typeof( TemplateParser ) );
+
       configureServices( services );
 
       return CreateEnvironment( services );
 
     }
 
+
+    /// <summary>
+    /// 创建一个新的数据库访问环境
+    /// </summary>
+    /// <param name="services">要注册在环境中的服务列表</param>
+    /// <returns></returns>
     public static DbEnv CreateEnvironment( IServiceCollection services )
     {
+
       var instance = new DbEnv();
-      services.AddSingleton<DbEnv>( instance );
+      services.AddSingleton( instance );
       instance.Services = services.BuildServiceProvider();
 
       return instance;

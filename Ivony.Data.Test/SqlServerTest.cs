@@ -26,11 +26,11 @@ namespace Ivony.Data.Test
 
       var env = DbEnv.CreateEnvironment( services =>
       {
-        services.AddSingleton<IDbTraceService>( new TestTraceService() );
+        services.AddSingleton<IDbTraceService>( traceService = new TestTraceService() );
 
       } );
 
-      var db = env.SqlExpress( "TestDatabase" );
+      db = env.SqlExpress( "TestDatabase" );
 
 
       db.T( $"IF OBJECT_ID(N'[dbo].[Test1]') IS NOT NULL DROP TABLE [dbo].[Test1]" ).ExecuteNonQuery();

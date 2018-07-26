@@ -312,8 +312,7 @@ namespace Ivony.Data
     /// 通过模板产生一个参数化查询对象并串联到现有的参数化查询对象之后
     /// </summary>
     /// <param name="firstQuery">需要被串联的参数化查询对象</param>
-    /// <param name="templateText">SQL 命令模版</param>
-    /// <param name="parameters">模版参数列表</param>
+    /// <param name="template">查询模板</param>
     /// <returns>串联后的参数化查询对象</returns>
     public static DbExecutableQuery<ParameterizedQuery> Concat( this DbExecutableQuery<ParameterizedQuery> firstQuery, FormattableString template )
     {

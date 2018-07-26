@@ -49,9 +49,9 @@ namespace Ivony.Data
     /// <summary>
     /// 通过连接 SQL Server Express 指定实例，创建 SQL Server 数据库访问器
     /// </summary>
+    /// <param name="environment">当前数据库访问环境</param>
     /// <param name="database">数据库名称或者数据库文件路径</param>
     /// <param name="datasource">SQL Server 实例名称</param>
-    /// <param name="configuration">SQL Server 配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
     private static SqlDbExecutor SqlExpress( this DbEnv environment, string database, string datasource )
     {
