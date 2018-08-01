@@ -22,7 +22,7 @@ namespace Ivony.Data.SqlClient
   /// <summary>
   /// 用于操作 SQL Server 的数据库访问工具
   /// </summary>
-  public class SqlDbExecutor : DbExecutorBase, IAsyncDbExecutor<ParameterizedQuery>, IDbTransactionProvider<SqlDbExecutor>
+  public class SqlDbExecutor : DbExecutorBase, IDbExecutor, IAsyncDbExecutor, IDbTransactionProvider<SqlDbExecutor>
   {
 
 
@@ -148,14 +148,22 @@ namespace Ivony.Data.SqlClient
     }
 
 
-    IDbExecuteContext IDbExecutor<ParameterizedQuery>.Execute( ParameterizedQuery query )
+    IDbExecuteContext IDbExecutor.Execute( IDbQuery query )
     {
-      return Execute( CreateCommand( query ), TryCreateTracing( this, query ) );
+      var parameterizedQuery = query as ParameterizedQuery;
+      if ( parameterizedQuery == null )
+        return null;
+
+      return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
     }
 
-    Task<IAsyncDbExecuteContext> IAsyncDbExecutor<ParameterizedQuery>.ExecuteAsync( ParameterizedQuery query, CancellationToken token )
+    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( IDbQuery query, CancellationToken token )
     {
-      return ExecuteAsync( CreateCommand( query ), token, TryCreateTracing( this, query ) );
+      var parameterizedQuery = query as ParameterizedQuery;
+      if ( parameterizedQuery == null )
+        return null;
+
+      return ExecuteAsync( CreateCommand( parameterizedQuery ), token, TryCreateTracing( this, query ) );
     }
 
     /// <summary>

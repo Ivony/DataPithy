@@ -22,6 +22,10 @@ namespace Ivony.Data
 
     private IServiceProvider _services;
 
+    /// <summary>
+    /// 创建 TemplateParser 对象
+    /// </summary>
+    /// <param name="services">服务提供程序</param>
     public TemplateParser( IServiceProvider services )
     {
       _services = services;

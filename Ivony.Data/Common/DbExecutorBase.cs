@@ -44,7 +44,7 @@ namespace Ivony.Data.Common
     /// <param name="executor">查询执行器</param>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>
-    protected IDbTracing TryCreateTracing<TQuery>( IDbExecutor<TQuery> executor, TQuery query ) where TQuery : IDbQuery
+    protected IDbTracing TryCreateTracing( IDbExecutor executor, IDbQuery query )
     {
 
       if ( TraceService == null )
@@ -72,10 +72,10 @@ namespace Ivony.Data.Common
     /// <typeparam name="TQuery">即将执行的查询的类型</typeparam>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>
-    protected IDbTracing TryCreateTracing<TQuery>( TQuery query ) where TQuery : IDbQuery
+    protected IDbTracing TryCreateTracing( IDbQuery query )
     {
 
-      return TryCreateTracing( (IDbExecutor<TQuery>) this, query );
+      return TryCreateTracing( (IDbExecutor) this, query );
 
     }
 

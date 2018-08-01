@@ -15,7 +15,7 @@ namespace Ivony.Data.MySqlClient
   /// <summary>
   /// 用于操作 MySQL 的数据库访问工具
   /// </summary>
-  public class MySqlDbExecutor : DbExecutorBase, IDbExecutor<ParameterizedQuery>, IDbTransactionProvider<MySqlDbExecutor>
+  public class MySqlDbExecutor : DbExecutorBase, IDbExecutor
   {
 
 
@@ -44,10 +44,14 @@ namespace Ivony.Data.MySqlClient
     protected MySqlDbConfiguration Configuration { get; }
 
 
-    public IDbExecuteContext Execute( ParameterizedQuery query )
+    public IDbExecuteContext Execute( IDbQuery query )
     {
 
-      return Execute( CreateCommand( query ), TryCreateTracing( this, query ) );
+      var parameterizedQuery = query as ParameterizedQuery;
+      if ( parameterizedQuery == null )
+        return null;
+
+      return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
 
     }
 
@@ -84,12 +88,6 @@ namespace Ivony.Data.MySqlClient
     {
 
       return new MySqlParameterizedQueryParser().Parse( query );
-    }
-
-
-    IDbTransactionContext<MySqlDbExecutor> IDbTransactionProvider<MySqlDbExecutor>.CreateTransaction()
-    {
-      return new MySqlDbTransactionContext( ConnectionString, Configuration );
     }
   }
 }

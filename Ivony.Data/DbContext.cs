@@ -18,9 +18,9 @@ namespace Ivony.Data
     public IServiceProvider ServiceProvider { get; }
 
 
-    public IDbProvider GetDbProvider()
+    public IDbExecutor GetDbExecutor()
     {
-      return ServiceProvider.GetRequiredService<IDbProvider>();
+      return ServiceProvider.GetRequiredService<IDbExecutor>();
     }
 
     public IDbTraceService GetTraceService()

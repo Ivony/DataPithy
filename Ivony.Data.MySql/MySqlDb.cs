@@ -1,5 +1,6 @@
 ﻿using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
+using Ivony.Data.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using System;
@@ -29,11 +30,20 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">MySql 配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static  IServiceCollection AddMySql( this IServiceCollection services, string connectionString )
+    public static IServiceCollection AddMySql( this IServiceCollection services, string connectionString )
     {
 
-      return services.AddSingleton( new MySqlDbProvider( null, connectionString ) );
+      return services.AddSingleton<IDbExecutor>( serviceProvier => CreateDbExecutor( connectionString ) );
 
+    }
+
+
+
+    private static IDbExecutor CreateDbExecutor( string connectionString )
+    {
+      return new DbProvider()
+        .Register( typeof( ParameterizedQuery ), () => new MySqlDbExecutor( connectionString, new MySqlDbConfiguration() ) )
+        .CreateExecutor();
     }
 
 
@@ -67,7 +77,6 @@ namespace Ivony.Data
       {
         Server = server,
         Database = database,
-        IntegratedSecurity = false,
         UserID = userID,
         Password = password,
         Pooling = pooling
@@ -94,7 +103,6 @@ namespace Ivony.Data
       {
         Server = server,
         Database = database,
-        IntegratedSecurity = false,
         UserID = userID,
         Password = password,
         Pooling = pooling
@@ -119,7 +127,6 @@ namespace Ivony.Data
       {
         Server = server,
         Database = database,
-        IntegratedSecurity = true,
         Pooling = pooling
       };
 
@@ -146,7 +153,6 @@ namespace Ivony.Data
         Server = server,
         Port = port,
         Database = database,
-        IntegratedSecurity = true,
         Pooling = pooling
       };
 

@@ -13,7 +13,7 @@ namespace Ivony.Data
 
 
     private static DbContext _default;
-    private static object _sync;
+    private static readonly object _sync = new object();
 
     public static DbContext Context { get; private set; } = _default = CreateDefaultContext();
 
@@ -66,9 +66,7 @@ namespace Ivony.Data
       services.AddSingleton( typeof( ITemplateParser ), typeof( TemplateParser ) );
       services.AddTransient( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
 
-
       return services;
-
     }
 
 
@@ -84,33 +82,11 @@ namespace Ivony.Data
       return new DbContext( services.BuildServiceProvider() );
     }
 
-
-    /// <summary>
-    /// 同步执行查询
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <returns></returns>
-    public static IDbExecuteContext Execute<T>( this T query ) where T : IDbQuery
-    {
-      return Context.GetDbProvider().GetDbExecutor<T>( query ).Execute( query );
-    }
-
-
-    /// <summary>
-    /// 异步执行查询
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <param name="token">取消查询标识</param>
-    /// <returns></returns>
-    public static Task<IAsyncDbExecuteContext> ExecuteAsync<T>( this T query, CancellationToken token = default( CancellationToken ) ) where T : IDbQuery
-    {
-      return Context.GetDbProvider().GetAsyncDbExecutor<T>( query ).ExecuteAsync( query, token );
-    }
-
     public static IDbTransactionContext BeginTransaction()
     {
       throw new NotImplementedException();
     }
+
   }
 }
 

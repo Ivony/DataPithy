@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Ivony.Data.Common;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using Ivony.Data.Queries;
 
 namespace Ivony.Data
 {
@@ -28,9 +29,15 @@ namespace Ivony.Data
     /// <returns>SQL Server 数据库访问器</returns>
     public static IServiceCollection AddSqlServer( this IServiceCollection services, string connectionString )
     {
-      return services.AddSingleton( serviceProvider => new SqlDbProvider( serviceProvider, connectionString ) );
+      return services.AddSingleton<IDbExecutor>( serviceProvider => CreateDbExecutor( connectionString ) );
     }
 
+    private static IDbExecutor CreateDbExecutor( string connectionString )
+    {
+      return new DbProvider()
+        .Register( typeof( ParameterizedQuery ), () => new SqlDbExecutor( connectionString, new SqlDbConfiguration() ) )
+        .CreateExecutor();
+    }
 
 
     /// <summary>

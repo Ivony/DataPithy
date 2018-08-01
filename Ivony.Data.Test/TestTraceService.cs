@@ -15,7 +15,7 @@ namespace Ivony.Data.Test
     IList<DbTracing> _list = new List<DbTracing>();
 
 
-    public IDbTracing CreateTracing<TQuery>( IDbExecutor<TQuery> executor, TQuery query ) where TQuery : IDbQuery
+    public IDbTracing CreateTracing( IDbExecutor executor, IDbQuery query )
     {
       var tracing = new DbTracing( query );
       _list.Add( tracing );

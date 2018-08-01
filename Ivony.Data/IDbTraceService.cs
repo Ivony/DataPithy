@@ -20,6 +20,6 @@ namespace Ivony.Data
     /// <param name="executor">正在执行查询的查询执行器</param>
     /// <param name="query">正在执行的查询对象</param>
     /// <returns>实现类应返回一个追踪器，用于记录日志信息。</returns>
-    IDbTracing CreateTracing<TQuery>( IDbExecutor<TQuery> executor, TQuery query ) where TQuery : IDbQuery;
+    IDbTracing CreateTracing( IDbExecutor executor, IDbQuery query );
   }
 }
