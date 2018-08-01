@@ -12,28 +12,18 @@ namespace Ivony.Data.Test
   public class MySqlTest
   {
     private static TestTraceService traceService;
-    private MySqlDbExecutor db;
-
-
-    static MySqlTest()
-    {
-      new ServiceCollection()
-        .AddDataPithy()
-        .AddMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" )
-        .AddSingleton<IDbTraceService>( traceService = new TestTraceService() )
-        .BuildServiceProvider()
-        .InitializeDb();
-    }
 
 
     public MySqlTest()
     {
 
+      Db.NewContext( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
+
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
       Db.T( $@"
 CREATE TABLE testTable(
-Id int(11) NOT NULL,
+Id int(11) NOT NULL AUTO_INCREMENT,
 Name varchar(50) DEFAULT NULL,
 Content text,
 PRIMARY KEY (Id)

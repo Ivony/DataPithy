@@ -27,14 +27,18 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static IServiceCollection AddSqlServer( this IServiceCollection services, string connectionString )
+    public static DbContextBuilder UseSqlServer( this DbContextBuilder builder, string connectionString )
     {
-      return services.AddSingleton<IDbExecutor>( serviceProvider => CreateDbExecutor( connectionString ) );
+
+      var executor = CreateDbExecutor( connectionString );
+      builder.DbProviders.Add( Db.DefaultDatabaseName, DbExecutorProvider.Create( () => executor, () => null ) );
+
+      return builder;
     }
 
     private static IDbExecutor CreateDbExecutor( string connectionString )
     {
-      return new DbProvider()
+      return new DbExecutorBuilder()
         .Register( typeof( ParameterizedQuery ), () => new SqlDbExecutor( connectionString, new SqlDbConfiguration() ) )
         .CreateExecutor();
     }
@@ -50,9 +54,9 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static IServiceCollection AddSqlServer( this IServiceCollection services, string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
+    public static DbContextBuilder UseSqlServer( this DbContextBuilder builder, string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
     {
-      var builder = new SqlConnectionStringBuilder()
+      var connectionBuilder = new SqlConnectionStringBuilder()
       {
         DataSource = dataSource,
         InitialCatalog = initialCatalog,
@@ -62,7 +66,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return AddSqlServer( services, builder.ConnectionString );
+      return UseSqlServer( builder, connectionBuilder.ConnectionString );
     }
 
 
@@ -74,9 +78,9 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static IServiceCollection AddSqlServer( this IServiceCollection services, string dataSource, string initialCatalog, bool pooling = true, SqlDbConfiguration configuration = null )
+    public static DbContextBuilder UseSqlServer( this DbContextBuilder builder, string dataSource, string initialCatalog, bool pooling = true, SqlDbConfiguration configuration = null )
     {
-      var builder = new SqlConnectionStringBuilder()
+      var connectionBuilder = new SqlConnectionStringBuilder()
       {
         DataSource = dataSource,
         InitialCatalog = initialCatalog,
@@ -84,7 +88,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return AddSqlServer( services, builder.ConnectionString );
+      return UseSqlServer( builder, connectionBuilder.ConnectionString );
     }
 
 

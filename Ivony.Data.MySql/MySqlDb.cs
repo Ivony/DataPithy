@@ -30,10 +30,14 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">MySql 配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, string connectionString )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, string connectionString )
     {
+      var dbExecutor = CreateDbExecutor( connectionString );
 
-      return services.AddSingleton<IDbExecutor>( serviceProvier => CreateDbExecutor( connectionString ) );
+      builder.DbProviders[Db.DefaultDatabaseName] = DbExecutorProvider.Create( () => dbExecutor, () => null );
+
+      return builder;
+
 
     }
 
@@ -41,7 +45,7 @@ namespace Ivony.Data
 
     private static IDbExecutor CreateDbExecutor( string connectionString )
     {
-      return new DbProvider()
+      return new DbExecutorBuilder()
         .Register( typeof( ParameterizedQuery ), () => new MySqlDbExecutor( connectionString, new MySqlDbConfiguration() ) )
         .CreateExecutor();
     }
@@ -54,9 +58,9 @@ namespace Ivony.Data
     /// <param name="builder">连接字符串构建器</param>
     /// <param name="configuration">MySql 配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, MySqlConnectionStringBuilder builder )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, MySqlConnectionStringBuilder connectionBuilder )
     {
-      return AddMySql( services, builder.ConnectionString );
+      return UseMySql( builder, connectionBuilder.ConnectionString );
     }
 
 
@@ -71,9 +75,9 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, string server, string database, string userID, string password, bool pooling = true )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, string server, string database, string userID, string password, bool pooling = true )
     {
-      var builder = new MySqlConnectionStringBuilder()
+      var connectionBuilder = new MySqlConnectionStringBuilder()
       {
         Server = server,
         Database = database,
@@ -82,7 +86,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return AddMySql( services, builder.ConnectionString );
+      return UseMySql( builder, connectionBuilder.ConnectionString );
     }
 
 
@@ -97,9 +101,9 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, string server, uint port, string database, string userID, string password, bool pooling = true )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, string server, uint port, string database, string userID, string password, bool pooling = true )
     {
-      var builder = new MySqlConnectionStringBuilder()
+      var connectionBuilder = new MySqlConnectionStringBuilder()
       {
         Server = server,
         Database = database,
@@ -108,7 +112,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return AddMySql( services, builder.ConnectionString );
+      return UseMySql( builder, connectionBuilder.ConnectionString );
     }
 
 
@@ -120,17 +124,17 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, string server, string database, bool pooling = true )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, string server, string database, bool pooling = true )
     {
 
-      var builder = new MySqlConnectionStringBuilder()
+      var connectionBuilder = new MySqlConnectionStringBuilder()
       {
         Server = server,
         Database = database,
         Pooling = pooling
       };
 
-      return AddMySql( services, builder.ConnectionString );
+      return UseMySql( builder, connectionBuilder.ConnectionString );
     }
 
 
@@ -145,10 +149,10 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">MySql 数据库配置</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static IServiceCollection AddMySql( this IServiceCollection services, string server, uint port, string database, bool pooling = true )
+    public static DbContextBuilder UseMySql( this DbContextBuilder builder, string server, uint port, string database, bool pooling = true )
     {
 
-      var builder = new MySqlConnectionStringBuilder()
+      var connectionBuilder = new MySqlConnectionStringBuilder()
       {
         Server = server,
         Port = port,
@@ -156,7 +160,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return AddMySql( services, builder.ConnectionString );
+      return UseMySql( builder, connectionBuilder.ConnectionString );
     }
 
 

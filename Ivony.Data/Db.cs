@@ -15,22 +15,85 @@ namespace Ivony.Data
     private static DbContext _default;
     private static readonly object _sync = new object();
 
-    public static DbContext Context { get; private set; } = _default = CreateDefaultContext();
 
+    private static DbContext _root;
+
+    private static AsyncLocal<DbContext> _current = new AsyncLocal<DbContext>();
+
+
+    /// <summary>
+    /// 获取当前数据访问上下文
+    /// </summary>
+    /// <returns></returns>
+    public static DbContext GetCurrentContext()
+    {
+      lock ( _sync )
+      {
+        if ( _root == null )
+          _current.Value = _root = CreateDefaultContext();
+      }
+
+      return _current.Value = _current.Value ?? _root;
+    }
+
+
+
+    /// <summary>
+    /// 创建新的数据访问上下文
+    /// </summary>
+    /// <param name="configure">配置数据访问上下文的方法</param>
+    /// <returns></returns>
+    public static IDisposable NewContext( Action<DbContextBuilder> configure )
+    {
+      var builder = new DbContextBuilder( GetCurrentContext() );
+      configure( builder );
+
+      var result = (DbContextScope) builder.Build();
+      _current.Value = result;
+      return result;
+    }
+
+
+    internal static void ExitContext( DbContext current, DbContext parent )
+    {
+      if ( _current.Value != current )
+        throw new InvalidOperationException();
+
+      _current.Value = parent;
+    }
+
+
+
+
+
+
+    /// <summary>
+    /// 使用初始化数据访问上下文
+    /// </summary>
+    public static void InitializeDb( Action<DbContextBuilder> configure )
+    {
+      lock ( _sync )
+      {
+        InitializeDb( new ServiceCollection().AddDataPithy().BuildServiceProvider(), configure );
+      }
+    }
 
 
     /// <summary>
     /// 使用指定的服务提供程序初始化数据访问上下文
     /// </summary>
     /// <param name="serviceProvider">服务提供程序</param>
-    public static void InitializeDb( this IServiceProvider serviceProvider )
+    public static void InitializeDb( this IServiceProvider serviceProvider, Action<DbContextBuilder> configure )
     {
       lock ( _sync )
       {
-        if ( Context != _default )
-          throw new InvalidOperationException();
+        if ( _root != null )
+          throw new InvalidOperationException("DataPithy is already initialized.");
 
-        Context = new DbContext( serviceProvider );
+        var builder = new DbContextBuilder( serviceProvider );
+        configure( builder );
+
+        _root = builder.Build();
       }
     }
 
@@ -51,7 +114,7 @@ namespace Ivony.Data
     /// <returns>参数化查询</returns>
     public static ParameterizedQuery Template( FormattableString template )
     {
-      return Context.GetTemplateParser().ParseTemplate( template );
+      return GetCurrentContext().GetTemplateParser().ParseTemplate( template );
     }
 
 
@@ -79,8 +142,14 @@ namespace Ivony.Data
       services.AddDataPithy();
 
 
-      return new DbContext( services.BuildServiceProvider() );
+      return new DbContext( services.BuildServiceProvider(), new Dictionary<string, IDbExecutorProvider>() );
     }
+
+    /// <summary>
+    /// 默认数据库连接名称
+    /// </summary>
+    public static string DefaultDatabaseName => "Default";
+
 
     public static IDbTransactionContext BeginTransaction()
     {

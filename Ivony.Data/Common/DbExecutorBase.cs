@@ -22,7 +22,7 @@ namespace Ivony.Data.Common
     /// <param name="environment">当前数据库访问环境</param>
     protected DbExecutorBase()
     {
-      TraceService = Db.Context.GetTraceService();
+      TraceService = Db.GetCurrentContext().GetTraceService();
     }
 
 

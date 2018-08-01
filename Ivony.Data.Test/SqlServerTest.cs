@@ -26,9 +26,8 @@ namespace Ivony.Data.Test
 
       new ServiceCollection()
         .AddDataPithy()
-        .AddSqlServer( "TestDatabase" )
         .BuildServiceProvider()
-        .InitializeDb();
+        .InitializeDb( builder => builder.UseSqlServer( "" ) );
 
 
 

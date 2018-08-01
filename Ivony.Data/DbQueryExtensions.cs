@@ -10,11 +10,22 @@ namespace Ivony.Data
   {
 
 
-    internal class ConfiguredQuery : IDbQuery, IDbQueryContainer
+
+    /// <summary>
+    /// 带有配置参数的数据库查询对象
+    /// </summary>
+    public class ConfiguredQuery : IDbQueryContainer
     {
+      /// <summary>
+      /// 数据库查询对象
+      /// </summary>
       public IDbQuery Query { get; }
 
 
+      /// <summary>
+      /// 创建 ConfiguredQuery 对象
+      /// </summary>
+      /// <param name="query">数据库查询</param>
       public ConfiguredQuery( IDbQuery query )
       {
         Query = query;
@@ -42,17 +53,52 @@ namespace Ivony.Data
       {
         return serviceDictionary.GetValueOrDefault( type );
       }
+
+
+      private Dictionary<string, string> _properties;
+      internal void SetProperty( string name, string value )
+      {
+        _properties[name] = value;
+      }
+
+      internal string GetProperty( string name )
+      {
+        return _properties.GetValueOrDefault( name );
+      }
+
+
     }
 
 
 
-    public static IDbQuery WithExecutor( this IDbQuery query, IDbExecutor executor )
+    /// <summary>
+    /// 指定查询的执行器
+    /// </summary>
+    /// <param name="query">数据库查询</param>
+    /// <param name="executor">用于该查询的执行器</param>
+    /// <returns>指定了执行器的数据库查询</returns>
+    public static ConfiguredQuery WithExecutor( this ConfiguredQuery query, IDbExecutor executor )
     {
-      var configured = query.AsConfiguredQuery();
-      configured.SetService( executor );
-
-      return configured;
+      query.SetService( executor );
+      return query;
     }
+
+
+
+    private static readonly string DatabasePropertyName = ".Database";
+
+    /// <summary>
+    /// 指定查询所属的数据库连接
+    /// </summary>
+    /// <param name="query">数据库查询</param>
+    /// <param name="database">该查询应该在哪个数据库连接上执行</param>
+    /// <returns></returns>
+    public static ConfiguredQuery WithDatabase( this ConfiguredQuery query, string database )
+    {
+      query.SetProperty( DatabasePropertyName, database );
+      return query;
+    }
+
 
     private static ConfiguredQuery AsConfiguredQuery( this IDbQuery query )
     {
@@ -65,12 +111,22 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询</param>
     /// <returns></returns>
-    public static IDbExecuteContext Execute<T>( this T query ) where T : IDbQuery
+    public static IDbExecuteContext Execute( this IDbQuery query )
     {
-      var configured = query as ConfiguredQuery;
-      var executor = configured?.GetService<IDbExecutor>() ?? Db.Context.GetDbExecutor();
+      return Db.GetCurrentContext().GetExecutor()?.Execute( query );
+    }
 
-      return executor.Execute( query );
+    /// <summary>
+    /// 同步执行查询
+    /// </summary>
+    /// <param name="query">要执行的查询</param>
+    /// <returns></returns>
+    public static IDbExecuteContext Execute<T>( this ConfiguredQuery query ) where T : IDbQuery
+    {
+
+      var executor = query.GetService<IDbExecutor>() ?? Db.GetCurrentContext().GetExecutor();
+
+      return executor?.Execute( query.Query );
     }
 
 
@@ -80,17 +136,26 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询</param>
     /// <param name="token">取消查询标识</param>
     /// <returns></returns>
-    public static Task<IAsyncDbExecuteContext> ExecuteAsync<T>( this T query, CancellationToken token = default( CancellationToken ) ) where T : IDbQuery
+    public static Task<IAsyncDbExecuteContext> ExecuteAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
     {
 
-      throw new NotImplementedException();
-#if false
+      return Db.GetCurrentContext().GetAsyncExecutor()?.ExecuteAsync( query, token );
 
-      var configured = query as ConfiguredQuery;
-      var dbProvider = configured?.GetService<IDbExecutor>() ?? Db.Context.GetDbExecutor();
+    }
 
-      return dbProvider.GetAsyncDbExecutor( query ).ExecuteAsync( query, token );
-#endif
+    /// <summary>
+    /// 异步执行查询
+    /// </summary>
+    /// <param name="query">要执行的查询</param>
+    /// <param name="token">取消查询标识</param>
+    /// <returns></returns>
+    public static Task<IAsyncDbExecuteContext> ExecuteAsync( this ConfiguredQuery query, CancellationToken token = default( CancellationToken ) )
+    {
+
+      var executor = query.GetService<IAsyncDbExecutor>() ?? Db.GetCurrentContext().GetAsyncExecutor();
+
+      return executor?.ExecuteAsync( query.Query, token );
+
     }
   }
 }
