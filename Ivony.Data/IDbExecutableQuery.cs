@@ -9,33 +9,4 @@ using System.Threading;
 
 namespace Ivony.Data
 {
-
-
-  /// <summary>
-  /// 定义一个可以执行的查询
-  /// </summary>
-  public interface IDbExecutableQuery
-  {
-
-    /// <summary>
-    /// 同步执行查询
-    /// </summary>
-    /// <returns></returns>
-    IDbExecuteContext Execute();
-
-  }
-
-
-
-  /// <summary>
-  /// 定义一个可以异步执行的查询
-  /// </summary>
-  public interface IAsyncDbExecutableQuery : IDbExecutableQuery
-  {
-    /// <summary>
-    /// 异步执行查询
-    /// </summary>
-    /// <returns></returns>
-    Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token );
-  }
 }

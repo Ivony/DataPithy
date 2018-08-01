@@ -25,10 +25,10 @@ namespace Ivony.Data.SqlClient
 
     private IsolationLevel _isolationLevel;
 
-    internal SqlDbTransactionContext( DbEnv environment, string connectionString, IsolationLevel isolationLevel )
+    internal SqlDbTransactionContext( string connectionString, SqlDbConfiguration configuration, IsolationLevel isolationLevel )
     {
       Connection = new SqlConnection( connectionString );
-      _executor = new SqlDbExecutorWithTransaction( environment, this );
+      _executor = new SqlDbExecutorWithTransaction( this, configuration );
       _isolationLevel = isolationLevel;
     }
 
@@ -71,8 +71,8 @@ namespace Ivony.Data.SqlClient
 
     private class SqlDbExecutorWithTransaction : SqlDbExecutor
     {
-      public SqlDbExecutorWithTransaction( DbEnv environment, SqlDbTransactionContext transaction )
-        : base( environment, transaction.Connection.ConnectionString )
+      public SqlDbExecutorWithTransaction( SqlDbTransactionContext transaction, SqlDbConfiguration configuration )
+        : base( transaction.Connection.ConnectionString, configuration )
       {
         TransactionContext = transaction;
       }

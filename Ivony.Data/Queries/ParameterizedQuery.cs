@@ -18,10 +18,6 @@ namespace Ivony.Data.Queries
   {
 
 
-
-    internal DbEnv Environment { get; }
-
-
     private class ParameterizedQueryFormattableString : FormattableString
     {
 
@@ -77,16 +73,17 @@ namespace Ivony.Data.Queries
     }
 
 
+    public DbContext Hosting { get; internal set; }
+
+
 
     /// <summary>
     /// 构建参数化查询对象
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    internal ParameterizedQuery( DbEnv environment, string template, object[] values )
+    internal ParameterizedQuery( string template, object[] values )
     {
-      Environment = environment ?? throw new ArgumentNullException( nameof( environment ) );
-
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
 
 
@@ -163,9 +160,6 @@ namespace Ivony.Data.Queries
       return writer.ToString();
     }
 
-
-
-
     /// <summary>
     /// 串联两个参数化查询对象
     /// </summary>
@@ -173,28 +167,6 @@ namespace Ivony.Data.Queries
     /// <param name="query2">第二个参数化查询对象</param>
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery operator +( ParameterizedQuery query1, ParameterizedQuery query2 )
-    {
-      return query1.Concat( query2 );
-    }
-
-    /// <summary>
-    /// 串联两个参数化查询对象
-    /// </summary>
-    /// <param name="query1">第一个参数化查询对象</param>
-    /// <param name="query2">第二个参数化查询对象</param>
-    /// <returns>串联后的参数化查询对象</returns>
-    public static DbExecutableQuery<ParameterizedQuery> operator +( DbExecutableQuery<ParameterizedQuery> query1, ParameterizedQuery query2 )
-    {
-      return query1.Concat( query2 );
-    }
-
-    /// <summary>
-    /// 串联两个参数化查询对象
-    /// </summary>
-    /// <param name="query1">第一个参数化查询对象</param>
-    /// <param name="query2">第二个参数化查询对象</param>
-    /// <returns>串联后的参数化查询对象</returns>
-    public static AsyncDbExecutableQuery<ParameterizedQuery> operator +( AsyncDbExecutableQuery<ParameterizedQuery> query1, ParameterizedQuery query2 )
     {
       return query1.Concat( query2 );
     }

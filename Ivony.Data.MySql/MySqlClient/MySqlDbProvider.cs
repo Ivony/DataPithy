@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,18 +13,20 @@ namespace Ivony.Data.MySqlClient
   {
 
     private string _connectionString;
-
-    public DbEnv Environment { get; }
+    private IServiceProvider _serviceProvider;
 
     /// <summary>
     /// 创建 MySqlDbProvider 对象
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
-    public MySqlDbProvider( DbEnv environment, string connectionString )
+    public MySqlDbProvider( IServiceProvider serviceProvider, string connectionString )
     {
-      Environment = environment;
       _connectionString = connectionString;
+      _serviceProvider = serviceProvider;
     }
+
+
+
 
     /// <summary>
     /// 获取当前上下文服务
@@ -35,9 +39,15 @@ namespace Ivony.Data.MySqlClient
     /// </summary>
     /// <typeparam name="T">所需要查询的查询类型</typeparam>
     /// <returns>数据库查询执行器</returns>
-    public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
+    public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>( T query ) where T : IDbQuery
     {
-      return Environment.MySql( _connectionString ) as IAsyncDbExecutor<T>;
+      return (IAsyncDbExecutor<T>) new MySqlDbExecutor( _connectionString, GetConfiguration() );
+    }
+
+    private MySqlDbConfiguration GetConfiguration()
+    {
+      return _serviceProvider.GetService<IOptions<MySqlDbConfiguration>>()?.Value
+        ?? ActivatorUtilities.CreateInstance<MySqlDbConfiguration>( _serviceProvider );
     }
 
 
@@ -46,9 +56,9 @@ namespace Ivony.Data.MySqlClient
     /// </summary>
     /// <typeparam name="T">所需要查询的查询类型</typeparam>
     /// <returns>数据库查询执行器</returns>
-    public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
+    public IDbExecutor<T> GetDbExecutor<T>( T query ) where T : IDbQuery
     {
-      return Environment.MySql( _connectionString ) as IDbExecutor<T>;
+      return (IAsyncDbExecutor<T>) new MySqlDbExecutor( _connectionString, GetConfiguration() );
     }
   }
 }

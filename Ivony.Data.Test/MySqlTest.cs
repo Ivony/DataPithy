@@ -16,15 +16,21 @@ namespace Ivony.Data.Test
     public MySqlTest()
     {
 
-      var env = DbEnv.CreateEnvironment( services =>
-      {
-        services.AddSingleton<IDbTraceService>( traceService = new TestTraceService() );
-      } );
+      new ServiceCollection()
+        .AddDataPithy()
+        .AddMySql( "localhost", "Test", "root", "" )
+        .AddSingleton<IDbTraceService>( traceService = new TestTraceService() )
+        .BuildServiceProvider()
+        .InitializeDb();
 
-      db = env.MySql( "localhost", "Test", "root", "" );
 
-      db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
-      db.T( $@"
+
+      
+
+
+
+      Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
+      Db.T( $@"
 CREATE TABLE testTable(
 Id int(11) NOT NULL,
 Name varchar(50) DEFAULT NULL,
@@ -35,20 +41,20 @@ PRIMARY KEY (Id)
     [TestInitialize]
     public void Initialize()
     {
-      db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
     }
     [TestMethod]
     public void StandardTest()
     {
-      Assert.IsNull( db.T( $"SELECT * FROM testTable" ).ExecuteScalar(), "空数据表查询测试失败！" );
-      Assert.IsNull( db.T( $"SELECT * FROM testTable" ).ExecuteFirstRow(), "空数据表查询测试失败！" );
+      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteScalar(), "空数据表查询测试失败！" );
+      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteFirstRow(), "空数据表查询测试失败！" );
 
-      Assert.AreEqual( db.T( $"SELECT COUNT(*) FROM testTable" ).ExecuteScalar<int>(), 0, "空数据表查询测试失败" );
-      Assert.AreEqual( db.T( $"INSERT INTO testTable ( Name, Content) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-      Assert.AreEqual( db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
-      Assert.IsNotNull( db.T( $"SELECT ID FROM testTable" ).ExecuteFirstRow(), "插入数据后查询测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT COUNT(*) FROM testTable" ).ExecuteScalar<int>(), 0, "空数据表查询测试失败" );
+      Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+      Assert.IsNotNull( Db.T( $"SELECT ID FROM testTable" ).ExecuteFirstRow(), "插入数据后查询测试失败" );
 
-      var dataItem = db.T( $"SELECT * FROM testTable" ).ExecuteDynamicObject();
+      var dataItem = Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicObject();
       Assert.AreEqual( dataItem.Name, "Ivony", "插入数据后查询测试失败" );
       Assert.AreEqual( dataItem["Content"], "Test", "插入数据后查询测试失败" );
     }
@@ -59,33 +65,33 @@ PRIMARY KEY (Id)
 
       using ( var transaction = db.BeginTransaction() )
       {
-        Assert.AreEqual( transaction.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( transaction.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
       }
 
-      Assert.AreEqual( db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
 
       using ( var transaction = db.BeginTransaction() )
       {
-        Assert.AreEqual( transaction.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( transaction.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
 
         transaction.Rollback();
       }
 
-      Assert.AreEqual( db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务测试失败" );
 
 
 
       using ( var transaction = db.BeginTransaction() )
       {
-        Assert.AreEqual( transaction.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( transaction.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
 
         transaction.Commit();
       }
 
-      Assert.AreEqual( db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "手动提交事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "手动提交事务测试失败" );
 
 
 
@@ -97,7 +103,7 @@ PRIMARY KEY (Id)
         {
           using ( transaction )
           {
-            transaction.T( $"SELECT * FROM Nothing" ).ExecuteNonQuery();
+            Db.T( $"SELECT * FROM Nothing" ).ExecuteNonQuery();
             transaction.Commit();
           }
         }
@@ -115,7 +121,7 @@ PRIMARY KEY (Id)
     public void TraceTest()
     {
 
-      db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
+      Db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
 
       var tracing = traceService.Last();
 
@@ -129,7 +135,7 @@ PRIMARY KEY (Id)
 
       try
       {
-        db.T( $"SELECT * FROM Nothing" ).ExecuteDynamics();
+        Db.T( $"SELECT * FROM Nothing" ).ExecuteDynamics();
       }
       catch
       {

@@ -1,4 +1,6 @@
 ﻿using Ivony.Data.Queries;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,18 +15,16 @@ namespace Ivony.Data.SqlClient
 
 
     private string _connectionString;
+    private IServiceProvider _serviceProvider;
 
-
-    public DbEnv Environment { get; }
 
     /// <summary>
     /// 创建 SqlDbProvider 对象
     /// </summary>
     /// <param name="connectionString">SQL Server 连接字符串</param>
-    public SqlDbProvider( DbEnv environment, string connectionString )
+    public SqlDbProvider( IServiceProvider serviceProvider, string connectionString )
     {
-      Environment = environment ?? throw new ArgumentNullException( nameof( environment ) );
-
+      _serviceProvider = serviceProvider;
       _connectionString = connectionString ?? throw new ArgumentNullException( nameof( _connectionString ) );
     }
 
@@ -33,9 +33,9 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     /// <typeparam name="T">要执行的查询类型</typeparam>
     /// <returns>数据库查询执行器</returns>
-    public IDbExecutor<T> GetDbExecutor<T>() where T : IDbQuery
+    public IDbExecutor<T> GetDbExecutor<T>( T query ) where T : IDbQuery
     {
-      return SqlServerDb.SqlServer( Environment, _connectionString ) as IDbExecutor<T>;
+      return new SqlDbExecutor( _connectionString, GetConfiguration() ) as IDbExecutor<T>;
     }
 
 
@@ -45,9 +45,16 @@ namespace Ivony.Data.SqlClient
     /// <typeparam name="T">要执行的查询类型</typeparam>
     /// <returns>异步查询执行器</returns>
 
-    public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>() where T : IDbQuery
+    public IAsyncDbExecutor<T> GetAsyncDbExecutor<T>( T query ) where T : IDbQuery
     {
-      return SqlServerDb.SqlServer( Environment, _connectionString ) as IAsyncDbExecutor<T>;
+      return new SqlDbExecutor( _connectionString, GetConfiguration() ) as IAsyncDbExecutor<T>;
     }
+
+    private SqlDbConfiguration GetConfiguration()
+    {
+      return _serviceProvider.GetService<IOptions<SqlDbConfiguration>>()?.Value
+        ?? ActivatorUtilities.CreateInstance<SqlDbConfiguration>( _serviceProvider );
+    }
+
   }
 }

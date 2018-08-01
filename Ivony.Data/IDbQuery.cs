@@ -12,6 +12,9 @@ namespace Ivony.Data
   /// </summary>
   public interface IDbQuery
   {
+
+    
+
   }
 
 

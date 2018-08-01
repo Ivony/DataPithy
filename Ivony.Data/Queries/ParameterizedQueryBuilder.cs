@@ -19,21 +19,6 @@ namespace Ivony.Data.Queries
 
 
 
-    /// <summary>
-    /// 获取当前的服务提供程序
-    /// </summary>
-    internal DbEnv Environment { get; }
-
-
-
-    public ParameterizedQueryBuilder( DbEnv environment )
-    {
-      Environment = environment;
-    }
-
-
-
-
 
     /// <summary>
     /// 用于同步的对象
@@ -108,7 +93,7 @@ namespace Ivony.Data.Queries
     {
       lock ( SyncRoot )
       {
-        return new ParameterizedQuery( Environment, textBuilder.ToString(), values.ToArray() );
+        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray() );
       }
     }
 

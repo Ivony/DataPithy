@@ -21,7 +21,7 @@ namespace Ivony.Data.Test
     {
 
       var userId = 0;
-      var query = DbEnv.Default.T( $"SELECT * FROM Users WHERE UserID = {userId}" );
+      var query = Db.T( $"SELECT * FROM Users WHERE UserID = {userId}" );
 
       var parser = new MySqlParameterizedQueryParser();
       var command = parser.Parse( query );

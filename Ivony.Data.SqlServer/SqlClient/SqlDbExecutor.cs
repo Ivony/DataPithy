@@ -42,13 +42,13 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     /// <param name="serviceProvider">当前要使用的数据库配置信息</param>
     /// <param name="connectionString">连接字符串</param>
-    public SqlDbExecutor( DbEnv environment, string connectionString )
-      : base( environment )
+    public SqlDbExecutor( string connectionString, SqlDbConfiguration configuration )
+      : base()
     {
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
 
-      Configuration = environment.Services.GetService<IOptions<SqlDbConfiguration>>()?.Value ?? ActivatorUtilities.CreateInstance<SqlDbConfiguration>( environment.Services );
+      Configuration = configuration;
 
     }
 
@@ -64,7 +64,7 @@ namespace Ivony.Data.SqlClient
     /// <returns>数据库事务上下文</returns>
     public SqlDbTransactionContext CreateTransaction( IsolationLevel isolationLevel = IsolationLevel.Unspecified )
     {
-      return new SqlDbTransactionContext( Environment, ConnectionString, isolationLevel );
+      return new SqlDbTransactionContext( ConnectionString, Configuration, isolationLevel );
     }
 
 

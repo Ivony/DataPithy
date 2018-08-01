@@ -20,13 +20,12 @@ namespace Ivony.Data.MySqlClient
 
 
 
-    public MySqlDbExecutor( DbEnv environment, string connectionString )
-      : base( environment )
+    public MySqlDbExecutor( string connectionString, MySqlDbConfiguration configuration )
     {
 
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      Configuration = Environment.Services.GetService<IOptions<MySqlDbConfiguration>>()?.Value ?? ActivatorUtilities.CreateInstance<MySqlDbConfiguration>( environment.Services );
+      Configuration = configuration;
 
     }
 
@@ -90,7 +89,7 @@ namespace Ivony.Data.MySqlClient
 
     IDbTransactionContext<MySqlDbExecutor> IDbTransactionProvider<MySqlDbExecutor>.CreateTransaction()
     {
-      return new MySqlDbTransactionContext( Environment, ConnectionString );
+      return new MySqlDbTransactionContext( ConnectionString, Configuration );
     }
   }
 }
