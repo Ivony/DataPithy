@@ -33,7 +33,7 @@ namespace Ivony.Data
       DbProviders = new Dictionary<string, IDbExecutorProvider>( parent.DbProviders );
 
       DefaultDatabase = parent.DefaultDatabase;
-      AutoWhitespaceSperator = parent.AutoWhitespaceSperator;
+      AutoWhitespaceSeparator = parent.AutoWhitespaceSeparator;
     }
 
 
@@ -59,7 +59,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取或设置自动添加空白分隔符设定
     /// </summary>
-    public bool AutoWhitespaceSperator { get; set; }
+    public bool AutoWhitespaceSeparator { get; set; }
 
 
     /// <summary>
@@ -78,7 +78,7 @@ namespace Ivony.Data
         context = new DbContextScope( Parent, DbProviders );
 
       context.DefaultDatabase = DefaultDatabase;
-      context.AutoWhitespaceSperator = AutoWhitespaceSperator;
+      context.AutoWhitespaceSeparator = AutoWhitespaceSeparator;
       return context;
 
 

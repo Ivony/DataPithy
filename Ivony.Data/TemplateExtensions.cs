@@ -60,5 +60,27 @@ namespace Ivony.Data
 
       return builder.BuildQuery();
     }
+
+
+    /// <summary>
+    /// 将数组转换为参数列表对象
+    /// </summary>
+    /// <param name="array">要转换的数组对象</param>
+    /// <returns>参数列表对象</returns>
+    public static ParameterList AsParameters( this Array array )
+    {
+      return new ParameterList( array );
+    }
+
+    /// <summary>
+    /// 将数组转换为参数列表对象
+    /// </summary>
+    /// <param name="array">要转换的数组对象</param>
+    /// <returns>参数列表对象</returns>
+    public static ParameterList AsParameters( this Array array, string separator )
+    {
+      return new ParameterList( array, separator );
+    }
+
   }
 }

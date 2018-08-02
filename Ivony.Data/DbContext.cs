@@ -108,7 +108,7 @@ namespace Ivony.Data
     /// <summary>
     /// 是否自动添加空白字符分隔符
     /// </summary>
-    public bool AutoWhitespaceSperator { get; set; } = false;
+    public bool AutoWhitespaceSeparator { get; set; } = false;
 
   }
 }
