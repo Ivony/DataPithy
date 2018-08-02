@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 创建新的数据访问上下文
+    /// 进入新的数据访问上下文
     /// </summary>
     /// <param name="configure">配置数据访问上下文的方法</param>
     /// <returns></returns>
@@ -89,7 +90,7 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 使用初始化数据访问上下文
+    /// 初始化根数据访问上下文
     /// </summary>
     public static DbContext InitializeDb( Action<DbContextConfigure> configure )
     {
@@ -104,7 +105,7 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 使用指定的服务提供程序初始化数据访问上下文
+    /// 初始化根数据访问上下文
     /// </summary>
     /// <param name="serviceProvider">服务提供程序</param>
     /// <param name="configure">数据访问上下文配置</param>
@@ -141,6 +142,7 @@ namespace Ivony.Data
       return Template( template );
     }
 
+
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
     /// </summary>
@@ -148,8 +150,37 @@ namespace Ivony.Data
     /// <returns>参数化查询</returns>
     public static ParameterizedQuery Template( FormattableString template )
     {
+      if ( template == null )
+        return null;
+
       return DbContext.GetTemplateParser().ParseTemplate( template );
     }
+
+
+    /// <summary>
+    /// 解析模板表达式，创建参数化查询对象
+    /// </summary>
+    /// <param name="text">查询文本</param>
+    /// <returns>参数化查询</returns>
+    public static ParameterizedQuery Text( string text )
+    {
+      if ( text == null )
+        return null;
+
+      return DbContext.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
+    }
+
+
+    /// <summary>
+    /// 将文本字符串转换为数据库查询对象
+    /// </summary>
+    /// <param name="queryText">查询文本</param>
+    /// <returns>数据库查询对象</returns>
+    public static ParameterizedQuery AsTextQuery( this string queryText )
+    {
+      return Db.Text( queryText );
+    }
+
 
 
 

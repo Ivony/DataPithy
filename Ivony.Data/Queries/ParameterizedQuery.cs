@@ -169,7 +169,7 @@ namespace Ivony.Data.Queries
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery operator +( ParameterizedQuery query1, ParameterizedQuery query2 )
     {
-      if ( query2.IsEmpty() )
+      if ( query2 == null || query2.IsEmpty() )
         return query1;
 
       return query1.Concat( query2 );
@@ -183,8 +183,7 @@ namespace Ivony.Data.Queries
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery operator +( ParameterizedQuery query1, FormattableString query2 )
     {
-      var templateQuery = Db.Template( query2 );
-      return query1.Concat( templateQuery );
+      return query1.Concat( query2 );
     }
 
     /// <summary>
@@ -195,9 +194,9 @@ namespace Ivony.Data.Queries
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery operator +( FormattableString query1, ParameterizedQuery query2 )
     {
-      var templateQuery = Db.Template( query1 );
-      return templateQuery.Concat( query2 );
+      return Db.Template( query1 ).Concat( query2 );
     }
+
 
 
     internal bool IsStartWithWhiteSpace()

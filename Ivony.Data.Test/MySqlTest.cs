@@ -14,11 +14,12 @@ namespace Ivony.Data.Test
     private static TestTraceService traceService;
 
 
-    public MySqlTest()
+
+    [TestInitialize]
+    public void Enter()
     {
 
       Db.Enter( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
-
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
       Db.T( $@"
@@ -28,12 +29,17 @@ Name varchar(50) DEFAULT NULL,
 Content text,
 PRIMARY KEY (Id)
 )" ).ExecuteNonQuery();
+
     }
-    [TestInitialize]
-    public void Initialize()
+
+    [TestCleanup]
+    public void Exit()
     {
-      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+      Db.Exit();
     }
+
+
+
     [TestMethod]
     public void StandardTest()
     {

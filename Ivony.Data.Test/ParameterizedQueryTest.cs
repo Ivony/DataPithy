@@ -150,12 +150,20 @@ namespace Ivony.Data.Test
         Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; SELECT * FROM Users WHERE UserID = #1#; SELECT * FROM Users WHERE UserID = #2#;", "多个带参数模板连接测试失败" );
 
 
-        query += (ParameterizedQuery) null;
+        ParameterizedQuery query1 = null;
+        query += query1;
         Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个 null 值失败" );
 
 
         query += $"";
         Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个空字符串失败" );
+
+        query += "DELETE Users;".AsTextQuery();
+        Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; DELETE Users;", "连接纯文本查询失败" );
+
+        query += " DELETE Users;".AsTextQuery();
+        Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; DELETE Users; DELETE Users;", "连接空白字符开头查询失败" );
+
 
       }
     }

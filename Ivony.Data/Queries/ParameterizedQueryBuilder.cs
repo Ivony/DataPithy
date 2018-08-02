@@ -107,8 +107,9 @@ namespace Ivony.Data.Queries
       lock ( SyncRoot )
       {
         if ( textBuilder.Length > 0
+          && Db.DbContext.AutoWhitespaceSperator == true
           && char.IsWhiteSpace( textBuilder[textBuilder.Length - 1] ) == false
-          && Db.DbContext.AutoWhitespaceSperator == true )
+          && (partial as ParameterizedQuery)?.IsStartWithWhiteSpace() == false)
 
           Append( ' ' );
 

@@ -25,7 +25,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="tuple">Tuple 对象</param>
     /// <returns>参数列表对象</returns>
-    public static ParameterList Create( ITuple tuple )
+    public static ParameterList Create( ITuple tuple, string separator = ", " )
     {
 
       var array = new object[tuple.Length];

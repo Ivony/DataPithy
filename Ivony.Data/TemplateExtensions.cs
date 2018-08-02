@@ -29,6 +29,17 @@ namespace Ivony.Data
     }
 
     /// <summary>
+    /// 串联两个参数化查询对象
+    /// </summary>
+    /// <param name="firstQuery">第一个参数化查询对象</param>
+    /// <param name="secondQuery">第二个参数化查询对象</param>
+    /// <returns>串联后的参数化查询对象</returns>
+    public static ParameterizedQuery Concat( this ParameterizedQuery firstQuery, FormattableString secondQuery )
+    {
+      return ConcatQueries( firstQuery, Db.Template( secondQuery ) );
+    }
+
+    /// <summary>
     /// 串联多个参数化查询对象
     /// </summary>
     /// <param name="firstQuery">第一个参数化查询对象</param>
@@ -38,7 +49,7 @@ namespace Ivony.Data
     {
       var builder = Db.DbContext.GetParameterizedQueryBuilder();
 
-      firstQuery.AppendTo( builder );
+      builder.AppendParameter( firstQuery );
       foreach ( var query in otherQueries )
       {
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
