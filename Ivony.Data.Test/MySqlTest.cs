@@ -17,7 +17,7 @@ namespace Ivony.Data.Test
     public MySqlTest()
     {
 
-      Db.NewContext( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
+      Db.Enter( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
 
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();

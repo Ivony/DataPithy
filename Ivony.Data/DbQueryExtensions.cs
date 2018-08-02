@@ -14,19 +14,21 @@ namespace Ivony.Data
     /// <summary>
     /// 带有配置参数的数据库查询对象
     /// </summary>
-    public class ConfiguredQuery : IDbQueryContainer
+    public class ConfiguredQuery<T> : IDbQueryContainer where T : IDbQuery
     {
       /// <summary>
       /// 数据库查询对象
       /// </summary>
-      public IDbQuery Query { get; }
+      public T Query { get; }
+
+      IDbQuery IDbQueryContainer.Query => this.Query;
 
 
       /// <summary>
       /// 创建 ConfiguredQuery 对象
       /// </summary>
       /// <param name="query">数据库查询</param>
-      public ConfiguredQuery( IDbQuery query )
+      internal ConfiguredQuery( T query )
       {
         Query = query;
       }
@@ -77,7 +79,7 @@ namespace Ivony.Data
     /// <param name="query">数据库查询</param>
     /// <param name="executor">用于该查询的执行器</param>
     /// <returns>指定了执行器的数据库查询</returns>
-    public static ConfiguredQuery WithExecutor( this ConfiguredQuery query, IDbExecutor executor )
+    public static ConfiguredQuery<T> WithExecutor<T>( this ConfiguredQuery<T> query, IDbExecutor executor ) where T : IDbQuery
     {
       query.SetService( executor );
       return query;
@@ -93,16 +95,22 @@ namespace Ivony.Data
     /// <param name="query">数据库查询</param>
     /// <param name="database">该查询应该在哪个数据库连接上执行</param>
     /// <returns></returns>
-    public static ConfiguredQuery WithDatabase( this ConfiguredQuery query, string database )
+    public static ConfiguredQuery<T> WithDatabase<T>( this ConfiguredQuery<T> query, string database ) where T : IDbQuery
     {
       query.SetProperty( DatabasePropertyName, database );
       return query;
     }
 
 
-    private static ConfiguredQuery AsConfiguredQuery( this IDbQuery query )
+    /// <summary>
+    /// 配置查询参数
+    /// </summary>
+    /// <typeparam name="T">查询类型</typeparam>
+    /// <param name="query">要配置的数据库查询对象</param>
+    /// <returns>可配置的查询对象</returns>
+    public static ConfiguredQuery<T> Configure<T>( this T query ) where T : IDbQuery
     {
-      return query as ConfiguredQuery ?? new ConfiguredQuery( query );
+      return new ConfiguredQuery<T>( query );
     }
 
 
@@ -113,7 +121,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDbExecuteContext Execute( this IDbQuery query )
     {
-      return Db.GetCurrentContext().GetExecutor()?.Execute( query );
+      return Db.DbContext.GetExecutor()?.Execute( query );
     }
 
     /// <summary>
@@ -121,10 +129,10 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询</param>
     /// <returns></returns>
-    public static IDbExecuteContext Execute<T>( this ConfiguredQuery query ) where T : IDbQuery
+    public static IDbExecuteContext Execute<T>( this ConfiguredQuery<T> query ) where T : IDbQuery
     {
 
-      var executor = query.GetService<IDbExecutor>() ?? Db.GetCurrentContext().GetExecutor();
+      var executor = query.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
 
       return executor?.Execute( query.Query );
     }
@@ -139,7 +147,7 @@ namespace Ivony.Data
     public static Task<IAsyncDbExecuteContext> ExecuteAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
     {
 
-      return Db.GetCurrentContext().GetAsyncExecutor()?.ExecuteAsync( query, token );
+      return Db.DbContext.GetAsyncExecutor()?.ExecuteAsync( query, token );
 
     }
 
@@ -149,10 +157,10 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询</param>
     /// <param name="token">取消查询标识</param>
     /// <returns></returns>
-    public static Task<IAsyncDbExecuteContext> ExecuteAsync( this ConfiguredQuery query, CancellationToken token = default( CancellationToken ) )
+    public static Task<IAsyncDbExecuteContext> ExecuteAsync<T>( this ConfiguredQuery<T> query, CancellationToken token = default( CancellationToken ) ) where T : IDbQuery
     {
 
-      var executor = query.GetService<IAsyncDbExecutor>() ?? Db.GetCurrentContext().GetAsyncExecutor();
+      var executor = query.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
 
       return executor?.ExecuteAsync( query.Query, token );
 

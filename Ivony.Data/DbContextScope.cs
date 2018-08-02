@@ -18,46 +18,44 @@ namespace Ivony.Data
 
 
 
-    private bool DisposeWhenParentIs( DbContext parent, Action disposeChild )
+
+
+    private void Exit()
     {
-
-      if ( Parent.Equals( parent ) )
-      {
-        disposeChild();
-        Dispose();
-        return true;
-      }
-
-      var scope = parent as DbContextScope;
-      if ( scope == null )
-        return false;
-
-      else
-        return scope.DisposeWhenParentIs( parent, () => Dispose() );
-
-
-
-    }
-
-    private void Dispose()
-    {
-
       Db.ExitContext( this, Parent );
     }
 
-    void IDisposable.Dispose()
+
+    private Action GetExiter( DbContextScope scope )
     {
+      if ( this.Equals( scope ) )
+        return () => this.Exit();
 
-      var context = Db.GetCurrentContext();
+      var exiter = (this.Parent as DbContextScope)?.GetExiter( scope );
+      if ( exiter == null )
+        return null;
 
-      var scope = context as DbContextScope;
-      scope.DisposeWhenParentIs( this, () => { } );
-
-
-      Dispose();
-
+      return () =>
+      {
+        this.Exit();
+        exiter();
+      };
     }
 
 
+    public void Dispose()
+    {
+
+
+      var current = Db.DbContext as DbContextScope;
+
+
+      var exiter = current?.GetExiter( this );
+
+      exiter?.Invoke();
+
+
+
+    }
   }
 }

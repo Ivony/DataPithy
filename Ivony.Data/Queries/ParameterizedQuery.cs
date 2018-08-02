@@ -72,9 +72,10 @@ namespace Ivony.Data.Queries
       private set;
     }
 
-
-    public DbContext Hosting { get; internal set; }
-
+    /// <summary>
+    /// 判断该参数化查询是否为一个空的查询
+    /// </summary>
+    internal bool IsEmpty() => TextTemplate == String.Empty;
 
 
     /// <summary>
@@ -168,7 +169,34 @@ namespace Ivony.Data.Queries
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery operator +( ParameterizedQuery query1, ParameterizedQuery query2 )
     {
+      if ( query2.IsEmpty() )
+        return query1;
+
       return query1.Concat( query2 );
+    }
+
+    /// <summary>
+    /// 串联两个参数化查询对象
+    /// </summary>
+    /// <param name="query1">第一个参数化查询对象</param>
+    /// <param name="query2">第二个参数化查询对象</param>
+    /// <returns>串联后的参数化查询对象</returns>
+    public static ParameterizedQuery operator +( ParameterizedQuery query1, FormattableString query2 )
+    {
+      var templateQuery = Db.Template( query2 );
+      return query1.Concat( templateQuery );
+    }
+
+    /// <summary>
+    /// 串联两个参数化查询对象
+    /// </summary>
+    /// <param name="query1">第一个参数化查询对象</param>
+    /// <param name="query2">第二个参数化查询对象</param>
+    /// <returns>串联后的参数化查询对象</returns>
+    public static ParameterizedQuery operator +( FormattableString query1, ParameterizedQuery query2 )
+    {
+      var templateQuery = Db.Template( query1 );
+      return templateQuery.Concat( query2 );
     }
 
 

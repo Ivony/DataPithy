@@ -8,6 +8,21 @@ namespace Ivony.Data.Test
   [TestClass]
   public class ParameterizedQueryTest
   {
+
+    [TestInitialize]
+    public void Enter()
+    {
+
+      Db.Enter( builder => { } );
+
+    }
+
+    [TestCleanup]
+    public void Exit()
+    {
+      Db.Exit();
+    }
+
     [TestMethod]
     public void TemplateParserTest()
     {
@@ -114,28 +129,35 @@ namespace Ivony.Data.Test
     public void ConcatTest()
     {
 
-      var query = Db.T( $"SELECT * FROM Users;" );
 
-      Assert.AreEqual( (query + query).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
-      Assert.AreEqual( query.Concat( query ).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
-
-
-      Assert.AreEqual( (query + query + query).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users; SELECT * FROM Users;", "多个纯文本模板连接测试失败" );
-      Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users; SELECT * FROM Users;", "多个纯文本模板连接测试失败" );
+      using ( Db.Enter( configure => { configure.AutoWhitespaceSperator = true; } ) )
+      {
 
 
-      query = Db.T( $"SELECT * FROM Users WHERE UserID = {1};" );
+        var query = Db.T( $"SELECT * FROM Users;" );
 
-      Assert.AreEqual( (query + query + query).TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; SELECT * FROM Users WHERE UserID = #1#; SELECT * FROM Users WHERE UserID = #2#;", "多个带参数模板连接测试失败" );
-      Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; SELECT * FROM Users WHERE UserID = #1#; SELECT * FROM Users WHERE UserID = #2#;", "多个带参数模板连接测试失败" );
-
-
-      query += null;
-      Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个 null 值失败" );
+        Assert.AreEqual( (query + query).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
+        Assert.AreEqual( query.Concat( query ).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
 
 
-      //query += "";
-      //Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个 null 值失败" );
+        Assert.AreEqual( (query + query + query).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users; SELECT * FROM Users;", "多个纯文本模板连接测试失败" );
+        Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users; SELECT * FROM Users;", "多个纯文本模板连接测试失败" );
+
+
+        query = Db.T( $"SELECT * FROM Users WHERE UserID = {1};" );
+
+        Assert.AreEqual( (query + query + query).TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; SELECT * FROM Users WHERE UserID = #1#; SELECT * FROM Users WHERE UserID = #2#;", "多个带参数模板连接测试失败" );
+        Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM Users WHERE UserID = #0#; SELECT * FROM Users WHERE UserID = #1#; SELECT * FROM Users WHERE UserID = #2#;", "多个带参数模板连接测试失败" );
+
+
+        query += (ParameterizedQuery) null;
+        Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个 null 值失败" );
+
+
+        query += $"";
+        Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = #0#;", "参数化查询对象连接一个空字符串失败" );
+
+      }
     }
 
 

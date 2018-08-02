@@ -13,22 +13,39 @@ namespace Ivony.Data.Test
   {
 
 
+
+
     [TestMethod]
     public void CurrentContext()
     {
 
-      Db.InitializeDb( builder => { } );
 
-      Assert.AreEqual( Db.GetCurrentContext().DefaultDatabase, Db.DefaultDatabaseName );
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
 
-      using ( Db.NewContext( builder => { builder.DefaultDatabase = "Test"; } ) )
+      using ( Db.Enter( builder => { builder.DefaultDatabase = "Test"; } ) )
       {
-        Assert.AreEqual( Db.GetCurrentContext().DefaultDatabase, "Test" );
+        Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test" );
       }
 
-      Assert.AreEqual( Db.GetCurrentContext().DefaultDatabase, Db.DefaultDatabaseName );
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
 
     }
+    [TestMethod]
+    public void DisposeContext()
+    {
 
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
+
+      var scope = Db.Enter( builder => { builder.DefaultDatabase = "Test1"; } );
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test1" );
+      Db.Enter( builder => { builder.DefaultDatabase = "Test2"; } );
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test2" );
+      Db.Enter( builder => { builder.DefaultDatabase = "Test3"; } );
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test3" );
+
+      scope.Dispose();
+
+      Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
+    }
   }
 }

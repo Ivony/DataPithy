@@ -20,6 +20,11 @@ namespace Ivony.Data.Queries
 
 
 
+    /// <summary>
+    /// 从 Tuple 创建 ParameterList 对象
+    /// </summary>
+    /// <param name="tuple">Tuple 对象</param>
+    /// <returns>参数列表对象</returns>
     public static ParameterList Create( ITuple tuple )
     {
 

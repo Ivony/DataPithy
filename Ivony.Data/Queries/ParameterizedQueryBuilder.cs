@@ -106,10 +106,14 @@ namespace Ivony.Data.Queries
     {
       lock ( SyncRoot )
       {
+        if ( textBuilder.Length > 0
+          && char.IsWhiteSpace( textBuilder[textBuilder.Length - 1] ) == false
+          && Db.DbContext.AutoWhitespaceSperator == true )
+
+          Append( ' ' );
+
         partial.AppendTo( this );
       }
-
     }
-
   }
 }

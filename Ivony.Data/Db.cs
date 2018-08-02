@@ -25,15 +25,21 @@ namespace Ivony.Data
     /// 获取当前数据访问上下文
     /// </summary>
     /// <returns></returns>
-    public static DbContext GetCurrentContext()
+    public static DbContext DbContext
     {
-      lock ( _sync )
+      get
       {
-        if ( _root == null )
-          _current.Value = _root = CreateDefaultContext();
-      }
+        lock ( _sync )
+        {
+          if ( _current.Value != null )
+            return _current.Value;
 
-      return _current.Value = _current.Value ?? _root;
+          if ( _root == null )
+            InitializeDb( configure => { } );
+
+          return _current.Value = _root;
+        }
+      }
     }
 
 
@@ -43,15 +49,30 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="configure">配置数据访问上下文的方法</param>
     /// <returns></returns>
-    public static IDisposable NewContext( Action<DbContextBuilder> configure )
+    public static IDisposable Enter( Action<DbContextConfigure> configure )
     {
-      var builder = new DbContextBuilder( GetCurrentContext() );
+      var builder = new DbContextConfigure( DbContext );
       configure( builder );
 
       var result = (DbContextScope) builder.Build();
       _current.Value = result;
       return result;
     }
+
+
+
+    /// <summary>
+    /// 退出当前上下文
+    /// </summary>
+    public static void Exit()
+    {
+      var scope = DbContext as DbContextScope;
+      if ( scope == null )
+        throw new InvalidOperationException();
+
+      scope.Dispose();
+    }
+
 
 
     internal static void ExitContext( DbContext current, DbContext parent )
@@ -70,11 +91,14 @@ namespace Ivony.Data
     /// <summary>
     /// 使用初始化数据访问上下文
     /// </summary>
-    public static void InitializeDb( Action<DbContextBuilder> configure )
+    public static DbContext InitializeDb( Action<DbContextConfigure> configure )
     {
       lock ( _sync )
       {
-        InitializeDb( new ServiceCollection().AddDataPithy().BuildServiceProvider(), configure );
+        if ( _root != null )
+          throw new InvalidOperationException( "DataPithy is already initialized." );
+
+        return _root = InitializeDbContext( new ServiceCollection().AddDataPithy().BuildServiceProvider(), configure );
       }
     }
 
@@ -83,19 +107,29 @@ namespace Ivony.Data
     /// 使用指定的服务提供程序初始化数据访问上下文
     /// </summary>
     /// <param name="serviceProvider">服务提供程序</param>
-    public static void InitializeDb( this IServiceProvider serviceProvider, Action<DbContextBuilder> configure )
+    /// <param name="configure">数据访问上下文配置</param>
+    public static IServiceProvider InitializeDb( this IServiceProvider serviceProvider, Action<DbContextConfigure> configure )
     {
       lock ( _sync )
       {
         if ( _root != null )
-          throw new InvalidOperationException("DataPithy is already initialized.");
+          throw new InvalidOperationException( "DataPithy is already initialized." );
 
-        var builder = new DbContextBuilder( serviceProvider );
-        configure( builder );
-
-        _root = builder.Build();
+        _root = InitializeDbContext( serviceProvider, configure );
       }
+
+      return serviceProvider;
     }
+
+
+    private static DbContext InitializeDbContext( IServiceProvider serviceProvider, Action<DbContextConfigure> configure )
+    {
+      var builder = new DbContextConfigure( serviceProvider );
+      builder.DefaultDatabase = DefaultDatabaseName;
+      configure( builder );
+      return builder.Build();
+    }
+
 
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
@@ -114,7 +148,7 @@ namespace Ivony.Data
     /// <returns>参数化查询</returns>
     public static ParameterizedQuery Template( FormattableString template )
     {
-      return GetCurrentContext().GetTemplateParser().ParseTemplate( template );
+      return DbContext.GetTemplateParser().ParseTemplate( template );
     }
 
 
@@ -132,18 +166,6 @@ namespace Ivony.Data
       return services;
     }
 
-
-
-
-    private static DbContext CreateDefaultContext()
-    {
-
-      var services = new ServiceCollection();
-      services.AddDataPithy();
-
-
-      return new DbContext( services.BuildServiceProvider(), new Dictionary<string, IDbExecutorProvider>() );
-    }
 
     /// <summary>
     /// 默认数据库连接名称

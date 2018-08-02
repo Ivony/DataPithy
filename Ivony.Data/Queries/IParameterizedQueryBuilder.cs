@@ -18,7 +18,7 @@
     /// <param name="ch">要添加到查询文本末尾的字符</param>
     void Append( char ch );
 
-    
+
     /// <summary>
     /// 添加一段查询文本
     /// </summary>
@@ -38,5 +38,6 @@
     /// </summary>
     /// <returns>参数化查询对象</returns>
     ParameterizedQuery BuildQuery();
+
   }
 }

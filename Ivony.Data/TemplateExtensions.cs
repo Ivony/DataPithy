@@ -18,33 +18,6 @@ namespace Ivony.Data
   {
 
     /// <summary>
-    /// 根据模板表达式创建参数化查询实例
-    /// </summary>
-    /// <param name="context">当前数据访问上下文</param>
-    /// <param name="template">参数化模板</param>
-    /// <returns>参数化查询实例</returns>
-    public static ParameterizedQuery Template( this DbContext context, FormattableString template )
-    {
-      var query = context.GetTemplateParser().ParseTemplate( template );
-      query.Hosting = context;
-      return query;
-    }
-
-    /// <summary>
-    /// 根据模板表达式创建参数化查询实例
-    /// </summary>
-    /// <param name="context">当前数据访问上下文</param>
-    /// <param name="template">参数化模板</param>
-    /// <returns>参数化查询实例</returns>
-    public static ParameterizedQuery T( this DbContext context, FormattableString template )
-    {
-      var query = context.GetTemplateParser().ParseTemplate( template );
-      query.Hosting = context;
-      return query;
-    }
-
-
-    /// <summary>
     /// 串联两个参数化查询对象
     /// </summary>
     /// <param name="firstQuery">第一个参数化查询对象</param>
@@ -63,7 +36,7 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery ConcatQueries( this ParameterizedQuery firstQuery, params ParameterizedQuery[] otherQueries )
     {
-      var builder = Db.GetCurrentContext().GetParameterizedQueryBuilder();
+      var builder = Db.DbContext.GetParameterizedQueryBuilder();
 
       firstQuery.AppendTo( builder );
       foreach ( var query in otherQueries )
@@ -71,7 +44,7 @@ namespace Ivony.Data
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
           continue;
 
-        query.AppendTo( builder );
+        builder.AppendParameter( query );
       }
 
       return builder.BuildQuery();

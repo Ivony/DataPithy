@@ -26,8 +26,6 @@ namespace Ivony.Data
     /// </summary>
     public IServiceProvider ServiceProvider { get; }
 
-
-
     private readonly ReadOnlyDictionary<string, IDbExecutorProvider> _dbProviders;
 
     /// <summary>
@@ -104,5 +102,13 @@ namespace Ivony.Data
     {
       return ServiceProvider.GetRequiredService<IParameterizedQueryBuilder>();
     }
+
+
+
+    /// <summary>
+    /// 是否自动添加空白字符分隔符
+    /// </summary>
+    public bool AutoWhitespaceSperator { get; set; } = false;
+
   }
 }
