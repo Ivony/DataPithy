@@ -15,10 +15,10 @@ namespace Ivony.Data
   }
 
 
-  internal interface IDbQueryContainer
+  internal interface IDbQueryContainer<T> where T : IDbQuery
   {
 
-    IDbQuery Query { get; }
+    T Query { get; }
 
   }
 

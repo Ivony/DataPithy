@@ -26,5 +26,10 @@ namespace Ivony.Data.MySqlClient
 
       return command;
     }
+
+    protected override string ParseDbName( DbName name )
+    {
+      return $"`{name.Name.Replace( "`", "``" )}`";
+    }
   }
 }

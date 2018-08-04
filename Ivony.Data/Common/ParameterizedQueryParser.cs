@@ -82,5 +82,14 @@ namespace Ivony.Data.Common
     /// <returns>命令对象</returns>
     protected abstract TCommand CreateCommand( string commandText, TParameter[] parameters );
 
+
+    /// <summary>
+    /// 解析 DbName 对象
+    /// </summary>
+    /// <param name="name">名称标识符</param>
+    /// <returns>解析后的字符串表达形式</returns>
+    protected abstract string ParseDbName( DbName name );
+
+
   }
 }

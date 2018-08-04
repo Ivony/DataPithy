@@ -125,5 +125,10 @@ namespace Ivony.Data.SqlClient
 
       return command;
     }
+
+    protected override string ParseDbName( DbName name )
+    {
+      return $"[{name.Name}]";
+    }
   }
 }

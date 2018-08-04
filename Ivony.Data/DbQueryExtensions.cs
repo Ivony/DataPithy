@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -6,23 +7,32 @@ using System.Threading.Tasks;
 
 namespace Ivony.Data
 {
+
+
+  /// <summary>
+  /// 提供针对数据库查询的扩展方法
+  /// </summary>
   public static class DbQueryExtensions
   {
 
 
 
+    private static class ConfigureKeys
+    {
+      public const string Executor = ".DbQuery.Executor";
+      public const string Database = ".DbQuery.Database";
+    }
+
+
     /// <summary>
     /// 带有配置参数的数据库查询对象
     /// </summary>
-    public class ConfiguredQuery<T> : IDbQueryContainer where T : IDbQuery
+    public class ConfiguredQuery<T> : IDbQueryContainer<T> where T : IDbQuery
     {
       /// <summary>
       /// 数据库查询对象
       /// </summary>
       public T Query { get; }
-
-      IDbQuery IDbQueryContainer.Query => this.Query;
-
 
       /// <summary>
       /// 创建 ConfiguredQuery 对象
@@ -31,42 +41,13 @@ namespace Ivony.Data
       internal ConfiguredQuery( T query )
       {
         Query = query;
+        Configures = new DbQueryConfigures();
       }
 
-
-      private Dictionary<Type, object> serviceDictionary = new Dictionary<Type, object>();
-
-      internal void SetService<T>( T service )
-      {
-        SetService( typeof( T ), service );
-      }
-
-      private void SetService<T>( Type type, T service )
-      {
-        serviceDictionary[type] = service;
-      }
-
-      internal T GetService<T>()
-      {
-        return (T) GetService( typeof( T ) );
-      }
-
-      private object GetService( Type type )
-      {
-        return serviceDictionary.GetValueOrDefault( type );
-      }
-
-
-      private Dictionary<string, string> _properties;
-      internal void SetProperty( string name, string value )
-      {
-        _properties[name] = value;
-      }
-
-      internal string GetProperty( string name )
-      {
-        return _properties.GetValueOrDefault( name );
-      }
+      /// <summary>
+      /// 获取附加于查询之上的配置
+      /// </summary>
+      public DbQueryConfigures Configures { get; }
 
 
     }
@@ -81,13 +62,23 @@ namespace Ivony.Data
     /// <returns>指定了执行器的数据库查询</returns>
     public static ConfiguredQuery<T> WithExecutor<T>( this ConfiguredQuery<T> query, IDbExecutor executor ) where T : IDbQuery
     {
-      query.SetService( executor );
+      query.Configures.SetService( executor );
       return query;
     }
 
+    /// <summary>
+    /// 指定查询的执行器
+    /// </summary>
+    /// <param name="query">数据库查询</param>
+    /// <param name="executor">用于该查询的执行器</param>
+    /// <returns>指定了执行器的数据库查询</returns>
+    public static ConfiguredQuery<T> WithExecutor<T>( this ConfiguredQuery<T> query, IAsyncDbExecutor executor ) where T : IDbQuery
+    {
+      query.Configures.SetService<IDbExecutor>( executor );
+      query.Configures.SetService( executor );
+      return query;
+    }
 
-
-    private static readonly string DatabasePropertyName = ".Database";
 
     /// <summary>
     /// 指定查询所属的数据库连接
@@ -97,7 +88,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static ConfiguredQuery<T> WithDatabase<T>( this ConfiguredQuery<T> query, string database ) where T : IDbQuery
     {
-      query.SetProperty( DatabasePropertyName, database );
+      query.Configures._settings[ConfigureKeys.Database] = database;
       return query;
     }
 
@@ -132,7 +123,7 @@ namespace Ivony.Data
     public static IDbExecuteContext Execute<T>( this ConfiguredQuery<T> query ) where T : IDbQuery
     {
 
-      var executor = query.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
+      var executor = query.Configures.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
 
       return executor?.Execute( query.Query );
     }
@@ -160,7 +151,7 @@ namespace Ivony.Data
     public static Task<IAsyncDbExecuteContext> ExecuteAsync<T>( this ConfiguredQuery<T> query, CancellationToken token = default( CancellationToken ) ) where T : IDbQuery
     {
 
-      var executor = query.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
+      var executor = query.Configures.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
 
       return executor?.ExecuteAsync( query.Query, token );
 
