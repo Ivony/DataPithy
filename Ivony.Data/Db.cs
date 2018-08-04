@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 
 namespace Ivony.Data
 {
+
+  /// <summary>
+  /// 提供数据访问基本工具方法
+  /// </summary>
   public static class Db
   {
 
 
-    private static DbContext _default;
     private static readonly object _sync = new object();
 
 
@@ -50,14 +53,12 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="configure">配置数据访问上下文的方法</param>
     /// <returns></returns>
-    public static IDisposable Enter( Action<DbContextConfigure> configure )
+    public static IDisposable Enter( Action<DbContext.Builder> configure )
     {
-      var builder = new DbContextConfigure( DbContext );
+      var builder = new DbContext.Builder( DbContext );
       configure( builder );
 
-      var result = (DbContextScope) builder.Build();
-      _current.Value = result;
-      return result;
+      return _current.Value = builder.Build();
     }
 
 
@@ -67,21 +68,17 @@ namespace Ivony.Data
     /// </summary>
     public static void Exit()
     {
-      var scope = DbContext as DbContextScope;
-      if ( scope == null )
-        throw new InvalidOperationException();
-
-      scope.Dispose();
+      DbContext.TryExit();
     }
 
 
 
-    internal static void ExitContext( DbContext current, DbContext parent )
+    internal static void ExitContext( DbContext current )
     {
       if ( _current.Value != current )
         throw new InvalidOperationException();
 
-      _current.Value = parent;
+      _current.Value = current.Parent;
     }
 
 
@@ -92,7 +89,7 @@ namespace Ivony.Data
     /// <summary>
     /// 初始化根数据访问上下文
     /// </summary>
-    public static DbContext InitializeDb( Action<DbContextConfigure> configure )
+    public static DbContext InitializeDb( Action<DbContext.Builder> configure )
     {
       lock ( _sync )
       {
@@ -109,7 +106,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="serviceProvider">服务提供程序</param>
     /// <param name="configure">数据访问上下文配置</param>
-    public static IServiceProvider InitializeDb( this IServiceProvider serviceProvider, Action<DbContextConfigure> configure )
+    public static IServiceProvider InitializeDb( this IServiceProvider serviceProvider, Action<DbContext.Builder> configure )
     {
       lock ( _sync )
       {
@@ -123,10 +120,9 @@ namespace Ivony.Data
     }
 
 
-    private static DbContext InitializeDbContext( IServiceProvider serviceProvider, Action<DbContextConfigure> configure )
+    private static DbContext InitializeDbContext( IServiceProvider serviceProvider, Action<DbContext.Builder> configure )
     {
-      var builder = new DbContextConfigure( serviceProvider );
-      builder.DefaultDatabase = DefaultDatabaseName;
+      var builder = new DbContext.Builder( serviceProvider );
       configure( builder );
       return builder.Build();
     }

@@ -27,11 +27,11 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static DbContextConfigure UseSqlServer( this DbContextConfigure builder, string connectionString )
+    public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string connectionString )
     {
 
       var executor = CreateDbExecutor( connectionString );
-      builder.DbProviders.Add( Db.DefaultDatabaseName, DbExecutorProvider.Create( () => executor, () => null ) );
+      builder.RegisterDbProvider( Db.DefaultDatabaseName, DbExecutorProvider.Create( () => executor, () => null ) );
 
       return builder;
     }
@@ -54,7 +54,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static DbContextConfigure UseSqlServer( this DbContextConfigure builder, string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
+    public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
     {
       var connectionBuilder = new SqlConnectionStringBuilder()
       {
@@ -78,7 +78,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static DbContextConfigure UseSqlServer( this DbContextConfigure builder, string dataSource, string initialCatalog, bool pooling = true, SqlDbConfiguration configuration = null )
+    public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string dataSource, string initialCatalog, bool pooling = true, SqlDbConfiguration configuration = null )
     {
       var connectionBuilder = new SqlConnectionStringBuilder()
       {

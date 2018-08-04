@@ -27,12 +27,16 @@ namespace Ivony.Data
     /// <summary>
     /// 带有配置参数的数据库查询对象
     /// </summary>
-    public class ConfiguredQuery<T> : IDbQueryContainer<T> where T : IDbQuery
+    public class ConfiguredQuery<T> : IDbQueryContainer where T : IDbQuery
     {
       /// <summary>
       /// 数据库查询对象
       /// </summary>
       public T Query { get; }
+
+      IDbQuery IDbQueryContainer.Query => this.Query;
+
+
 
       /// <summary>
       /// 创建 ConfiguredQuery 对象
@@ -48,7 +52,6 @@ namespace Ivony.Data
       /// 获取附加于查询之上的配置
       /// </summary>
       public DbQueryConfigures Configures { get; }
-
 
     }
 
@@ -88,7 +91,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static ConfiguredQuery<T> WithDatabase<T>( this ConfiguredQuery<T> query, string database ) where T : IDbQuery
     {
-      query.Configures._settings[ConfigureKeys.Database] = database;
+      query.Configures[ConfigureKeys.Database] = database;
       return query;
     }
 
@@ -105,6 +108,18 @@ namespace Ivony.Data
     }
 
 
+    private static Exception NotSupported( IDbQuery query )
+    {
+      return new NotSupportedException( $"Execute query failed, there has no executor support query type of \"{query.GetType()}\"" );
+    }
+
+    private static Exception NotSupportedAsync( IDbQuery query )
+    {
+      return new NotSupportedException( $"Try async execute query failed, there has no async executor support query type of \"{query.GetType()}\" . you can try synchronized execute it." );
+    }
+
+
+
     /// <summary>
     /// 同步执行查询
     /// </summary>
@@ -112,7 +127,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDbExecuteContext Execute( this IDbQuery query )
     {
-      return Db.DbContext.GetExecutor()?.Execute( query );
+      return Db.DbContext.GetExecutor()?.Execute( query ) ?? throw NotSupported( query );
     }
 
     /// <summary>
@@ -125,7 +140,7 @@ namespace Ivony.Data
 
       var executor = query.Configures.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
 
-      return executor?.Execute( query.Query );
+      return executor?.Execute( query.Query ) ?? throw NotSupported( query.Query ); ;
     }
 
 
@@ -138,7 +153,7 @@ namespace Ivony.Data
     public static Task<IAsyncDbExecuteContext> ExecuteAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
     {
 
-      return Db.DbContext.GetAsyncExecutor()?.ExecuteAsync( query, token );
+      return Db.DbContext.GetAsyncExecutor()?.ExecuteAsync( query, token ) ?? throw NotSupportedAsync( query ); ;
 
     }
 
@@ -153,7 +168,7 @@ namespace Ivony.Data
 
       var executor = query.Configures.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
 
-      return executor?.ExecuteAsync( query.Query, token );
+      return executor?.ExecuteAsync( query.Query, token ) ?? throw NotSupportedAsync( query.Query ); ;
 
     }
   }

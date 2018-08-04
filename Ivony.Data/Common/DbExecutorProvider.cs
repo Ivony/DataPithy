@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ivony.Data
+namespace Ivony.Data.Common
 {
+  /// <summary>
+  /// 提供 IDbExecutorProvider 的标准实现
+  /// </summary>
   public class DbExecutorProvider : IDbExecutorProvider
   {
 

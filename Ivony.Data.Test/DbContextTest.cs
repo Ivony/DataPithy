@@ -22,7 +22,7 @@ namespace Ivony.Data.Test
 
       Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
 
-      using ( Db.Enter( builder => { builder.DefaultDatabase = "Test"; } ) )
+      using ( Db.Enter( builder => { builder.SetDefaultDatabase( "Test" ); } ) )
       {
         Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test" );
       }
@@ -36,11 +36,11 @@ namespace Ivony.Data.Test
 
       Assert.AreEqual( Db.DbContext.DefaultDatabase, Db.DefaultDatabaseName );
 
-      var scope = Db.Enter( builder => { builder.DefaultDatabase = "Test1"; } );
+      var scope = Db.Enter( builder => { builder.SetDefaultDatabase( "Test1" ); } );
       Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test1" );
-      Db.Enter( builder => { builder.DefaultDatabase = "Test2"; } );
+      Db.Enter( builder => { builder.SetDefaultDatabase( "Test2" ); } );
       Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test2" );
-      Db.Enter( builder => { builder.DefaultDatabase = "Test3"; } );
+      Db.Enter( builder => { builder.SetDefaultDatabase( "Test3" ); } );
       Assert.AreEqual( Db.DbContext.DefaultDatabase, "Test3" );
 
       scope.Dispose();

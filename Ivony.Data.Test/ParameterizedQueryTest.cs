@@ -130,7 +130,7 @@ namespace Ivony.Data.Test
     {
 
 
-      using ( Db.Enter( configure => { configure.AutoWhitespaceSeparator = true; } ) )
+      using ( Db.Enter( configure => { configure.SetAutoWhitespaceSeparator( true ); } ) )
       {
 
 
