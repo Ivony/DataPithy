@@ -121,7 +121,7 @@ namespace Ivony.Data
         return null;
       }
 
-      
+
       var convertible = value as IConvertible;
       if ( convertible == null )
         throw new InvalidCastException( string.Format( CultureInfo.InvariantCulture, "无法将 {0} 类型的实例转换为 {1} 类型", value.GetType(), type ) );
@@ -134,6 +134,13 @@ namespace Ivony.Data
 
     private static T ConvertObject<T>( object value )
     {
+      if ( Convert.IsDBNull( value ) )
+      {
+        var type = typeof( T );
+        if ( type != typeof( DBNull ) && type.IsClass )
+          return default( T );
+      }
+
       return (T) value;
     }
 
