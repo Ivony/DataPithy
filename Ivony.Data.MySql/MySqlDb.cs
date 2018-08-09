@@ -32,22 +32,9 @@ namespace Ivony.Data
     /// <returns>MySql 数据库访问器</returns>
     public static DbContext.Builder UseMySql( this DbContext.Builder builder, string connectionString )
     {
-      var dbExecutor = CreateDbExecutor( connectionString );
-
-      builder.RegisterDbProvider( Db.DefaultDatabaseName, DbExecutorProvider.Create( () => dbExecutor, () => null ) );
+      builder.RegisterDbProvider( Db.DefaultDatabaseName, new MySqlDbProvider( connectionString ) );
 
       return builder;
-
-
-    }
-
-
-
-    private static IDbExecutor CreateDbExecutor( string connectionString )
-    {
-      return new DbExecutorBuilder()
-        .Register( typeof( ParameterizedQuery ), () => new MySqlDbExecutor( connectionString, new MySqlDbConfiguration() ) )
-        .CreateExecutor();
     }
 
 

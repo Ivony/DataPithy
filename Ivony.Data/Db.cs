@@ -200,10 +200,127 @@ namespace Ivony.Data
     public static string DefaultDatabaseName => "Default";
 
 
-    public static IDbTransactionContext BeginTransaction()
+
+    public static void Transaction( Action inTransactionActions )
     {
-      throw new NotImplementedException();
+      Transaction( DbContext, inTransactionActions );
     }
+
+    public static void Transaction( this DbContext context, Action actions )
+    {
+      Transaction( context, null, actions );
+    }
+
+
+    public static void Transaction( string database, Action actions )
+    {
+      Transaction( DbContext, database, actions );
+    }
+
+    public static void Transaction( this DbContext context, string database, Action actions )
+    {
+      var transaction = context.CreateTransaction( database );
+
+      bool rollbacked = false;
+      try
+      {
+        transaction.BeginTransaction();
+        actions();
+      }
+      catch
+      {
+        transaction.Rollback();
+        rollbacked = true;
+        throw;
+      }
+      finally
+      {
+        if ( rollbacked == false )
+          transaction.Commit();
+      }
+    }
+
+
+
+
+    public static Task Transaction( Func<Task> asyncActions )
+    {
+      return Transaction( DbContext, asyncActions );
+    }
+
+    public static Task Transaction( this DbContext context, Func<Task> asyncActions )
+    {
+      return Transaction( context, null, asyncActions );
+    }
+
+    public static Task Transaction( string database, Func<Task> asyncActions )
+    {
+      return Transaction( DbContext, database, asyncActions );
+    }
+
+    public static async Task Transaction( this DbContext context, string database, Func<Task> asyncActions )
+    {
+      var transaction = context.CreateTransaction( database );
+
+      bool rollbacked = false;
+      try
+      {
+        transaction.BeginTransaction();
+        await asyncActions();
+      }
+      catch
+      {
+        transaction.Rollback();
+        rollbacked = true;
+        throw;
+      }
+      finally
+      {
+        if ( rollbacked == false )
+          transaction.Commit();
+      }
+    }
+
+
+
+    public static Task TransactionAsync( Func<Task> asyncActions )
+    {
+      return TransactionAsync( DbContext, asyncActions );
+    }
+
+    public static Task TransactionAsync( this DbContext context, Func<Task> asyncActions )
+    {
+      return TransactionAsync( context, null, asyncActions );
+    }
+
+    public static Task TransactionAsync( string database, Func<Task> asyncActions )
+    {
+      return TransactionAsync( DbContext, database, asyncActions );
+    }
+
+    public static async Task TransactionAsync( this DbContext context, string database, Func<Task> asyncActions )
+    {
+      var transaction = context.CreateAsyncTransaction( database );
+
+      bool rollbacked = false;
+      try
+      {
+        await transaction.BeginTransactionAsync();
+        await asyncActions();
+      }
+      catch
+      {
+        await transaction.RollbackAsync();
+        rollbacked = true;
+        throw;
+      }
+      finally
+      {
+        if ( rollbacked == false )
+          await transaction.CommitAsync();
+      }
+    }
+
 
   }
 }

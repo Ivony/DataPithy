@@ -29,20 +29,10 @@ namespace Ivony.Data
     /// <returns>SQL Server 数据库访问器</returns>
     public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string connectionString )
     {
-
-      var executor = CreateDbExecutor( connectionString );
-      builder.RegisterDbProvider( Db.DefaultDatabaseName, DbExecutorProvider.Create( () => executor, () => null ) );
+      builder.RegisterDbProvider( Db.DefaultDatabaseName, new SqlServerDbProvider( connectionString ) );
 
       return builder;
     }
-
-    private static IDbExecutor CreateDbExecutor( string connectionString )
-    {
-      return new DbExecutorBuilder()
-        .Register( typeof( ParameterizedQuery ), () => new SqlDbExecutor( connectionString, new SqlDbConfiguration() ) )
-        .CreateExecutor();
-    }
-
 
     /// <summary>
     /// 通过指定的用户名和密码登陆 SQL Server 数据库，以创建 SQL Server 数据库访问器

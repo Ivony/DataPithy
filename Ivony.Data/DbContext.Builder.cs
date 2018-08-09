@@ -43,7 +43,7 @@ namespace Ivony.Data
 
 
 
-      private IDictionary<string, IDbExecutorProvider> providers = new Dictionary<string, IDbExecutorProvider>();
+      private IDictionary<string, IDbProvider> providers = new Dictionary<string, IDbProvider>();
 
 
       /// <summary>
@@ -52,7 +52,7 @@ namespace Ivony.Data
       /// <param name="database"></param>
       /// <param name="provider"></param>
       /// <returns></returns>
-      public Builder RegisterDbProvider( string database, IDbExecutorProvider provider )
+      public Builder RegisterDbProvider( string database, IDbProvider provider )
       {
         providers.Add( database, provider );
         return this;
@@ -138,7 +138,7 @@ namespace Ivony.Data
         context.AutoWhitespaceSeparator = autoWhiteSpace ?? Parent?.AutoWhitespaceSeparator ?? false;
 
         context.services = new ReadOnlyDictionary<Type, object>( services );
-        context.providers = new ReadOnlyDictionary<string, IDbExecutorProvider>( providers );
+        context.providers = new ReadOnlyDictionary<string, IDbProvider>( providers );
 
         return context;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ivony.Data
 {
@@ -8,7 +9,7 @@ namespace Ivony.Data
   /// <summary>
   /// IDbExecutor 提供程序
   /// </summary>
-  public interface IDbExecutorProvider
+  public interface IDbProvider
   {
 
     /// <summary>
@@ -26,5 +27,21 @@ namespace Ivony.Data
     /// <returns></returns>
     IAsyncDbExecutor GetAsyncDbExecutor( DbContext context );
 
+
+
+    /// <summary>
+    /// 创建事务上下文
+    /// </summary>
+    /// <param name="context">当前数据库访问上下文</param>
+    /// <returns></returns>
+    IDbTransactionContext CreateTransaction( DbContext context);
+
+
+    /// <summary>
+    /// 创建异步事务上下文
+    /// </summary>
+    /// <param name="context">当前数据库访问上下文</param>
+    /// <returns></returns>
+    IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context );
   }
 }

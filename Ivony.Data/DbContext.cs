@@ -108,7 +108,7 @@ namespace Ivony.Data
 
 
 
-    private IReadOnlyDictionary<string, IDbExecutorProvider> providers;
+    private IReadOnlyDictionary<string, IDbProvider> providers;
 
     private IReadOnlyDictionary<Type, object> services;
 
@@ -145,15 +145,47 @@ namespace Ivony.Data
     {
       database = database ?? DefaultDatabase;
 
+      return GetExecutor( this, database );
+    }
+
+    private IDbExecutor GetExecutor( DbContext context, string database )
+    {
       if ( providers.TryGetValue( database, out var dbExecutorProvider ) )
-        return dbExecutorProvider.GetDbExecutor( this );
+        return dbExecutorProvider.GetDbExecutor( context );
 
       else if ( Parent != null )
-        return Parent.GetExecutor( database );
+        return Parent.GetExecutor( context, database );
 
       else
-        return ServiceProvider.GetRequiredService<IDbExecutor>();
+        return null;
     }
+
+
+    /// <summary>
+    /// 创建数据库事务
+    /// </summary>
+    /// <param name="database">指定的数据库</param>
+    /// <returns></returns>
+    public IDbTransactionContext CreateTransaction( string database = null )
+    {
+      database = database ?? DefaultDatabase;
+
+      return CreateTransaction( this, database );
+    }
+
+    private IDbTransactionContext CreateTransaction( DbContext context, string database )
+    {
+      if ( providers.TryGetValue( database, out var dbProvider ) )
+        return dbProvider.CreateTransaction( context );
+
+      else if ( context.Parent != null )
+        return Parent.CreateTransaction( context, database );
+
+      else
+        return null;
+    }
+
+
 
 
 
@@ -175,6 +207,34 @@ namespace Ivony.Data
       else
         return ServiceProvider.GetRequiredService<IAsyncDbExecutor>();
     }
+
+
+
+    /// <summary>
+    /// 创建异步数据库事务
+    /// </summary>
+    /// <param name="database">指定的数据库</param>
+    /// <returns></returns>
+    public IAsyncDbTransactionContext CreateAsyncTransaction( string database = null )
+    {
+      database = database ?? DefaultDatabase;
+
+      return CreateAsyncTransaction( this, database );
+    }
+
+    private IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context, string database )
+    {
+      if ( providers.TryGetValue( database, out var dbProvider ) )
+        return dbProvider.CreateAsyncTransaction( context );
+
+      else if ( context.Parent != null )
+        return Parent.CreateAsyncTransaction( context, database );
+
+      else
+        return null;
+    }
+
+
 
 
     /// <summary>
