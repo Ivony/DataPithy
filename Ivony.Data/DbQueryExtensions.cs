@@ -20,7 +20,7 @@ namespace Ivony.Data
     private static class ConfigureKeys
     {
       public const string Executor = ".DbQuery.Executor";
-      public const string Database = ".DbQuery.Database";
+      public const string DbProvider = ".DbQuery.DbProvider";
     }
 
 
@@ -55,11 +55,10 @@ namespace Ivony.Data
     /// 指定查询所属的数据库连接
     /// </summary>
     /// <param name="query">数据库查询</param>
-    /// <param name="database">该查询应该在哪个数据库连接上执行</param>
     /// <returns></returns>
-    public static T WithDatabase<T>( this T query, string database ) where T : IDbQuery
+    public static T WithDatabase<T>( this T query, IDbProvider dbProvider ) where T : IDbQuery
     {
-      query.Configures[ConfigureKeys.Database] = database;
+      query.Configures.SetService<IDbProvider>( dbProvider );
       return query;
     }
 
@@ -84,7 +83,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDbExecuteContext Execute( this IDbQuery query )
     {
-      var executor = query.Configures?.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
+      var executor = query.Configures?.GetService<IDbExecutor>() ?? Db.Context.GetExecutor();
       return executor?.Execute( query ) ?? throw NotSupported( query ); ;
     }
 
@@ -98,7 +97,7 @@ namespace Ivony.Data
     public static Task<IAsyncDbExecuteContext> ExecuteAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
     {
 
-      var executor = query.Configures.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
+      var executor = query.Configures.GetService<IAsyncDbExecutor>() ?? Db.Context.GetAsyncExecutor();
       return executor?.ExecuteAsync( query, token ) ?? throw NotSupportedAsync( query ); ;
 
     }

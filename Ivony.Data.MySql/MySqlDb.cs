@@ -32,7 +32,7 @@ namespace Ivony.Data
     /// <returns>MySql 数据库访问器</returns>
     public static DbContext.Builder UseMySql( this DbContext.Builder builder, string connectionString )
     {
-      builder.RegisterDbProvider( Db.DefaultDatabaseName, new MySqlDbProvider( connectionString ) );
+      builder.SetDbProvider( new MySqlDbProvider( connectionString ) );
 
       return builder;
     }

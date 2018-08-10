@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Ivony.Data.Common;
 using Ivony.Data.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +38,12 @@ namespace Ivony.Data
     }
 
 
+    private void Exit()
+    {
+      Db.ExitContext( this );
+    }
+
+
     private void Exit( bool throwException )
     {
       if ( Parent == null )
@@ -45,7 +54,7 @@ namespace Ivony.Data
           return;
       }
 
-      var exiter = Db.DbContext.GetExiter( this );
+      var exiter = Db.Context.GetExiter( this );
       if ( exiter == null )
       {
         if ( throwException )
@@ -55,12 +64,6 @@ namespace Ivony.Data
       }
 
       exiter();
-    }
-
-
-    private void Exit()
-    {
-      Db.ExitContext( this );
     }
 
 
@@ -86,22 +89,34 @@ namespace Ivony.Data
     }
 
 
+
+
+    private bool _disposed = false;
+
+
     void IDisposable.Dispose()
     {
+      if ( _disposed )//确保只被执行一次。
+        return;
 
       Exit( true );
+      _disposed = true;
 
+
+
+      var disposable = DbProvider as IDisposable;
+      disposable?.Dispose();
     }
 
 
 
+
+
     /// <summary>
-    /// 获取默认数据库名称
+    /// 需要使用的数据库访问提供程序
     /// </summary>
-    public string DefaultDatabase { get; private set; }
+    public IDbProvider DbProvider { get; private set; }
 
-
-    private IReadOnlyDictionary<string, IDbProvider> providers;
 
     private IReadOnlyDictionary<Type, object> services;
 
@@ -145,107 +160,53 @@ namespace Ivony.Data
 
 
 
-    /// <summary>
-    /// 获取当前默认的查询执行器
-    /// </summary>
-    /// <returns></returns>
-    public IDbExecutor GetExecutor( string database = null )
-    {
-      database = database ?? DefaultDatabase;
-
-      return GetExecutor( this, database );
-    }
-
-    private IDbExecutor GetExecutor( DbContext context, string database )
-    {
-      var transaction = context.GetTransaction( database );
-      if ( transaction != null )
-        return transaction.GetExecutor();
-
-      if ( providers.TryGetValue( database, out var dbExecutorProvider ) )
-        return dbExecutorProvider.GetDbExecutor( context );
-
-      else if ( Parent != null )
-        return Parent.GetExecutor( context, database );
-
-      else
-        return null;
-    }
-
-    private IDbTransactionContext GetTransaction( string database )
-    {
-
-      if ( _transactions.TryGetValue( database, out var transaction ) )
-      {
-        if ( transaction.Status == TransactionStatus.Completed )
-        {
-          _transactions.Remove( database );
-          return null;
-        }
-
-        return transaction;
-      }
-
-      return null;
-
-    }
-
-    private IDictionary<string, IDbTransactionContext> _transactions = new Dictionary<string, IDbTransactionContext>();
-
 
 
     /// <summary>
     /// 创建数据库事务
     /// </summary>
-    /// <param name="database">指定的数据库</param>
     /// <returns></returns>
-    internal IDbTransactionContext CreateTransaction( string database = null )
+    internal IDbTransactionContext CreateTransaction()
     {
-      database = database ?? DefaultDatabase;
-
-      return CreateTransaction( this, database );
+      return DbProvider.CreateTransaction( this );
     }
 
-    private IDbTransactionContext CreateTransaction( DbContext context, string database )
+    /// <summary>
+    /// 创建异步数据库事务
+    /// </summary>
+    /// <returns></returns>
+    internal IAsyncDbTransactionContext CreateAsyncTransaction()
     {
-      if ( providers.TryGetValue( database, out var dbProvider ) )
-        return dbProvider.CreateTransaction( context );
-
-      else if ( context.Parent != null )
-        return Parent.CreateTransaction( context, database );
-
-      else
-        return null;
+      return CreateTransaction() as IAsyncDbTransactionContext;
     }
+
 
 
     /// <summary>
-    /// 在当前上下文开启一个事务执行
+    /// 获取查询执行器
     /// </summary>
-    /// <param name="database"></param>
     /// <returns></returns>
-    public IDbTransactionContext BeginTransaction( string database = null )
+    public IDbExecutor GetExecutor()
     {
-      database = database ?? DefaultDatabase;
-
-
-      if ( _transactions.TryGetValue( database, out var transaction ) )
-      {
-        if ( transaction.Status == TransactionStatus.Completed )
-          _transactions.Remove( database );
-
-        else
-          throw new InvalidOperationException( $"数据库 {database} 在当前上下文正在执行另一个事务" );
-      }
-
-      transaction = CreateTransaction( database );
-      if ( transaction == null )
-        throw new NotSupportedException();
-
-      _transactions[database] = transaction;
-      transaction.BeginTransaction();
-      return transaction;
+      return DbProvider.GetDbExecutor( this );
     }
+
+
+
+    /// <summary>
+    /// 获取异步查询执行器
+    /// </summary>
+    /// <returns></returns>
+    public IAsyncDbExecutor GetAsyncExecutor()
+    {
+      var executor = GetExecutor();
+      if ( executor == null )
+        return null;
+
+      return executor as IAsyncDbExecutor ?? new AsyncExecutorWrapper( executor );
+    }
+
+
 
 
 
@@ -260,57 +221,6 @@ namespace Ivony.Data
       return ActivatorUtilities.CreateInstance<T>( this );
     }
 
-
-
-
-
-    /// <summary>
-    /// 获取当前默认的异步查询执行器
-    /// </summary>
-    /// <returns></returns>
-    public IAsyncDbExecutor GetAsyncExecutor( string database = null )
-    {
-      database = database ?? DefaultDatabase;
-
-      return GetAsyncExecutor( this, database );
-    }
-
-    private IAsyncDbExecutor GetAsyncExecutor( DbContext context, string database )
-    {
-      if ( providers.TryGetValue( database, out var dbExecutorProvider ) )
-        return dbExecutorProvider.GetAsyncDbExecutor( context );
-
-      else if ( Parent != null )
-        return Parent.GetAsyncExecutor( context, database );
-
-      return null;
-    }
-
-
-
-    /// <summary>
-    /// 创建异步数据库事务
-    /// </summary>
-    /// <param name="database">指定的数据库</param>
-    /// <returns></returns>
-    public IAsyncDbTransactionContext CreateAsyncTransaction( string database = null )
-    {
-      database = database ?? DefaultDatabase;
-
-      return CreateAsyncTransaction( this, database );
-    }
-
-    private IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context, string database )
-    {
-      if ( providers.TryGetValue( database, out var dbProvider ) )
-        return dbProvider.CreateAsyncTransaction( context );
-
-      else if ( context.Parent != null )
-        return Parent.CreateAsyncTransaction( context, database );
-
-      else
-        return null;
-    }
 
 
 
@@ -352,9 +262,16 @@ namespace Ivony.Data
 
 
     /// <summary>
+    /// 获取当前上下文的属性设置
+    /// </summary>
+    public IReadOnlyDictionary<string, object> Properties { get; private set; }
+
+
+
+    /// <summary>
     /// 是否自动添加空白字符分隔符
     /// </summary>
-    public bool AutoWhitespaceSeparator { get; internal set; } = false;
+    public bool AutoWhitespaceSeparator { get; private set; } = false;
 
   }
 }

@@ -25,6 +25,8 @@ namespace Ivony.Data
       internal Builder( DbContext parent )
       {
         Parent = parent;
+        Properties = new Dictionary<string, object>( parent.Properties );
+        DbProvider = parent.DbProvider;
       }
 
 
@@ -34,25 +36,22 @@ namespace Ivony.Data
       /// </summary>
       protected DbContext Parent { get; }
 
-      /// <summary>
-      /// 获取服务提供程序
-      /// </summary>
-      protected IServiceProvider ServiceProvider { get; }
-
-
-
-      private IDictionary<string, IDbProvider> providers = new Dictionary<string, IDbProvider>();
 
 
       /// <summary>
-      /// 注册一个数据访问提供程序
+      /// 获取数据访问提供程序
       /// </summary>
-      /// <param name="database"></param>
-      /// <param name="provider"></param>
-      /// <returns></returns>
-      public Builder RegisterDbProvider( string database, IDbProvider provider )
+      protected IDbProvider DbProvider { get; private set; }
+
+
+      /// <summary>
+      /// 设置数据访问提供程序
+      /// </summary>
+      /// <param name="provider">数据访问提供程序</param>
+      /// <returns>设置的数据访问提供程序</returns>
+      public Builder SetDbProvider( IDbProvider provider )
       {
-        providers.Add( database, provider );
+        DbProvider = provider;
         return this;
       }
 
@@ -68,19 +67,6 @@ namespace Ivony.Data
         autoWhiteSpace = value;
         return this;
       }
-
-
-      string database;
-
-      /// <summary>
-      /// 设置默认数据库
-      /// </summary>
-      public Builder SetDefaultDatabase( string database )
-      {
-        this.database = database;
-        return this;
-      }
-
 
 
       private IDictionary<Type, object> services = new Dictionary<Type, object>();
@@ -115,6 +101,12 @@ namespace Ivony.Data
       }
 
 
+      /// <summary>
+      /// 注册一个服务
+      /// </summary>
+      /// <param name="serviceType"></param>
+      /// <param name="serviceInstance"></param>
+      /// <returns></returns>
       public Builder RegisterService( Type serviceType, object serviceInstance )
       {
         if ( serviceType == null )
@@ -130,6 +122,13 @@ namespace Ivony.Data
         return this;
       }
 
+
+      /// <summary>
+      /// 注册一个服务
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="serviceInstance"></param>
+      /// <returns></returns>
       public Builder RegisterService<T>( T serviceInstance )
       {
         if ( serviceInstance == null )
@@ -140,6 +139,13 @@ namespace Ivony.Data
         return this;
       }
 
+
+      /// <summary>
+      /// 注册一个服务
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="serviceFactory"></param>
+      /// <returns></returns>
       public Builder RegisterService<T>( Func<T> serviceFactory )
       {
         if ( serviceFactory == null )
@@ -152,17 +158,30 @@ namespace Ivony.Data
 
 
 
+
+      protected IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+
+
+      public Builder SetProperty( string key, object value )
+      {
+        Properties[key] = value;
+        return this;
+      }
+
+
+
       internal DbContext Build()
       {
         DbContext context = new DbContext();
 
         context.Parent = Parent;
 
-        context.DefaultDatabase = database ?? Parent?.DefaultDatabase ?? Db.DefaultDatabaseName;
         context.AutoWhitespaceSeparator = autoWhiteSpace ?? Parent?.AutoWhitespaceSeparator ?? false;
 
         context.services = new ReadOnlyDictionary<Type, object>( services );
-        context.providers = new ReadOnlyDictionary<string, IDbProvider>( providers );
+        context.Properties = new ReadOnlyDictionary<string, object>( Properties );
+
+        context.DbProvider = DbProvider;
 
         return context;
 

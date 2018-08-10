@@ -40,57 +40,78 @@ PRIMARY KEY (Id)
     [TestMethod]
     public void StandardTest()
     {
-      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteScalar(), "空数据表查询测试失败！" );
-      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteFirstRow(), "空数据表查询测试失败！" );
+      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteScalar(), "空数据表查询" );
+      Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteFirstRow(), "空数据表查询" );
 
-      Assert.AreEqual( Db.T( $"SELECT COUNT(*) FROM testTable" ).ExecuteScalar<int>(), 0, "空数据表查询测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT COUNT(*) FROM testTable" ).ExecuteScalar<int>(), 0, "空数据表查询" );
       Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
-      Assert.IsNotNull( Db.T( $"SELECT ID FROM testTable" ).ExecuteFirstRow(), "插入数据后查询测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
+      Assert.IsNotNull( Db.T( $"SELECT ID FROM testTable" ).ExecuteFirstRow(), "插入数据后查询" );
 
       var dataItem = Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicObject();
-      Assert.AreEqual( dataItem.Name, "Ivony", "插入数据后查询测试失败" );
-      Assert.AreEqual( dataItem["Content"], "Test", "插入数据后查询测试失败" );
+      Assert.AreEqual( dataItem.Name, "Ivony", "插入数据后查询" );
+      Assert.AreEqual( dataItem["Content"], "Test", "插入数据后查询" );
     }
 
     [TestMethod]
     public void TransactionTest()
     {
-      using ( var transaction = Db.DbContext.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务" );
 
-      using ( var transaction = Db.DbContext.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
 
         transaction.Rollback();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务" );
 
 
 
-      using ( var transaction = Db.DbContext.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
 
         transaction.Commit();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "手动提交事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "手动提交事务" );
 
+      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+
+
+
+      using ( var transaction = Db.EnterTransaction() )
+      {
+        Exception exception = null;
+        try
+        {
+          Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+          transaction.Commit();
+          Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+
+        }
+        catch ( Exception e )
+        {
+          exception = e;
+        }
+
+        Assert.IsNotNull( exception, "提交事务后再执行操作引发异常" );
+      }
 
 
       {
         Exception exception = null;
-        var transaction = (MySqlDbTransactionContext) Db.DbContext.BeginTransaction();
+        var transaction = (MySqlDbTransactionContext) Db.EnterTransaction();
 
         try
         {

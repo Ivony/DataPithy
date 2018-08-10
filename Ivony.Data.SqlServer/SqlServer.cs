@@ -29,7 +29,7 @@ namespace Ivony.Data
     /// <returns>SQL Server 数据库访问器</returns>
     public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string connectionString )
     {
-      builder.RegisterDbProvider( Db.DefaultDatabaseName, new SqlServerDbProvider( connectionString ) );
+      builder.SetDbProvider( new SqlServerDbProvider( connectionString ) );
 
       return builder;
     }

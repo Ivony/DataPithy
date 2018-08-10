@@ -22,9 +22,10 @@ namespace Ivony.Data
       return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
     }
 
-    public override IAsyncDbExecutor GetAsyncDbExecutor( DbContext context )
+    public override IDbTransactionContext CreateTransaction( DbContext context )
     {
-      return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
+      return new SqlDbTransactionContext( ConnectionString );
     }
+
   }
 }

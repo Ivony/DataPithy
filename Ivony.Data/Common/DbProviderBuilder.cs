@@ -39,17 +39,11 @@ namespace Ivony.Data.Common
       }
 
 
-      public IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context )
-      {
-        return null;
-      }
-
       public IDbTransactionContext CreateTransaction( DbContext context )
       {
         return null;
       }
 
-      public IAsyncDbExecutor GetAsyncDbExecutor( DbContext context ) => asyncExecutor;
 
       public IDbExecutor GetDbExecutor( DbContext context ) => executor;
     }

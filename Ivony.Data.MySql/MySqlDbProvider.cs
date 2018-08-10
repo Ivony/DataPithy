@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Ivony.Data
 {
-  public class MySqlDbProvider : DbProviderBase
+  public class MySqlDbProvider : IDbProvider
   {
 
     public MySqlDbProvider( string connectionString )
@@ -19,12 +19,12 @@ namespace Ivony.Data
 
 
 
-    public override IDbTransactionContext CreateTransaction( DbContext context )
+    public IDbTransactionContext CreateTransaction( DbContext context )
     {
       return new MySqlDbTransactionContext( ConnectionString );
     }
 
-    public override IDbExecutor GetDbExecutor( DbContext context )
+    public IDbExecutor GetDbExecutor( DbContext context )
     {
       return new MySqlDbExecutor( ConnectionString );
     }

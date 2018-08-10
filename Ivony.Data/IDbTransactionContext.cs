@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Ivony.Data
   /// <summary>
   /// 定义数据库事务上下文
   /// </summary>
-  public interface IDbTransactionContext : IDisposable
+  public interface IDbTransactionContext : IDbProvider, IDisposableObjectContianer
   {
     /// <summary>
     /// 提交事务
@@ -30,14 +31,6 @@ namespace Ivony.Data
     void BeginTransaction();
 
 
-
-    /// <summary>
-    /// 获取数据库查询执行器
-    /// </summary>
-    /// <returns>数据库查询执行器</returns>
-    IDbExecutor GetExecutor();
-
-
     /// <summary>
     /// 获取事务状态
     /// </summary>
@@ -49,7 +42,7 @@ namespace Ivony.Data
   /// <summary>
   /// 定义异步数据库事务上下文
   /// </summary>
-  public interface IAsyncDbTransactionContext
+  public interface IAsyncDbTransactionContext : IDbTransactionContext
   {
 
 
@@ -67,12 +60,6 @@ namespace Ivony.Data
     /// 异步开启事务，若事务创建时已经开启，则调用该方法没有副作用
     /// </summary>
     Task BeginTransactionAsync();
-
-    /// <summary>
-    /// 获取异步数据库查询执行器
-    /// </summary>
-    /// <returns>异步数据库查询执行器</returns>
-    IAsyncDbExecutor GetDbExecutor();
   }
 
 

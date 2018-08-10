@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Ivony.Data.Common;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,8 +19,14 @@ namespace Ivony.Data.MySqlClient
       Connection = new MySqlConnection( connectionString );
     }
 
+    /// <summary>
+    /// 获取数据库连接对象
+    /// </summary>
     public MySqlConnection Connection { get; }
 
+    /// <summary>
+    /// 获取数据库事务对象
+    /// </summary>
     public MySqlTransaction Transaction { get; private set; }
 
     public TransactionStatus Status { get; private set; } = TransactionStatus.NotBeginning;
@@ -56,21 +63,9 @@ namespace Ivony.Data.MySqlClient
 
         Transaction.Commit();
         Status = TransactionStatus.Completed;
-        Dispose();
       }
     }
 
-
-    public IDbExecutor GetExecutor()
-    {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.NotBeginning )
-          BeginTransaction();
-
-        return new MySqlDbExecutorWithTransaction( this );
-      }
-    }
 
     public void Rollback()
     {
@@ -84,7 +79,6 @@ namespace Ivony.Data.MySqlClient
 
         Transaction.Rollback();
         Status = TransactionStatus.Completed;
-        Dispose();
       }
     }
 
@@ -98,8 +92,36 @@ namespace Ivony.Data.MySqlClient
         Status = TransactionStatus.Completed;
         Connection.Dispose();
         Transaction?.Dispose();
+        disposeAction?.Invoke();
       }
     }
 
+
+    public IDbExecutor GetDbExecutor( DbContext context )
+    {
+      lock ( _sync )
+      {
+        if ( Status == TransactionStatus.NotBeginning )
+          BeginTransaction();
+
+        if ( Status == TransactionStatus.Completed )
+          throw new InvalidOperationException();
+
+        return new MySqlDbExecutorWithTransaction( this );
+      }
+    }
+
+    public IDbTransactionContext CreateTransaction( DbContext context )
+    {
+      throw new NotSupportedException( "MySQL database is not supported nested Transaction." );
+    }
+
+
+    private Action disposeAction;
+
+    void IDisposableObjectContianer.RegisterDispose( Action disposeMethod )
+    {
+      disposeAction += disposeMethod;
+    }
   }
 }

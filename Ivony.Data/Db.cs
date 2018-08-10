@@ -29,7 +29,7 @@ namespace Ivony.Data
     /// 获取当前数据访问上下文
     /// </summary>
     /// <returns></returns>
-    public static DbContext DbContext
+    public static DbContext Context
     {
       get
       {
@@ -55,11 +55,24 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable Enter( Action<DbContext.Builder> configure )
     {
-      var builder = new DbContext.Builder( DbContext );
+      return _current.Value = NewContext( configure );
+    }
+
+
+
+    /// <summary>
+    /// 创建一个新的数据访问上下文
+    /// </summary>
+    /// <param name="configure">配置数据访问上下文的方法</param>
+    /// <returns>新的数据访问上下文</returns>
+    public static DbContext NewContext( Action<DbContext.Builder> configure )
+    {
+      var builder = new DbContext.Builder( Context );
       configure( builder );
 
-      return _current.Value = builder.Build();
+      return builder.Build();
     }
+
 
 
 
@@ -68,7 +81,7 @@ namespace Ivony.Data
     /// </summary>
     public static void Exit()
     {
-      DbContext.TryExit();
+      Context.TryExit();
     }
 
 
@@ -138,7 +151,7 @@ namespace Ivony.Data
       if ( template == null )
         return null;
 
-      return DbContext.GetTemplateParser().ParseTemplate( template );
+      return Context.GetTemplateParser().ParseTemplate( template );
     }
 
 
@@ -152,7 +165,7 @@ namespace Ivony.Data
       if ( text == null )
         return null;
 
-      return DbContext.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
+      return Context.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
     }
 
 
@@ -169,9 +182,32 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 默认数据库连接名称
+    /// 在当前上下文开启一个事务执行
     /// </summary>
-    public static string DefaultDatabaseName => "Default";
+    /// <returns></returns>
+    public static IDbTransactionContext EnterTransaction()
+    {
+      return EnterTransaction( builder => { } );
+    }
+
+
+
+    /// <summary>
+    /// 在当前上下文开启一个事务执行
+    /// </summary>
+    /// <returns></returns>
+    public static IDbTransactionContext EnterTransaction( Action<DbContext.Builder> configure )
+
+    {
+      var transaction = Context.DbProvider.CreateTransaction( Context ) ?? throw new NotSupportedException();
+
+      var transactionContext = Enter( builder => { configure( builder ); builder.SetDbProvider( transaction ); } );
+      transaction.RegisterDispose( () => transactionContext.Dispose() );
+
+      return transaction;
+    }
+
+
 
 
 
@@ -181,44 +217,41 @@ namespace Ivony.Data
     /// <param name="actions"></param>
     public static void Transaction( Action actions )
     {
-      Transaction( null, actions );
+      using ( var transaction = EnterTransaction() )
+      {
+        try
+        {
+          actions();
+        }
+        catch ( Exception e )
+        {
+          if ( transaction.Status == TransactionStatus.Running )
+            transaction.Rollback();
+
+          if ( e is RollbackException == false )
+            throw;
+        }
+        finally
+        {
+          if ( transaction.Status == TransactionStatus.Running )
+            transaction.Commit();
+        }
+      }
     }
+
 
     /// <summary>
-    /// 创建一个事务并执行
+    /// 回滚事务
     /// </summary>
-    /// <param name="actions"></param>
-    public static void Transaction( string database, Action actions )
+    public static void Rollback()
     {
-      var transaction = DbContext.CreateTransaction( database );
+      if ( Context.DbProvider is IDbTransactionContext == false )
+        throw new InvalidOperationException( "Rollback method must invoked in transaction context" );
 
-      transaction.Run( actions );
+      throw new RollbackException();
     }
 
-
-
-
-
-    /// <summary>
-    /// 创建一个事务并执行
-    /// </summary>
-    /// <param name="actions"></param>
-    public static Task TransactionAsync( Func<Task> asyncActions )
-    {
-      return TransactionAsync( null, asyncActions );
-    }
-
-    /// <summary>
-    /// 创建一个事务并执行
-    /// </summary>
-    /// <param name="actions"></param>
-    public static Task TransactionAsync( string database, Func<Task> asyncActions )
-    {
-      var transaction = DbContext.CreateAsyncTransaction( database );
-      if ( transaction == null )
-        throw new NotSupportedException();
-      return transaction.RunAsync( asyncActions );
-    }
   }
 }
+
 
