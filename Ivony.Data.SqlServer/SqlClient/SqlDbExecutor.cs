@@ -14,8 +14,6 @@ using System.Linq;
 using System.Threading;
 using System.Data.Common;
 using Ivony.Data.Common;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Ivony.Data.SqlClient
 {

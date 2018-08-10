@@ -10,6 +10,9 @@ namespace Ivony.Data
   /// </summary>
   public class RollbackException : Exception
   {
+    /// <summary>
+    /// 创建 RollbackException 对象
+    /// </summary>
     public RollbackException() : base( "Transaction will be rollback, don't catch this exception." )
     {
     }
