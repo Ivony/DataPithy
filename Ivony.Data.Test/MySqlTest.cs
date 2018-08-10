@@ -109,6 +109,41 @@ PRIMARY KEY (Id)
       }
 
 
+
+      using ( var transaction = Db.EnterTransaction() )
+      {
+        Exception exception = null;
+        try
+        {
+          Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+          transaction.Commit();
+          Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+
+        }
+        catch ( Exception e )
+        {
+          exception = e;
+        }
+
+        Assert.IsNotNull( exception, "提交事务后再执行操作引发异常" );
+      }
+
+
+
+      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+
+      Db.Transaction( () =>
+      {
+        Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "直接运行事务" );
+
+        Db.Rollback();
+      } );
+
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
+
+
+
       {
         Exception exception = null;
         var transaction = (MySqlDbTransactionContext) Db.EnterTransaction();

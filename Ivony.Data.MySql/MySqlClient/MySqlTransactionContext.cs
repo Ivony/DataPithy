@@ -119,7 +119,7 @@ namespace Ivony.Data.MySqlClient
 
     private Action disposeAction;
 
-    void IDisposableObjectContianer.RegisterDispose( Action disposeMethod )
+    void IDisposableObjectContainer.RegisterDispose( Action disposeMethod )
     {
       disposeAction += disposeMethod;
     }

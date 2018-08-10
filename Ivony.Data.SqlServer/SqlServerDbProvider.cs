@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Ivony.Data
 {
-  public class SqlServerDbProvider : DbProviderBase
+  public class SqlServerDbProvider : IDbProvider
   {
     public SqlServerDbProvider( string connectionString )
     {
@@ -17,12 +17,12 @@ namespace Ivony.Data
     public string ConnectionString { get; private set; }
 
 
-    public override IDbExecutor GetDbExecutor( DbContext context )
+    public IDbExecutor GetDbExecutor( DbContext context )
     {
       return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
     }
 
-    public override IDbTransactionContext CreateTransaction( DbContext context )
+    public IDbTransactionContext CreateTransaction( DbContext context )
     {
       return new SqlDbTransactionContext( ConnectionString );
     }

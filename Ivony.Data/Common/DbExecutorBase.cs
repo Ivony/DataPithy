@@ -18,7 +18,6 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
-    /// <param name="environment">当前数据库访问环境</param>
     protected DbExecutorBase()
     {
       TraceService = Db.Context.GetTraceService();
@@ -67,7 +66,6 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 尝试创建 IDbTracing 对象
     /// </summary>
-    /// <typeparam name="TQuery">即将执行的查询的类型</typeparam>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>
     protected IDbTracing TryCreateTracing( IDbQuery query )

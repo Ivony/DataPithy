@@ -168,7 +168,7 @@ namespace Ivony.Data
     /// <returns></returns>
     internal IDbTransactionContext CreateTransaction()
     {
-      return DbProvider.CreateTransaction( this );
+      return DbProvider.CreateTransaction( this ) ?? throw new NotSupportedException();
     }
 
     /// <summary>
@@ -177,7 +177,8 @@ namespace Ivony.Data
     /// <returns></returns>
     internal IAsyncDbTransactionContext CreateAsyncTransaction()
     {
-      return CreateTransaction() as IAsyncDbTransactionContext;
+      var transaction = CreateTransaction() ?? throw new NotSupportedException();
+      return transaction as IAsyncDbTransactionContext ?? new AsyncDbTransactionContextWrapper( transaction );
     }
 
 

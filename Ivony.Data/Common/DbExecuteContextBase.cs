@@ -24,9 +24,9 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="dataReader">用于读取数据的 IDataReader 对象</param>
     /// <param name="tracing">用于追踪此次查询过程的追踪器</param>
-    /// <param name="connectionResource">销毁该上下文时，需要同时销毁的连接资源</param>
+    /// <param name="disposeMethod">销毁上下文时要执行的方法</param>
     /// <param name="sync">用于同步的对象，如果有的话</param>
-    protected DbExecuteContextBase( IDataReader dataReader, IDbTracing tracing = null, IDisposable connectionResource = null, object sync = null )
+    protected DbExecuteContextBase( IDataReader dataReader, IDbTracing tracing = null, Action disposeMethod = null, object sync = null )
     {
 
       if ( dataReader == null )
@@ -34,9 +34,10 @@ namespace Ivony.Data.Common
 
 
       SyncRoot = sync;
+      this.disposeMethod = disposeMethod;
+
 
       DataReader = dataReader;
-      ConnectionResource = connectionResource;
       Tracing = tracing;
 
       DataTableAdapter = new DataTableAdapter();
@@ -57,15 +58,6 @@ namespace Ivony.Data.Common
       private set;
     }
 
-
-    /// <summary>
-    /// 获取销毁该上下文时，需要同时销毁的连接资源
-    /// </summary>
-    protected IDisposable ConnectionResource
-    {
-      get;
-      private set;
-    }
 
 
     /// <summary>
@@ -182,18 +174,30 @@ namespace Ivony.Data.Common
 
 
 
+    private Action disposeMethod;
+
+    void IDisposableObjectContainer.RegisterDispose( Action disposeAction )
+    {
+      disposeMethod += disposeAction;
+    }
+
+
+
     /// <summary>
     /// 销毁执行上下文所有相关的资源，并通知追踪器查询已经完成
     /// </summary>
     public virtual void Dispose()
     {
-      if ( ConnectionResource != null )
-        ConnectionResource.Dispose();
-
-      if ( SyncRoot != null )
-        Monitor.Exit( SyncRoot );
-
-      DataReader.Dispose();
+      try
+      {
+        DataReader.Dispose();
+        disposeMethod?.Invoke();
+      }
+      finally
+      {
+        if ( SyncRoot != null )
+          Monitor.Exit( SyncRoot );
+      }
 
       try
       {
@@ -208,6 +212,7 @@ namespace Ivony.Data.Common
       }
       catch { }
     }
+
   }
 
 
@@ -224,9 +229,10 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="dataReader">用于读取数据的 IDataReader 对象</param>
     /// <param name="tracing">用于追踪此次查询过程的追踪器</param>
-    /// <param name="connectionResource">销毁该上下文时，需要同时销毁的连接资源</param>
-    protected AsyncDbExecuteContextBase( DbDataReader dataReader, IDbTracing tracing = null, IDisposable connectionResource = null )
-      : base( dataReader, tracing, connectionResource )
+    /// <param name="disposeMethod">当上下文销毁时要执行的方法</param>
+    /// <param name="sync">用于同步的对象</param>
+    protected AsyncDbExecuteContextBase( DbDataReader dataReader, IDbTracing tracing = null, Action disposeMethod = null, object sync = null )
+      : base( dataReader, tracing, disposeMethod, sync )
     {
 
       DataReader = dataReader;

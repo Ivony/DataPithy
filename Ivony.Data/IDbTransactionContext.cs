@@ -12,7 +12,7 @@ namespace Ivony.Data
   /// <summary>
   /// 定义数据库事务上下文
   /// </summary>
-  public interface IDbTransactionContext : IDbProvider, IDisposableObjectContianer
+  public interface IDbTransactionContext : IDbProvider, IDisposableObjectContainer
   {
     /// <summary>
     /// 提交事务

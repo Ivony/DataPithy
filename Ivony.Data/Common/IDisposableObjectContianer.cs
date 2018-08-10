@@ -7,7 +7,7 @@ namespace Ivony.Data.Common
   /// <summary>
   /// 定义可销毁对象的容器，当容器销毁时，所有子对象将一并销毁。
   /// </summary>
-  public interface IDisposableObjectContianer : IDisposable
+  public interface IDisposableObjectContainer : IDisposable
   {
 
     /// <summary>

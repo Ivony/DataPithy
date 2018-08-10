@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Common;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Ivony.Data
   /// <summary>
   /// 查询执行上下文
   /// </summary>
-  public interface IDbExecuteContext : IDisposable
+  public interface IDbExecuteContext : IDisposableObjectContainer
   {
 
     /// <summary>

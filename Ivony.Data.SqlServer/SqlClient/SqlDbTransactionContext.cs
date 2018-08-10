@@ -62,7 +62,7 @@ namespace Ivony.Data.SqlClient
     }
 
 
-    void IDisposableObjectContianer.RegisterDispose( Action disposeMethod )
+    void IDisposableObjectContainer.RegisterDispose( Action disposeMethod )
     {
       throw new NotImplementedException();
     }

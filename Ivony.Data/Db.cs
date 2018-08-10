@@ -200,7 +200,10 @@ namespace Ivony.Data
     {
       var transaction = Context.DbProvider.CreateTransaction( Context ) ?? throw new NotSupportedException();
 
-      var transactionContext = Enter( builder => { configure( builder ); builder.SetDbProvider( transaction ); } );
+      var transactionContext = Enter( builder =>
+      {
+        configure( builder ); builder.SetDbProvider( transaction );
+      } );
       transaction.RegisterDispose( () => transactionContext.Dispose() );
 
       return transaction;
@@ -229,6 +232,37 @@ namespace Ivony.Data
 
           if ( e is RollbackException == false )
             throw;
+        }
+        finally
+        {
+          if ( transaction.Status == TransactionStatus.Running )
+            transaction.Commit();
+        }
+      }
+    }
+
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="actions"></param>
+    public static T Transaction<T>( Func<T> actions )
+    {
+      using ( var transaction = EnterTransaction() )
+      {
+        try
+        {
+          return actions();
+        }
+        catch ( Exception e )
+        {
+          if ( transaction.Status == TransactionStatus.Running )
+            transaction.Rollback();
+
+          if ( e is RollbackException == false )
+            throw;
+
+          else
+            return default( T );
         }
         finally
         {
