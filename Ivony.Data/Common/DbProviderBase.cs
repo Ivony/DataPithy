@@ -4,35 +4,24 @@ using System.Text;
 
 namespace Ivony.Data.Common
 {
-  /// <summary>
-  /// 提供 IDbExecutorProvider 的标准实现
-  /// </summary>
-  public abstract class DbProviderBase : IDbProvider
+  public class DbProviderBase : IDbProvider
   {
-
-
-
-
-    protected abstract IDbExecutor CreateExecutor( DbExecutorBuilder builder );
-
-    public IDbExecutor GetDbExecutor( DbContext context )
+    public virtual IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context )
     {
-      return CreateExecutor( new DbExecutorBuilder() );
+      return CreateTransaction(context) as IAsyncDbTransactionContext;
     }
 
-
-    public IAsyncDbExecutor GetAsyncDbExecutor( DbContext context )
+    public virtual IDbTransactionContext CreateTransaction( DbContext context )
     {
       return null;
     }
 
-
-    public IDbTransactionContext CreateTransaction( DbContext context )
+    public virtual IAsyncDbExecutor GetAsyncDbExecutor( DbContext context )
     {
-      return null;
+      return GetDbExecutor( context ) as IAsyncDbExecutor;
     }
 
-    public IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context )
+    public virtual IDbExecutor GetDbExecutor( DbContext context )
     {
       return null;
     }

@@ -18,30 +18,6 @@ namespace Ivony.Data.Queries
   {
 
 
-    private class ParameterizedQueryFormattableString : FormattableString
-    {
-
-      private ParameterizedQuery _query;
-
-      public ParameterizedQueryFormattableString( ParameterizedQuery query )
-      {
-        _query = query ?? throw new ArgumentNullException( nameof( query ) );
-      }
-
-      public override int ArgumentCount => _query.ParameterValues.Length;
-
-      public override string Format => _query.TextTemplate;
-
-      public override object GetArgument( int index ) => _query.ParameterValues.GetValue( index );
-
-      public override object[] GetArguments() => _query.ParameterValues;
-
-      public override string ToString( IFormatProvider formatProvider )
-      {
-        return _query.ToString();
-      }
-    }
-
 
     /// <summary>
     /// 定义匹配参数占位符的正则表达式
@@ -72,6 +48,14 @@ namespace Ivony.Data.Queries
       private set;
     }
 
+
+
+
+    /// <summary>
+    /// 应用于此查询的配置项
+    /// </summary>
+    public DbQueryConfigures Configures { get; }
+
     /// <summary>
     /// 判断该参数化查询是否为一个空的查询
     /// </summary>
@@ -83,7 +67,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    internal ParameterizedQuery( string template, object[] values )
+    internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null )
     {
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
 
@@ -93,6 +77,8 @@ namespace Ivony.Data.Queries
 
       ParameterValues = new object[values.Length];
       values.CopyTo( ParameterValues, 0 );
+
+      Configures = configures ?? new DbQueryConfigures();
     }
 
 

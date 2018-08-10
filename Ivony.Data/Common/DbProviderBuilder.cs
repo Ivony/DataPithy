@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ivony.Data.Common
@@ -10,7 +11,7 @@ namespace Ivony.Data.Common
   /// <summary>
   /// 辅助构建 IDbProvider 对象
   /// </summary>
-  public class DbProviderBuilder : IAsyncDbExecutorRegisterService, IAsyncDbTransactionExecutorRegisterService, IDbExecutorRegisterService, IDbTransactionExecutorRegisterService
+  public class DbProviderBuilder : IAsyncDbExecutorRegisterService, IDbExecutorRegisterService
   {
 
 
@@ -21,27 +22,47 @@ namespace Ivony.Data.Common
     /// <returns></returns>
     public IDbProvider Build()
     {
-      return null;
+      throw new NotImplementedException();
     }
 
 
 
-
-    private List<(Func<IDbTransactionContext, IDbQuery, bool>, Func<IDbTransactionContext, IDbQuery, Task<IDbExecuteContext>>)> async_trans = new List<(Func<IDbTransactionContext, IDbQuery, bool>, Func<IDbTransactionContext, IDbQuery, Task<IDbExecuteContext>>)>();
-    private List<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)> async_execs = new List<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)>();
-    private List<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)> execs = new List<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)>();
-    private List<(Func<IDbTransactionContext, IDbQuery, bool>, Func<IDbTransactionContext, IDbQuery, IDbExecuteContext>)> trans_execs = new List<(Func<IDbTransactionContext, IDbQuery, bool>, Func<IDbTransactionContext, IDbQuery, IDbExecuteContext>)>();
-
-
-
-    void IAsyncDbTransactionExecutorRegisterService.Register( Func<IDbTransactionContext, IDbQuery, bool> predicate, Func<IDbTransactionContext, IDbQuery, Task<IDbExecuteContext>> executor )
+    private class DbProvider : IDbProvider
     {
-      async_trans.Add( (predicate, executor) );
+      private readonly IDbExecutor executor;
+      private readonly IAsyncDbExecutor asyncExecutor;
+
+      public DbProvider( IDbExecutor executor, IAsyncDbExecutor asyncExecutor )
+      {
+        this.executor = executor;
+        this.asyncExecutor = asyncExecutor;
+      }
+
+
+      public IAsyncDbTransactionContext CreateAsyncTransaction( DbContext context )
+      {
+        return null;
+      }
+
+      public IDbTransactionContext CreateTransaction( DbContext context )
+      {
+        return null;
+      }
+
+      public IAsyncDbExecutor GetAsyncDbExecutor( DbContext context ) => asyncExecutor;
+
+      public IDbExecutor GetDbExecutor( DbContext context ) => executor;
     }
+
+
+
+    private List<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)> asyncs = new List<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)>();
+    private List<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)> execs = new List<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)>();
+
 
     void IAsyncDbExecutorRegisterService.Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, Task<IAsyncDbExecuteContext>> executor )
     {
-      async_execs.Add( (predicate, executor) );
+      asyncs.Add( (predicate, executor) );
     }
 
     void IDbExecutorRegisterService.Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, IDbExecuteContext> executor )
@@ -49,83 +70,56 @@ namespace Ivony.Data.Common
       execs.Add( (predicate, executor) );
     }
 
-    void IDbTransactionExecutorRegisterService.Register( Func<IDbTransactionContext, IDbQuery, bool> predicate, Func<IDbTransactionContext, IDbQuery, IDbExecuteContext> executor )
+
+
+
+
+
+    private class CompositeDbExecutor : IAsyncDbExecutor
     {
-      trans_execs.Add( (predicate, executor) );
-    }
+      private IReadOnlyCollection<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)> _executors;
+      private IReadOnlyCollection<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)> _asyncExecutors;
 
-
-
-
-
-
-    private class ExecutorItem
-    {
-      public Func<IDbQuery, IDbExecuteContext> Executor { get; set; }
-
-      public Func<IDbQuery, bool> Predicate { get; set; }
-    }
-
-
-
-    /// <summary>
-    /// 协助构建 IDbExecutor 对象
-    /// </summary>
-    private class ExecutorRegisterService : IDbExecutorRegisterService
-    {
-
-      /// <summary>
-      /// 创建 IDbExecutor 对象
-      /// </summary>
-      /// <returns></returns>
-      public IDbExecutor BuildExecutor()
+      public CompositeDbExecutor(
+        IReadOnlyCollection<(Func<IDbQuery, bool>, Func<IDbQuery, IDbExecuteContext>)> execcutors,
+        IReadOnlyCollection<(Func<IDbQuery, bool>, Func<IDbQuery, Task<IAsyncDbExecuteContext>>)> asyncExecutors
+        )
       {
-        return new DbExecutor( this );
+        _executors = execcutors;
+        _asyncExecutors = asyncExecutors;
       }
 
-
-      private class DbExecutor : IDbExecutor
+      public IDbExecuteContext Execute( IDbQuery query )
       {
-
-        public DbExecutor( ExecutorRegisterService provider )
+        foreach ( var item in _executors )
         {
-          Provider = provider;
+          if ( item.Item1( query ) == false )
+            continue;
+
+          var result = item.Item2( query );
+          if ( result != null )
+            return result;
         }
 
-        public ExecutorRegisterService Provider { get; }
-
-        public IDbExecuteContext Execute( IDbQuery query )
+        foreach ( var item in _asyncExecutors )
         {
+          if ( item.Item1( query ) == false )
+            continue;
 
-          foreach ( var executeMethod in Provider.FindExecutors( query ) )
-          {
-            var result = executeMethod( query );
-            if ( result != null )
-              return result;
-          }
-
-          return null;
+          var result = item.Item2( query ).Result;
+          if ( result != null )
+            return result;
         }
+
+        return null;
       }
 
-
-      private List<ExecutorItem> Items { get; } = new List<ExecutorItem>();
-
-      /// <summary>
-      /// 创建 IDbExecutor 对象
-      /// </summary>
-      /// <param name="query">要执行的查询</param>
-      /// <returns>查询执行器</returns>
-      protected virtual Func<IDbQuery, IDbExecuteContext>[] FindExecutors( IDbQuery query )
+      public Task<IAsyncDbExecuteContext> ExecuteAsync( IDbQuery query, CancellationToken token )
       {
-        return Items.FindAll( item => item.Predicate( query ) ).Select( item => item.Executor ).ToArray();
-      }
-
-      void IDbExecutorRegisterService.Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, IDbExecuteContext> executor )
-      {
-        Items.Add( new ExecutorItem { Predicate = predicate, Executor = executor } );
+        throw new NotImplementedException();
       }
     }
+
 
   }
 }

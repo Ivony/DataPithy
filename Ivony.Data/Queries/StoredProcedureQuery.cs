@@ -21,19 +21,20 @@ namespace Ivony.Data.Queries
     /// 创建 StoredProcedureExpression 对象
     /// </summary>
     /// <param name="name">存储过程名称</param>
-    public StoredProcedureQuery( string name ) : this( name, new Dictionary<string, object>() ) { }
+    public StoredProcedureQuery( string name, DbQueryConfigures configures = null ) : this( name, new Dictionary<string, object>(), configures ) { }
 
     /// <summary>
     /// 创建 StoredProcedureExpression 对象
     /// </summary>
     /// <param name="name">存储过程名称</param>
     /// <param name="parameters">存储过程参数列表</param>
-    public StoredProcedureQuery( string name, IDictionary<string, object> parameters )
+    public StoredProcedureQuery( string name, IDictionary<string, object> parameters, DbQueryConfigures configures = null )
     {
 
       _name = name;
       _parameters = parameters;
 
+      Configures = configures ?? new DbQueryConfigures();
     }
 
 
@@ -52,5 +53,10 @@ namespace Ivony.Data.Queries
     {
       get { return _parameters; }
     }
+
+    /// <summary>
+    /// 应用于此查询的配置项
+    /// </summary>
+    public DbQueryConfigures Configures { get; }
   }
 }

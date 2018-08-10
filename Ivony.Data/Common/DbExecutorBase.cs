@@ -40,7 +40,6 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 尝试创建 IDbTracing 对象
     /// </summary>
-    /// <typeparam name="TQuery">即将执行的查询的类型</typeparam>
     /// <param name="executor">查询执行器</param>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>

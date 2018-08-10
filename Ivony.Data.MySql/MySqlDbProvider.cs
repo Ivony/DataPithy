@@ -17,10 +17,16 @@ namespace Ivony.Data
 
     public string ConnectionString { get; }
 
-    protected override IDbExecutor CreateExecutor( DbExecutorBuilder builder )
+
+
+    public override IDbTransactionContext CreateTransaction( DbContext context )
     {
-      builder.AddExecutor<ParameterizedQuery>( new MySqlDbExecutor( ConnectionString, new MySqlDbConfiguration() ) );
-      return builder.BuildExecutor();
+      return new MySqlDbTransactionContext( ConnectionString );
+    }
+
+    public override IDbExecutor GetDbExecutor( DbContext context )
+    {
+      return new MySqlDbExecutor( ConnectionString );
     }
   }
 }

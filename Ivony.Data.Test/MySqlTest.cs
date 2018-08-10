@@ -11,9 +11,6 @@ namespace Ivony.Data.Test
   [TestClass]
   public class MySqlTest
   {
-    private static TestTraceService traceService;
-
-
 
     [TestInitialize]
     public void Enter()
@@ -59,8 +56,7 @@ PRIMARY KEY (Id)
     [TestMethod]
     public void TransactionTest()
     {
-#if false
-      using ( var transaction = db.BeginTransaction() )
+      using ( var transaction = Db.DbContext.BeginTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
@@ -68,9 +64,9 @@ PRIMARY KEY (Id)
 
       Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
 
-      using ( var transaction = db.BeginTransaction() )
+      using ( var transaction = Db.DbContext.BeginTransaction() )
       {
-        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
 
         transaction.Rollback();
@@ -80,9 +76,9 @@ PRIMARY KEY (Id)
 
 
 
-      using ( var transaction = db.BeginTransaction() )
+      using ( var transaction = Db.DbContext.BeginTransaction() )
       {
-        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES (  ( {"Ivony"}, {"Test"} ) )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
+        Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
 
         transaction.Commit();
@@ -94,7 +90,7 @@ PRIMARY KEY (Id)
 
       {
         Exception exception = null;
-        var transaction = (MySqlDbTransactionContext) db.BeginTransaction();
+        var transaction = (MySqlDbTransactionContext) Db.DbContext.BeginTransaction();
 
         try
         {
@@ -112,41 +108,44 @@ PRIMARY KEY (Id)
         Assert.IsNotNull( exception, "事务中出现异常测试失败" );
         Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed );
       }
-#endif
     }
 
     [TestMethod]
     public void TraceTest()
     {
-
-      Db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
-
-      var tracing = traceService.Last();
-
-      var logs = tracing.TraceEvents;
-      Assert.AreEqual( logs.Length, 3 );
-
-      Assert.AreEqual( logs[0].EventName, "OnExecuting" );
-      Assert.AreEqual( logs[1].EventName, "OnLoadingData" );
-      Assert.AreEqual( logs[2].EventName, "OnComplete" );
-
-
-      try
+      var traceService = new TestTraceService();
+      using ( Db.Enter( configure => configure.RegisterService<IDbTraceService>( traceService ) ) )
       {
-        Db.T( $"SELECT * FROM Nothing" ).ExecuteDynamics();
-      }
-      catch
-      {
+        Db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
+
+        var tracing = traceService.Last();
+
+        var logs = tracing.TraceEvents;
+        Assert.AreEqual( logs.Length, 3 );
+
+        Assert.AreEqual( logs[0].EventName, "OnExecuting" );
+        Assert.AreEqual( logs[1].EventName, "OnLoadingData" );
+        Assert.AreEqual( logs[2].EventName, "OnComplete" );
+
+
+        try
+        {
+          Db.T( $"SELECT * FROM Nothing" ).ExecuteDynamics();
+        }
+        catch
+        {
+
+        }
+
+        tracing = traceService.Last();
+
+        logs = tracing.TraceEvents;
+        Assert.AreEqual( logs.Length, 2 );
+
+        Assert.AreEqual( logs[0].EventName, "OnExecuting" );
+        Assert.AreEqual( logs[1].EventName, "OnException" );
 
       }
-
-      tracing = traceService.Last();
-
-      logs = tracing.TraceEvents;
-      Assert.AreEqual( logs.Length, 2 );
-
-      Assert.AreEqual( logs[0].EventName, "OnExecuting" );
-      Assert.AreEqual( logs[1].EventName, "OnException" );
     }
   }
 }

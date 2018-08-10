@@ -39,7 +39,7 @@ namespace Ivony.Data
             return _current.Value;
 
           if ( _root == null )
-            InitializeDb( configure => { } );
+            Initialize( configure => { } );
 
           return _current.Value = _root;
         }
@@ -89,40 +89,29 @@ namespace Ivony.Data
     /// <summary>
     /// 初始化根数据访问上下文
     /// </summary>
-    public static DbContext InitializeDb( Action<DbContext.Builder> configure )
+    public static DbContext Initialize( Action<DbContext.Builder> configure )
     {
       lock ( _sync )
       {
         if ( _root != null )
           throw new InvalidOperationException( "DataPithy is already initialized." );
 
-        return _root = InitializeDbContext( new ServiceCollection().AddDataPithy().BuildServiceProvider(), configure );
+        return _root = InitializeCore( builder =>
+        {
+          builder.RegisterService<IParameterizedQueryBuilder>( () => new ParameterizedQueryBuilder() );
+          builder.RegisterService( typeof( ITemplateParser ), typeof( TemplateParser ) );
+
+          configure( builder );
+        } );
       }
     }
 
 
-    /// <summary>
-    /// 初始化根数据访问上下文
-    /// </summary>
-    /// <param name="serviceProvider">服务提供程序</param>
-    /// <param name="configure">数据访问上下文配置</param>
-    public static IServiceProvider InitializeDb( this IServiceProvider serviceProvider, Action<DbContext.Builder> configure )
+
+
+    private static DbContext InitializeCore( Action<DbContext.Builder> configure )
     {
-      lock ( _sync )
-      {
-        if ( _root != null )
-          throw new InvalidOperationException( "DataPithy is already initialized." );
-
-        _root = InitializeDbContext( serviceProvider, configure );
-      }
-
-      return serviceProvider;
-    }
-
-
-    private static DbContext InitializeDbContext( IServiceProvider serviceProvider, Action<DbContext.Builder> configure )
-    {
-      var builder = new DbContext.Builder( serviceProvider );
+      var builder = new DbContext.Builder();
       configure( builder );
       return builder.Build();
     }
@@ -179,21 +168,6 @@ namespace Ivony.Data
 
 
 
-
-    /// <summary>
-    /// 配置使用 DataPithy
-    /// </summary>
-    /// <param name="services">服务配置</param>
-    public static IServiceCollection AddDataPithy( this IServiceCollection services )
-    {
-
-      services.AddSingleton( typeof( ITemplateParser ), typeof( TemplateParser ) );
-      services.AddTransient( typeof( IParameterizedQueryBuilder ), typeof( ParameterizedQueryBuilder ) );
-
-      return services;
-    }
-
-
     /// <summary>
     /// 默认数据库连接名称
     /// </summary>
@@ -201,127 +175,50 @@ namespace Ivony.Data
 
 
 
-    public static void Transaction( Action inTransactionActions )
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="actions"></param>
+    public static void Transaction( Action actions )
     {
-      Transaction( DbContext, inTransactionActions );
+      Transaction( null, actions );
     }
 
-    public static void Transaction( this DbContext context, Action actions )
-    {
-      Transaction( context, null, actions );
-    }
-
-
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="actions"></param>
     public static void Transaction( string database, Action actions )
     {
-      Transaction( DbContext, database, actions );
-    }
+      var transaction = DbContext.CreateTransaction( database );
 
-    public static void Transaction( this DbContext context, string database, Action actions )
-    {
-      var transaction = context.CreateTransaction( database );
-
-      bool rollbacked = false;
-      try
-      {
-        transaction.BeginTransaction();
-        actions();
-      }
-      catch
-      {
-        transaction.Rollback();
-        rollbacked = true;
-        throw;
-      }
-      finally
-      {
-        if ( rollbacked == false )
-          transaction.Commit();
-      }
+      transaction.Run( actions );
     }
 
 
 
 
-    public static Task Transaction( Func<Task> asyncActions )
-    {
-      return Transaction( DbContext, asyncActions );
-    }
 
-    public static Task Transaction( this DbContext context, Func<Task> asyncActions )
-    {
-      return Transaction( context, null, asyncActions );
-    }
-
-    public static Task Transaction( string database, Func<Task> asyncActions )
-    {
-      return Transaction( DbContext, database, asyncActions );
-    }
-
-    public static async Task Transaction( this DbContext context, string database, Func<Task> asyncActions )
-    {
-      var transaction = context.CreateTransaction( database );
-
-      bool rollbacked = false;
-      try
-      {
-        transaction.BeginTransaction();
-        await asyncActions();
-      }
-      catch
-      {
-        transaction.Rollback();
-        rollbacked = true;
-        throw;
-      }
-      finally
-      {
-        if ( rollbacked == false )
-          transaction.Commit();
-      }
-    }
-
-
-
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="actions"></param>
     public static Task TransactionAsync( Func<Task> asyncActions )
     {
-      return TransactionAsync( DbContext, asyncActions );
+      return TransactionAsync( null, asyncActions );
     }
 
-    public static Task TransactionAsync( this DbContext context, Func<Task> asyncActions )
-    {
-      return TransactionAsync( context, null, asyncActions );
-    }
-
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="actions"></param>
     public static Task TransactionAsync( string database, Func<Task> asyncActions )
     {
-      return TransactionAsync( DbContext, database, asyncActions );
+      var transaction = DbContext.CreateAsyncTransaction( database );
+      if ( transaction == null )
+        throw new NotSupportedException();
+      return transaction.RunAsync( asyncActions );
     }
-
-    public static async Task TransactionAsync( this DbContext context, string database, Func<Task> asyncActions )
-    {
-      var transaction = context.CreateAsyncTransaction( database );
-
-      bool rollbacked = false;
-      try
-      {
-        await transaction.BeginTransactionAsync();
-        await asyncActions();
-      }
-      catch
-      {
-        await transaction.RollbackAsync();
-        rollbacked = true;
-        throw;
-      }
-      finally
-      {
-        if ( rollbacked == false )
-          await transaction.CommitAsync();
-      }
-    }
-
-
   }
 }
 

@@ -16,10 +16,15 @@ namespace Ivony.Data
 
     public string ConnectionString { get; private set; }
 
-    protected override IDbExecutor CreateExecutor( DbExecutorBuilder builder )
+
+    public override IDbExecutor GetDbExecutor( DbContext context )
     {
-      builder.AddExecutor<ParameterizedQuery>( new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() ) );
-      return builder.BuildExecutor();
+      return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
+    }
+
+    public override IAsyncDbExecutor GetAsyncDbExecutor( DbContext context )
+    {
+      return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
     }
   }
 }

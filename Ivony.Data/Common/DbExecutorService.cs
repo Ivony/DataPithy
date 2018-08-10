@@ -20,35 +20,6 @@ namespace Ivony.Data.Common
     void Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, Task<IAsyncDbExecuteContext>> executor );
   }
 
-
-  /// <summary>
-  /// 提供注册异步事务查询执行方法的服务
-  /// </summary>
-  public interface IAsyncDbTransactionExecutorRegisterService
-  {
-    /// <summary>
-    /// 添加一个异步查询执行方法
-    /// </summary>
-    /// <param name="predicate">需要满足的条件</param>
-    /// <param name="executor">查询执行方法</param>
-    void Register( Func<IDbTransactionContext, IDbQuery, bool> predicate, Func<IDbTransactionContext, IDbQuery, Task<IDbExecuteContext>> executor );
-  }
-
-
-  /// <summary>
-  /// 提供注册事务查询执行方法的服务
-  /// </summary>
-  public interface IDbTransactionExecutorRegisterService
-  {
-    /// <summary>
-    /// 添加一个同步查询执行方法
-    /// </summary>
-    /// <param name="predicate">需要满足的条件</param>
-    /// <param name="executor">查询执行方法</param>
-    void Register( Func<IDbTransactionContext, IDbQuery, bool> predicate, Func<IDbTransactionContext, IDbQuery, IDbExecuteContext> executor );
-  }
-
-
   /// <summary>
   /// 提供注册数据库查询执行方法的服务
   /// </summary>
@@ -103,6 +74,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
@@ -115,6 +87,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
@@ -127,6 +100,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executorFactory">创建查询执行器的工厂方法</param>
     /// <returns></returns>
@@ -139,6 +113,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <param name="queryType">适用的查询类型</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
@@ -150,6 +125,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <param name="queryType">适用的查询类型</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
@@ -161,6 +137,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <typeparam name="T">适用的查询类型</typeparam>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
@@ -172,6 +149,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册一个查询执行器
     /// </summary>
+    /// <param name="service">查询执行器注册服务</param>
     /// <typeparam name="T">适用的查询类型</typeparam>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>

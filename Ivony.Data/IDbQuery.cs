@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,13 @@ namespace Ivony.Data
   /// </summary>
   public interface IDbQuery
   {
+
+
+    /// <summary>
+    /// 获取查询配置对象
+    /// </summary>
+    DbQueryConfigures Configures { get; }
+
   }
 
 

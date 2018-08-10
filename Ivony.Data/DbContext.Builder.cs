@@ -17,16 +17,14 @@ namespace Ivony.Data
     public class Builder
     {
 
-      internal Builder( IServiceProvider serviceProvider )
+      internal Builder()
       {
-        ServiceProvider = serviceProvider;
       }
 
 
       internal Builder( DbContext parent )
       {
         Parent = parent;
-        ServiceProvider = Parent.ServiceProvider;
       }
 
 
@@ -88,6 +86,35 @@ namespace Ivony.Data
       private IDictionary<Type, object> services = new Dictionary<Type, object>();
 
 
+
+      private static void ChecktInstanceType( Type serviceType, Type instanceType )
+      {
+        if ( serviceType.IsAssignableFrom( instanceType ) == false )
+          throw new InvalidOperationException( $"Type of instance is \"{instanceType}\", it's cannot register for a service type of \"{serviceType}\"" );
+      }
+
+
+      /// <summary>
+      /// 注册一个服务
+      /// </summary>
+      /// <param name="serviceType">服务类型</param>
+      /// <param name="instanceType">实现类型</param>
+      /// <returns>DbContext构建器</returns>
+      public Builder RegisterService( Type serviceType, Type instanceType )
+      {
+        if ( serviceType == null )
+          throw new ArgumentNullException( nameof( serviceType ) );
+        if ( instanceType == null )
+          throw new ArgumentNullException( nameof( instanceType ) );
+
+        ChecktInstanceType( serviceType, instanceType );
+
+        services[serviceType] = instanceType;
+
+        return this;
+      }
+
+
       public Builder RegisterService( Type serviceType, object serviceInstance )
       {
         if ( serviceType == null )
@@ -97,9 +124,7 @@ namespace Ivony.Data
 
 
         var instanceType = serviceInstance.GetType();
-        if ( serviceType.IsAssignableFrom( instanceType ) == false )
-          throw new InvalidOperationException( $"Type of instance is \"{instanceType}\", it's cannot register for a service type of \"{serviceType}\"" );
-
+        ChecktInstanceType( serviceType, instanceType );
         services[serviceType] = serviceInstance;
 
         return this;
@@ -132,7 +157,6 @@ namespace Ivony.Data
         DbContext context = new DbContext();
 
         context.Parent = Parent;
-        context.ServiceProvider = ServiceProvider;
 
         context.DefaultDatabase = database ?? Parent?.DefaultDatabase ?? Db.DefaultDatabaseName;
         context.AutoWhitespaceSeparator = autoWhiteSpace ?? Parent?.AutoWhitespaceSeparator ?? false;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Text;
 using Ivony.Data.Queries;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ namespace Ivony.Data
   /// <summary>
   /// 数据访问上下文
   /// </summary>
-  public partial class DbContext : IDisposable
+  public partial class DbContext : IServiceProvider, IDisposable
   {
 
 
@@ -95,17 +96,9 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 服务提供程序
-    /// </summary>
-    public IServiceProvider ServiceProvider { get; private set; }
-
-
-    /// <summary>
     /// 获取默认数据库名称
     /// </summary>
     public string DefaultDatabase { get; private set; }
-
-
 
 
     private IReadOnlyDictionary<string, IDbProvider> providers;
@@ -118,12 +111,22 @@ namespace Ivony.Data
     /// </summary>
     /// <typeparam name="T">服务类型</typeparam>
     /// <returns>服务实例</returns>
-    public T GetService<T>()
+    public T GetService<T>() where T : class
     {
+
+      {
+        var instance = this as T;
+        if ( instance != null )
+          return instance;
+      }
+
       if ( services.TryGetValue( typeof( T ), out var service ) )
       {
         if ( service is T instance )
           return instance;
+
+        if ( service is Type instanceType )
+          return (T) ActivatorUtilities.CreateInstance( this, instanceType );
 
         return ((Func<T>) service)();
       }
@@ -132,9 +135,14 @@ namespace Ivony.Data
       if ( Parent != null )
         return Parent.GetService<T>();
 
-      else
-        return ServiceProvider.GetService<T>();
+      return default( T );
     }
+
+    object IServiceProvider.GetService( Type serviceType )
+    {
+      return typeof( DbContext ).GetMethod( "GetService" ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
+    }
+
 
 
     /// <summary>
@@ -150,6 +158,10 @@ namespace Ivony.Data
 
     private IDbExecutor GetExecutor( DbContext context, string database )
     {
+      var transaction = context.GetTransaction( database );
+      if ( transaction != null )
+        return transaction.GetExecutor();
+
       if ( providers.TryGetValue( database, out var dbExecutorProvider ) )
         return dbExecutorProvider.GetDbExecutor( context );
 
@@ -160,13 +172,34 @@ namespace Ivony.Data
         return null;
     }
 
+    private IDbTransactionContext GetTransaction( string database )
+    {
+
+      if ( _transactions.TryGetValue( database, out var transaction ) )
+      {
+        if ( transaction.Status == TransactionStatus.Completed )
+        {
+          _transactions.Remove( database );
+          return null;
+        }
+
+        return transaction;
+      }
+
+      return null;
+
+    }
+
+    private IDictionary<string, IDbTransactionContext> _transactions = new Dictionary<string, IDbTransactionContext>();
+
+
 
     /// <summary>
     /// 创建数据库事务
     /// </summary>
     /// <param name="database">指定的数据库</param>
     /// <returns></returns>
-    public IDbTransactionContext CreateTransaction( string database = null )
+    internal IDbTransactionContext CreateTransaction( string database = null )
     {
       database = database ?? DefaultDatabase;
 
@@ -186,6 +219,48 @@ namespace Ivony.Data
     }
 
 
+    /// <summary>
+    /// 在当前上下文开启一个事务执行
+    /// </summary>
+    /// <param name="database"></param>
+    /// <returns></returns>
+    public IDbTransactionContext BeginTransaction( string database = null )
+    {
+      database = database ?? DefaultDatabase;
+
+
+      if ( _transactions.TryGetValue( database, out var transaction ) )
+      {
+        if ( transaction.Status == TransactionStatus.Completed )
+          _transactions.Remove( database );
+
+        else
+          throw new InvalidOperationException( $"数据库 {database} 在当前上下文正在执行另一个事务" );
+      }
+
+      transaction = CreateTransaction( database );
+      if ( transaction == null )
+        throw new NotSupportedException();
+
+      _transactions[database] = transaction;
+      transaction.BeginTransaction();
+      return transaction;
+    }
+
+
+
+
+    /// <summary>
+    /// 获取指定类型的配置对象
+    /// </summary>
+    /// <typeparam name="T">配置类型</typeparam>
+    /// <returns></returns>
+    public T GetConfiguration<T>()
+    {
+      return ActivatorUtilities.CreateInstance<T>( this );
+    }
+
+
 
 
 
@@ -197,15 +272,18 @@ namespace Ivony.Data
     {
       database = database ?? DefaultDatabase;
 
+      return GetAsyncExecutor( this, database );
+    }
 
+    private IAsyncDbExecutor GetAsyncExecutor( DbContext context, string database )
+    {
       if ( providers.TryGetValue( database, out var dbExecutorProvider ) )
-        return dbExecutorProvider.GetAsyncDbExecutor( this );
+        return dbExecutorProvider.GetAsyncDbExecutor( context );
 
       else if ( Parent != null )
-        return Parent.GetAsyncExecutor( database );
+        return Parent.GetAsyncExecutor( context, database );
 
-      else
-        return ServiceProvider.GetRequiredService<IAsyncDbExecutor>();
+      return null;
     }
 
 
@@ -244,8 +322,8 @@ namespace Ivony.Data
     public IDbTraceService GetTraceService()
     {
       return GetService<IDbTraceService>()
-        ?? Parent?.GetService<IDbTraceService>()
-        ?? ServiceProvider.GetService<IDbTraceService>();
+        ?? Parent?.GetService<IDbTraceService>();
+
     }
 
     /// <summary>
@@ -255,8 +333,8 @@ namespace Ivony.Data
     public ITemplateParser GetTemplateParser()
     {
       return GetService<ITemplateParser>()
-        ?? Parent?.GetService<ITemplateParser>()
-        ?? ServiceProvider.GetRequiredService<ITemplateParser>();
+        ?? Parent?.GetService<ITemplateParser>();
+
     }
 
 
@@ -268,11 +346,9 @@ namespace Ivony.Data
     {
 
       return GetService<IParameterizedQueryBuilder>()
-        ?? Parent?.GetService<IParameterizedQueryBuilder>()
-        ?? ServiceProvider.GetRequiredService<IParameterizedQueryBuilder>();
+        ?? Parent?.GetService<IParameterizedQueryBuilder>();
 
     }
-
 
 
     /// <summary>

@@ -37,13 +37,19 @@ namespace Ivony.Data
     /// <returns>数据库查询执行器</returns>
     IDbExecutor GetExecutor();
 
+
+    /// <summary>
+    /// 获取事务状态
+    /// </summary>
+    TransactionStatus Status { get; }
+
   }
 
 
   /// <summary>
   /// 定义异步数据库事务上下文
   /// </summary>
-  public interface IAsyncDbTransactionContext 
+  public interface IAsyncDbTransactionContext
   {
 
 
@@ -67,6 +73,23 @@ namespace Ivony.Data
     /// </summary>
     /// <returns>异步数据库查询执行器</returns>
     IAsyncDbExecutor GetDbExecutor();
+  }
+
+
+
+  /// <summary>
+  /// 获取事务状态
+  /// </summary>
+  public enum TransactionStatus
+  {
+    /// <summary>事务尚未开始</summary>
+    NotBeginning,
+
+    /// <summary>事务正在执行</summary>
+    Running,
+
+    /// <summary>事务已完成</summary>
+    Completed
   }
 
 }

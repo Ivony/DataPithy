@@ -88,12 +88,13 @@ namespace Ivony.Data.Queries
     /// <summary>
     /// 创建参数化查询对象实例
     /// </summary>
+    /// <param name="configures">要应用于查询的配置项</param>
     /// <returns>参数化查询对象</returns>
-    public ParameterizedQuery BuildQuery()
+    public ParameterizedQuery BuildQuery( DbQueryConfigures configures )
     {
       lock ( SyncRoot )
       {
-        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray() );
+        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray(), configures );
       }
     }
 
@@ -109,7 +110,7 @@ namespace Ivony.Data.Queries
         if ( textBuilder.Length > 0
           && Db.DbContext.AutoWhitespaceSeparator == true
           && char.IsWhiteSpace( textBuilder[textBuilder.Length - 1] ) == false
-          && (partial as ParameterizedQuery)?.IsStartWithWhiteSpace() == false)
+          && (partial as ParameterizedQuery)?.IsStartWithWhiteSpace() == false )
 
           Append( ' ' );
 

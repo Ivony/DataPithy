@@ -36,8 +36,9 @@
     /// <summary>
     /// 创建参数化查询对象实例
     /// </summary>
+    /// <param name="configures">要应用于该查询的配置信息</param>
     /// <returns>参数化查询对象</returns>
-    ParameterizedQuery BuildQuery();
+    ParameterizedQuery BuildQuery( DbQueryConfigures configures );
 
   }
 }

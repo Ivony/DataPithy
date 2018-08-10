@@ -48,6 +48,7 @@ namespace Ivony.Data
     public static ParameterizedQuery ConcatQueries( this ParameterizedQuery firstQuery, params ParameterizedQuery[] otherQueries )
     {
       var builder = Db.DbContext.GetParameterizedQueryBuilder();
+      var configures = firstQuery.Configures;
 
       builder.AppendParameter( firstQuery );
       foreach ( var query in otherQueries )
@@ -55,10 +56,11 @@ namespace Ivony.Data
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
           continue;
 
+        configures = configures.Merge( query.Configures );
         builder.AppendParameter( query );
       }
 
-      return builder.BuildQuery();
+      return builder.BuildQuery( configures );
     }
 
 

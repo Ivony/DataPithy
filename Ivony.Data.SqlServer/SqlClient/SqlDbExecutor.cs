@@ -22,7 +22,7 @@ namespace Ivony.Data.SqlClient
   /// <summary>
   /// 用于操作 SQL Server 的数据库访问工具
   /// </summary>
-  public class SqlDbExecutor : DbExecutorBase, IDbExecutor, IAsyncDbExecutor, IDbTransactionProvider<SqlDbExecutor>
+  public class SqlDbExecutor : DbExecutorBase, IDbExecutor, IAsyncDbExecutor
   {
 
 
@@ -56,22 +56,6 @@ namespace Ivony.Data.SqlClient
 
     protected SqlDbConfiguration Configuration { get; }
 
-
-
-    /// <summary>
-    /// 创建数据库事务上下文
-    /// </summary>
-    /// <returns>数据库事务上下文</returns>
-    public SqlDbTransactionContext CreateTransaction( IsolationLevel isolationLevel = IsolationLevel.Unspecified )
-    {
-      return new SqlDbTransactionContext( ConnectionString, Configuration, isolationLevel );
-    }
-
-
-    IDbTransactionContext<SqlDbExecutor> IDbTransactionProvider<SqlDbExecutor>.CreateTransaction()
-    {
-      return CreateTransaction();
-    }
 
 
 
