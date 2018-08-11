@@ -68,7 +68,7 @@ namespace Ivony.Data
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <param name="configuration">SQL Server 数据库配置</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string dataSource, string initialCatalog, bool pooling = true, SqlDbConfiguration configuration = null )
+    public static DbContext.Builder UseSqlServer( this DbContext.Builder builder, string dataSource, string initialCatalog, bool pooling = true )
     {
       var connectionBuilder = new SqlConnectionStringBuilder()
       {

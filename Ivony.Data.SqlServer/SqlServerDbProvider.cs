@@ -19,7 +19,7 @@ namespace Ivony.Data
 
     public IDbExecutor GetDbExecutor( DbContext context )
     {
-      return new SqlDbExecutor( ConnectionString, new SqlDbConfiguration() );
+      return new SqlDbExecutor( ConnectionString );
     }
 
     public IDbTransactionContext CreateTransaction( DbContext context )

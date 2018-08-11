@@ -6,66 +6,25 @@ using Ivony.Data.Common;
 
 namespace Ivony.Data.SqlClient
 {
-  public class SqlDbTransactionContext : IDbTransactionContext
+  public class SqlDbTransactionContext : DbTransactionContextBase<SqlTransaction>
   {
-
-
-    public SqlDbTransactionContext( string connectionString )
+    internal SqlDbTransactionContext( string connectionString )
     {
       Connection = new SqlConnection( connectionString );
     }
 
     public SqlConnection Connection { get; }
-    public SqlTransaction Transaction { get; private set; }
 
-
-
-    public TransactionStatus Status { get; private set; } = TransactionStatus.NotBeginning;
-
-    TransactionStatus IDbTransactionContext.Status => throw new NotImplementedException();
-
-    public void BeginTransaction()
+    protected override SqlTransaction BeginTransactionCore()
     {
-      Transaction = Connection.BeginTransaction();
+      return Connection.BeginTransaction();
     }
 
-    public void Commit()
+    protected override IDbExecutor GetDbExecutorCore( DbContext context )
     {
-      throw new NotImplementedException();
+      return new SqlDbExecutor( this );
     }
 
-    public void Dispose()
-    {
-      throw new NotImplementedException();
-    }
-
-    public void Rollback()
-    {
-      throw new NotImplementedException();
-    }
-
-
-    public IDbExecutor GetDbExecutor()
-    {
-      throw new NotImplementedException();
-    }
-
-    public IDbExecutor GetDbExecutor( DbContext context )
-    {
-      throw new NotImplementedException();
-    }
-
-    public IDbTransactionContext CreateTransaction( DbContext context )
-    {
-
-      throw new InvalidOperationException();
-    }
-
-
-    void IDisposableObjectContainer.RegisterDispose( Action disposeMethod )
-    {
-      throw new NotImplementedException();
-    }
 
   }
 }

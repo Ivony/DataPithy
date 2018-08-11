@@ -54,22 +54,10 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable Enter( Action<DbContext.Builder> configure )
     {
-      return _current.Value = NewContext( configure );
-    }
-
-
-
-    /// <summary>
-    /// 创建一个新的数据访问上下文
-    /// </summary>
-    /// <param name="configure">配置数据访问上下文的方法</param>
-    /// <returns>新的数据访问上下文</returns>
-    public static DbContext NewContext( Action<DbContext.Builder> configure )
-    {
       var builder = new DbContext.Builder( Context );
       configure( builder );
 
-      return builder.Build();
+      return _current.Value = builder.Build();
     }
 
 

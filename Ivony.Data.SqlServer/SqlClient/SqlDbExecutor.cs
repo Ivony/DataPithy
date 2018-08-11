@@ -26,33 +26,45 @@ namespace Ivony.Data.SqlClient
 
 
     /// <summary>
-    /// 获取当前连接字符串
+    /// 创建 SqlServer 数据库查询执行程序
     /// </summary>
-    protected string ConnectionString
+    /// <param name="connectionString">连接字符串</param>
+    public SqlDbExecutor( string connectionString )
     {
-      get;
-      private set;
+
+      ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
+      Configuration = Db.Context.GetConfiguration<SqlServerConfiguration>();
+
     }
 
 
     /// <summary>
-    /// 创建 SqlServer 数据库查询执行程序
+    /// 创建在事务中执行的 SqlServer 数据库查询执行程序
     /// </summary>
-    /// <param name="serviceProvider">当前要使用的数据库配置信息</param>
-    /// <param name="connectionString">连接字符串</param>
-    public SqlDbExecutor( string connectionString, SqlDbConfiguration configuration )
-      : base()
+    /// <param name="transaction">数据库事务上下文（如果在事务中执行的话）</param>
+    public SqlDbExecutor( SqlDbTransactionContext transaction )
     {
-
-      ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-
-      Configuration = configuration;
+      Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
+      ConnectionString = Transaction.Connection.ConnectionString;
+      Configuration = Db.Context.GetConfiguration<SqlServerConfiguration>();
 
     }
 
 
 
-    protected SqlDbConfiguration Configuration { get; }
+
+    /// <summary>
+    /// 获取当前连接字符串
+    /// </summary>
+    protected string ConnectionString { get; }
+
+    /// <summary>
+    /// 如果在事务中执行，获取事务上下文对象
+    /// </summary>
+    protected SqlDbTransactionContext Transaction { get; }
+
+
+    protected SqlServerConfiguration Configuration { get; }
 
 
 
@@ -70,9 +82,9 @@ namespace Ivony.Data.SqlClient
       {
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-
-        var connection = new SqlConnection( ConnectionString );
-        connection.Open();
+        var connection = Transaction?.Connection ?? new SqlConnection( ConnectionString );
+        if ( connection.State == ConnectionState.Closed )
+          connection.Open();
         command.Connection = connection;
 
         if ( Configuration.QueryExecutingTimeout.HasValue )
@@ -80,7 +92,7 @@ namespace Ivony.Data.SqlClient
 
 
         var reader = command.ExecuteReader();
-        var context = new SqlDbExecuteContext( connection, reader, tracing );
+        var context = new SqlDbExecuteContext( reader, tracing, () => OnExecuted( connection ) );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
@@ -91,6 +103,20 @@ namespace Ivony.Data.SqlClient
       {
         TryExecuteTracing( tracing, t => t.OnException( exception ) );
         throw;
+      }
+    }
+
+    private SqlConnection GetConnection()
+    {
+
+      if ( Transaction != null )
+        return Transaction.Connection;
+
+      else
+      {
+        var connection = new SqlConnection( ConnectionString );
+        connection.Open();
+        return connection;
       }
     }
 
@@ -107,8 +133,9 @@ namespace Ivony.Data.SqlClient
       {
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        var connection = new SqlConnection( ConnectionString );
-        await connection.OpenAsync( token );
+        var connection = Transaction?.Connection ?? new SqlConnection( ConnectionString );
+        if ( connection.State == ConnectionState.Closed )
+          await connection.OpenAsync( token );
         command.Connection = connection;
 
         if ( Configuration.QueryExecutingTimeout.HasValue )
@@ -116,7 +143,7 @@ namespace Ivony.Data.SqlClient
 
 
         var reader = await command.ExecuteReaderAsync( token );
-        var context = new SqlDbExecuteContext( connection, reader, tracing );
+        var context = new SqlDbExecuteContext( reader, tracing, () => OnExecuted( connection ) );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
@@ -129,6 +156,11 @@ namespace Ivony.Data.SqlClient
       }
     }
 
+    private void OnExecuted( SqlConnection connection )
+    {
+      if ( Transaction == null )
+        connection.Dispose();
+    }
 
     IDbExecuteContext IDbExecutor.Execute( IDbQuery query )
     {

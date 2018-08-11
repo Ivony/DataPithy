@@ -21,12 +21,12 @@ namespace Ivony.Data.Test
     private SqlDbExecutor db;
 
 
-    public SqlServerTest()
+
+    [TestInitialize]
+    public void Enter()
     {
 
-      Db.Initialize( builder => builder.UseSqlServer( "" ) );
-
-
+      Db.Enter( builder => builder.UseSqlServer( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
 
       Db.T( $"IF OBJECT_ID(N'[dbo].[Test1]') IS NOT NULL DROP TABLE [dbo].[Test1]" ).ExecuteNonQuery();
       Db.T( $@"
@@ -39,6 +39,20 @@ CREATE TABLE [dbo].[Test1]
     [Index] INT NOT NULL, 
     CONSTRAINT [PK_Test1] PRIMARY KEY ([ID]) 
 )" ).ExecuteNonQuery();
+
+    }
+
+    [TestCleanup]
+    public void Exit()
+    {
+      Db.Exit();
+    }
+
+
+    public SqlServerTest()
+    {
+
+
     }
 
 

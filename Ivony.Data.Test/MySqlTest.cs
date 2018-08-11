@@ -161,8 +161,8 @@ PRIMARY KEY (Id)
           exception = e;
         }
 
-        Assert.IsNotNull( exception, "事务中出现异常测试失败" );
-        Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed );
+        Assert.IsNotNull( exception, "事务中出现异常测试" );
+        Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed,"退出事务自动关闭连接" );
       }
     }
 

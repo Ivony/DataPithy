@@ -11,7 +11,7 @@ namespace Ivony.Data.MySqlClient
   /// <summary>
   /// 实现 MySQL 数据库事务支持
   /// </summary>
-  public class MySqlDbTransactionContext : IDbTransactionContext
+  public class MySqlDbTransactionContext : DbTransactionContextBase<MySqlTransaction>
   {
 
     internal MySqlDbTransactionContext( string connectionString )
@@ -24,104 +24,22 @@ namespace Ivony.Data.MySqlClient
     /// </summary>
     public MySqlConnection Connection { get; }
 
-    /// <summary>
-    /// 获取数据库事务对象
-    /// </summary>
-    public MySqlTransaction Transaction { get; private set; }
-
-    public TransactionStatus Status { get; private set; } = TransactionStatus.NotBeginning;
-
-    private object _sync = new object();
-
-    public void BeginTransaction()
+    protected override MySqlTransaction BeginTransactionCore()
     {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.Running )
-          return;
-
-        else if ( Status == TransactionStatus.Completed )
-          throw new ObjectDisposedException( "transaction" );
-
-
-        Connection.Open();
-        Transaction = Connection.BeginTransaction();
-
-        Status = TransactionStatus.Running;
-      }
+      Connection.Open();
+      return Connection.BeginTransaction();
     }
 
-    public void Commit()
+    protected override IDbExecutor GetDbExecutorCore( DbContext context )
     {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.NotBeginning )
-          throw new InvalidOperationException();
-
-        else if ( Status == TransactionStatus.Completed )
-          throw new ObjectDisposedException( "transaction" );
-
-        Transaction.Commit();
-        Status = TransactionStatus.Completed;
-      }
+      return new MySqlDbExecutorWithTransaction( this );
     }
 
-
-    public void Rollback()
+    protected override void DisposeTransaction( MySqlTransaction transaction )
     {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.NotBeginning )
-          throw new InvalidOperationException();
-
-        else if ( Status == TransactionStatus.Completed )
-          throw new ObjectDisposedException( "transaction" );
-
-        Transaction.Rollback();
-        Status = TransactionStatus.Completed;
-      }
+      base.DisposeTransaction( transaction );
+      Connection.Dispose();
     }
 
-    public void Dispose()
-    {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.Running )
-          Transaction.Rollback();
-
-        Status = TransactionStatus.Completed;
-        Connection.Dispose();
-        Transaction?.Dispose();
-        disposeAction?.Invoke();
-      }
-    }
-
-
-    public IDbExecutor GetDbExecutor( DbContext context )
-    {
-      lock ( _sync )
-      {
-        if ( Status == TransactionStatus.NotBeginning )
-          BeginTransaction();
-
-        if ( Status == TransactionStatus.Completed )
-          throw new InvalidOperationException();
-
-        return new MySqlDbExecutorWithTransaction( this );
-      }
-    }
-
-    public IDbTransactionContext CreateTransaction( DbContext context )
-    {
-      throw new NotSupportedException( "MySQL database is not supported nested Transaction." );
-    }
-
-
-    private Action disposeAction;
-
-    void IDisposableObjectContainer.RegisterDispose( Action disposeMethod )
-    {
-      disposeAction += disposeMethod;
-    }
   }
 }
