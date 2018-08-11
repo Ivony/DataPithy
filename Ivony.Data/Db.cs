@@ -19,16 +19,16 @@ namespace Ivony.Data
     private static readonly object _sync = new object();
 
 
-    private static DbContext _root;
+    private static DatabaseContext _root;
 
-    private static AsyncLocal<DbContext> _current = new AsyncLocal<DbContext>();
+    private static AsyncLocal<DatabaseContext> _current = new AsyncLocal<DatabaseContext>();
 
 
     /// <summary>
     /// 获取当前数据访问上下文
     /// </summary>
     /// <returns></returns>
-    public static DbContext Context
+    public static DatabaseContext DbContext
     {
       get
       {
@@ -52,9 +52,9 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="configure">配置数据访问上下文的方法</param>
     /// <returns></returns>
-    public static IDisposable Enter( Action<DbContext.Builder> configure )
+    public static IDisposable Enter( Action<DatabaseContext.Builder> configure )
     {
-      var builder = new DbContext.Builder( Context );
+      var builder = new DatabaseContext.Builder( DbContext );
       configure( builder );
 
       return _current.Value = builder.Build();
@@ -68,12 +68,12 @@ namespace Ivony.Data
     /// </summary>
     public static void Exit()
     {
-      Context.TryExit();
+      DbContext.TryExit();
     }
 
 
 
-    internal static void ExitContext( DbContext current )
+    internal static void ExitContext( DatabaseContext current )
     {
       if ( _current.Value != current )
         throw new InvalidOperationException();
@@ -89,7 +89,7 @@ namespace Ivony.Data
     /// <summary>
     /// 初始化根数据访问上下文
     /// </summary>
-    public static DbContext Initialize( Action<DbContext.Builder> configure )
+    public static DatabaseContext Initialize( Action<DatabaseContext.Builder> configure )
     {
       lock ( _sync )
       {
@@ -109,9 +109,9 @@ namespace Ivony.Data
 
 
 
-    private static DbContext InitializeCore( Action<DbContext.Builder> configure )
+    private static DatabaseContext InitializeCore( Action<DatabaseContext.Builder> configure )
     {
-      var builder = new DbContext.Builder();
+      var builder = new DatabaseContext.Builder();
       configure( builder );
       return builder.Build();
     }
@@ -138,7 +138,7 @@ namespace Ivony.Data
       if ( template == null )
         return null;
 
-      return Context.GetTemplateParser().ParseTemplate( template );
+      return DbContext.GetTemplateParser().ParseTemplate( template );
     }
 
 
@@ -152,7 +152,7 @@ namespace Ivony.Data
       if ( text == null )
         return null;
 
-      return Context.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
+      return DbContext.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
     }
 
 
@@ -183,10 +183,10 @@ namespace Ivony.Data
     /// 在当前上下文开启一个事务执行
     /// </summary>
     /// <returns></returns>
-    public static IDbTransactionContext EnterTransaction( Action<DbContext.Builder> configure )
+    public static IDbTransactionContext EnterTransaction( Action<DatabaseContext.Builder> configure )
 
     {
-      var transaction = Context.DbProvider.CreateTransaction( Context ) ?? throw new NotSupportedException();
+      var transaction = DbContext.DbProvider.CreateTransaction( DbContext ) ?? throw new NotSupportedException();
 
       var transactionContext = Enter( builder =>
       {
@@ -266,7 +266,7 @@ namespace Ivony.Data
     /// </summary>
     public static void Rollback()
     {
-      if ( Context.DbProvider is IDbTransactionContext == false )
+      if ( DbContext.DbProvider is IDbTransactionContext == false )
         throw new InvalidOperationException( "Rollback method must invoked in transaction context" );
 
       throw new RollbackException();

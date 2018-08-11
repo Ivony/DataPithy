@@ -17,14 +17,14 @@ namespace Ivony.Data
     public string ConnectionString { get; private set; }
 
 
-    public IDbExecutor GetDbExecutor( DbContext context )
+    public IDbExecutor GetDbExecutor( DatabaseContext context )
     {
       return new SqlDbExecutor( ConnectionString );
     }
 
-    public IDbTransactionContext CreateTransaction( DbContext context )
+    public IDbTransactionContext CreateTransaction( DatabaseContext context )
     {
-      return new SqlDbTransactionContext( ConnectionString );
+      return new SqlServerTransactionContext( ConnectionString );
     }
 
   }

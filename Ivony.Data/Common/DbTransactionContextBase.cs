@@ -124,7 +124,7 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual IDbExecutor GetDbExecutor( DbContext context )
+    public virtual IDbExecutor GetDbExecutor( DatabaseContext context )
     {
       lock ( Sync )
       {
@@ -144,14 +144,14 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="context">数据访问上下文</param>
     /// <returns>查询执行器</returns>
-    protected abstract IDbExecutor GetDbExecutorCore( DbContext context );
+    protected abstract IDbExecutor GetDbExecutorCore( DatabaseContext context );
 
     /// <summary>
     /// 创建内嵌事务
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual IDbTransactionContext CreateTransaction( DbContext context )
+    public virtual IDbTransactionContext CreateTransaction( DatabaseContext context )
     {
       throw new NotSupportedException( "Database is not supported nested Transaction." );
     }

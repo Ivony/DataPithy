@@ -33,7 +33,7 @@ namespace Ivony.Data.SqlClient
     {
 
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      Configuration = Db.Context.GetConfiguration<SqlServerConfiguration>();
+      Configuration = Db.DbContext.GetConfiguration<SqlServerConfiguration>();
 
     }
 
@@ -42,11 +42,11 @@ namespace Ivony.Data.SqlClient
     /// 创建在事务中执行的 SqlServer 数据库查询执行程序
     /// </summary>
     /// <param name="transaction">数据库事务上下文（如果在事务中执行的话）</param>
-    public SqlDbExecutor( SqlDbTransactionContext transaction )
+    public SqlDbExecutor( SqlServerTransactionContext transaction )
     {
       Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
       ConnectionString = Transaction.Connection.ConnectionString;
-      Configuration = Db.Context.GetConfiguration<SqlServerConfiguration>();
+      Configuration = Db.DbContext.GetConfiguration<SqlServerConfiguration>();
 
     }
 
@@ -61,7 +61,7 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 如果在事务中执行，获取事务上下文对象
     /// </summary>
-    protected SqlDbTransactionContext Transaction { get; }
+    protected SqlServerTransactionContext Transaction { get; }
 
 
     protected SqlServerConfiguration Configuration { get; }
@@ -86,6 +86,7 @@ namespace Ivony.Data.SqlClient
         if ( connection.State == ConnectionState.Closed )
           connection.Open();
         command.Connection = connection;
+        command.Transaction = Transaction?.Transaction;
 
         if ( Configuration.QueryExecutingTimeout.HasValue )
           command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;

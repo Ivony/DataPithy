@@ -17,7 +17,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="context">当前数据库访问上下文</param>
     /// <returns></returns>
-    IDbExecutor GetDbExecutor( DbContext context );
+    IDbExecutor GetDbExecutor( DatabaseContext context );
 
 
     /// <summary>
@@ -25,7 +25,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="context">当前数据库访问上下文</param>
     /// <returns></returns>
-    IDbTransactionContext CreateTransaction( DbContext context);
+    IDbTransactionContext CreateTransaction( DatabaseContext context);
 
 
   }

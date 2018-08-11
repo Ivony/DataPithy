@@ -26,7 +26,10 @@ namespace Ivony.Data.Test
     public void Enter()
     {
 
-      Db.Enter( builder => builder.UseSqlServer( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
+      Db.Enter( builder => builder
+        .UseSqlServer( "Data Source=(localdb)\\ProjectsV13;Initial Catalog=Test;" )
+        .RegisterService<IDbTraceService>( traceService = new TestTraceService() )
+      );
 
       Db.T( $"IF OBJECT_ID(N'[dbo].[Test1]') IS NOT NULL DROP TABLE [dbo].[Test1]" ).ExecuteNonQuery();
       Db.T( $@"
@@ -55,14 +58,6 @@ CREATE TABLE [dbo].[Test1]
 
     }
 
-
-    [TestInitialize]
-    public void Initialize()
-    {
-
-      Db.T( $"TRUNCATE TABLE Test1" ).ExecuteNonQuery();
-
-    }
 
 
     [TestMethod]
@@ -106,8 +101,7 @@ CREATE TABLE [dbo].[Test1]
     [TestMethod]
     public void TransactionTest()
     {
-#if false
-      using ( var transaction = Db.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1})" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
@@ -115,7 +109,7 @@ CREATE TABLE [dbo].[Test1]
 
       Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
 
-      using ( var transaction = Db.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
@@ -127,7 +121,7 @@ CREATE TABLE [dbo].[Test1]
 
 
 
-      using ( var transaction = Db.BeginTransaction() )
+      using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
         Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
@@ -141,7 +135,7 @@ CREATE TABLE [dbo].[Test1]
 
       {
         Exception exception = null;
-        var transaction = (SqlDbTransactionContext) Db.BeginTransaction();
+        var transaction = (SqlServerTransactionContext) Db.EnterTransaction();
 
         try
         {
@@ -159,7 +153,6 @@ CREATE TABLE [dbo].[Test1]
         Assert.IsNotNull( exception, "事务中出现异常测试失败" );
         Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed );
       }
-#endif
     }
 
 

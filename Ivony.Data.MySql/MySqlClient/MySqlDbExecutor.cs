@@ -68,7 +68,7 @@ namespace Ivony.Data.MySqlClient
     /// <summary>
     /// 获取当前配置
     /// </summary>
-    protected MySqlDbConfiguration Configuration => Db.Context.GetConfiguration<MySqlDbConfiguration>();
+    protected MySqlDbConfiguration Configuration => Db.DbContext.GetConfiguration<MySqlDbConfiguration>();
 
 
     public IDbExecuteContext Execute( IDbQuery query )

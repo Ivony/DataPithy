@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivony.Data.SqlServer", "Ivo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivony.Data.Test", "Ivony.Data.Test\Ivony.Data.Test.csproj", "{FCFF20D9-3CCA-4B57-B2E0-65E8B58A6797}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ivony.Data.QueryBuilder", "Ivony.Data.QueryBuilder\Ivony.Data.QueryBuilder.csproj", "{AE87555E-D36D-4922-8979-A13F4A3D103D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivony.Data.QueryBuilder", "Ivony.Data.QueryBuilder\Ivony.Data.QueryBuilder.csproj", "{AE87555E-D36D-4922-8979-A13F4A3D103D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicTest", "DynamicTest\DynamicTest.csproj", "{A820C612-ACE0-4A85-8C72-9FCC6D7919B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{AE87555E-D36D-4922-8979-A13F4A3D103D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE87555E-D36D-4922-8979-A13F4A3D103D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE87555E-D36D-4922-8979-A13F4A3D103D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A820C612-ACE0-4A85-8C72-9FCC6D7919B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A820C612-ACE0-4A85-8C72-9FCC6D7919B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A820C612-ACE0-4A85-8C72-9FCC6D7919B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A820C612-ACE0-4A85-8C72-9FCC6D7919B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

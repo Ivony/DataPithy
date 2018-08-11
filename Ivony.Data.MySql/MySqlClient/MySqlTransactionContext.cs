@@ -30,7 +30,7 @@ namespace Ivony.Data.MySqlClient
       return Connection.BeginTransaction();
     }
 
-    protected override IDbExecutor GetDbExecutorCore( DbContext context )
+    protected override IDbExecutor GetDbExecutorCore( DatabaseContext context )
     {
       return new MySqlDbExecutorWithTransaction( this );
     }

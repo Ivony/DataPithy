@@ -47,7 +47,7 @@ namespace Ivony.Data
     /// <returns>串联后的参数化查询对象</returns>
     public static ParameterizedQuery ConcatQueries( this ParameterizedQuery firstQuery, params ParameterizedQuery[] otherQueries )
     {
-      var builder = Db.Context.GetParameterizedQueryBuilder();
+      var builder = Db.DbContext.GetParameterizedQueryBuilder();
       var configures = firstQuery.Configures;
 
       builder.AppendParameter( firstQuery );

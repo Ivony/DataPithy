@@ -20,7 +20,7 @@ namespace Ivony.Data.Common
     /// </summary>
     protected DbExecutorBase()
     {
-      TraceService = Db.Context.GetTraceService();
+      TraceService = Db.DbContext.GetTraceService();
     }
 
 

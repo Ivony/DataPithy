@@ -143,6 +143,21 @@ PRIMARY KEY (Id)
       Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
 
 
+      Db.Transaction( () =>
+      {
+        Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+      } );
+
+
+      var content = Db.Transaction( () =>
+      {
+        return Db.T( $"SELECT Content FROM testTable WHERE Name = {"Ivony"}" ).ExecuteScalar<string>();
+      } );
+
+      Assert.AreEqual( content, "Test", "直接运行事务并返回值" );
+
+
+
 
       {
         Exception exception = null;
@@ -162,7 +177,7 @@ PRIMARY KEY (Id)
         }
 
         Assert.IsNotNull( exception, "事务中出现异常测试" );
-        Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed,"退出事务自动关闭连接" );
+        Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed, "退出事务自动关闭连接" );
       }
     }
 

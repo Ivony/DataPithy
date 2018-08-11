@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RootNamespace>Ivony.Data</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ivony.Data\Ivony.Data.csproj" />
+    <ProjectReference Include="..\Ivony.Data.QueryBuilder\Ivony.Data.QueryBuilder.csproj" />
   </ItemGroup>
 
 </Project>
