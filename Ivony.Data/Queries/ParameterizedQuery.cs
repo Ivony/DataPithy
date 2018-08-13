@@ -20,9 +20,10 @@ namespace Ivony.Data.Queries
 
 
     /// <summary>
-    /// 定义匹配参数占位符的正则表达式
+    /// 定义匹配占位符的正则表达式
     /// </summary>
-    public static readonly Regex ParameterPlaceholdRegex = new Regex( @"#(?<index>[0-9]+)#", RegexOptions.Compiled );
+    public static readonly Regex ParameterPlaceholdRegex = new Regex( @"#((?<index>[0-9]+)|(@(?<dbName>([^#]|##)+)))#", RegexOptions.Compiled );
+
 
     /// <summary>
     /// 定义系统参数占位符的正则表达式
@@ -67,6 +68,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
+    /// <param name="configures">查询配置数据</param>
     internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null )
     {
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );

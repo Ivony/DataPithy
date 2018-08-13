@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Ivony.Data.QueryBuilders
 {
-  public class SqlExpressionBuilder
+  public class SqlQueryBuilder
   {
 
 

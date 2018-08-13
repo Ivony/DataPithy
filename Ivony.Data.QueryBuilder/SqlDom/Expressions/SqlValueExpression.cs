@@ -15,85 +15,95 @@ namespace Ivony.Data.SqlDom.Expressions
       switch ( value )
       {
         case null:
-          return new SqlConstantExpression( DBNull.Value );
+          return Constant( DBNull.Value );
 
         case SqlValueExpression expression:
           return expression;
 
         default:
-          return new SqlConstantExpression( value );
+          return Constant( value );
       }
+    }
+
+
+    public static SqlValueExpression Constant( object value )
+    {
+      if ( value == null || value is DBNull )
+        return new SqlDbNullExpression();
+
+      else
+        return new SqlConstantExpression( value );
     }
 
 
 
     public static SqlArithmeticalExpression operator +( SqlValueExpression left, SqlValueExpression right )
-      => new SqlArithmeticalExpression( ExpressionType.Add, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlArithmeticalExpression( ExpressionType.Add, left, right ?? Constant( null ) );
 
     public static SqlArithmeticalExpression operator +( SqlValueExpression left, object right )
-      => new SqlArithmeticalExpression( ExpressionType.Add, left, new SqlConstantExpression( right ) );
+      => new SqlArithmeticalExpression( ExpressionType.Add, left, Constant( right ) );
 
 
     public static SqlArithmeticalExpression operator -( SqlValueExpression left, SqlValueExpression right )
-      => new SqlArithmeticalExpression( ExpressionType.Subtract, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlArithmeticalExpression( ExpressionType.Subtract, left, right ?? Constant( null ) );
 
     public static SqlArithmeticalExpression operator -( SqlValueExpression left, object right )
-      => new SqlArithmeticalExpression( ExpressionType.Subtract, left, new SqlConstantExpression( right ) );
+      => new SqlArithmeticalExpression( ExpressionType.Subtract, left, Constant( right ) );
 
 
     public static SqlArithmeticalExpression operator *( SqlValueExpression left, SqlValueExpression right )
-      => new SqlArithmeticalExpression( ExpressionType.Multiply, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlArithmeticalExpression( ExpressionType.Multiply, left, right ?? Constant( null ) );
 
     public static SqlArithmeticalExpression operator *( SqlValueExpression left, object right )
-      => new SqlArithmeticalExpression( ExpressionType.Multiply, left, new SqlConstantExpression( right ) );
+      => new SqlArithmeticalExpression( ExpressionType.Multiply, left, Constant( right ) );
 
 
     public static SqlArithmeticalExpression operator /( SqlValueExpression left, SqlValueExpression right )
-      => new SqlArithmeticalExpression( ExpressionType.Divide, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlArithmeticalExpression( ExpressionType.Divide, left, right ?? Constant( null ) );
 
     public static SqlArithmeticalExpression operator /( SqlValueExpression left, object right )
-      => new SqlArithmeticalExpression( ExpressionType.Divide, left, new SqlConstantExpression( right ) );
+      => new SqlArithmeticalExpression( ExpressionType.Divide, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator >( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.GreaterThan, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.GreaterThan, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator >( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.GreaterThan, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.GreaterThan, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator <( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.LessThan, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.LessThan, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator <( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.LessThan, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.LessThan, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator >=( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.GreaterThanOrEqual, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.GreaterThanOrEqual, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator >=( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.GreaterThanOrEqual, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.GreaterThanOrEqual, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator <=( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.LessThanOrEqual, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.LessThanOrEqual, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator <=( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.LessThanOrEqual, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.LessThanOrEqual, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator ==( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.Equal, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.Equal, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator ==( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.Equal, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.Equal, left, Constant( right ) );
 
 
     public static SqlComparisonExpression operator !=( SqlValueExpression left, SqlValueExpression right )
-      => new SqlComparisonExpression( ExpressionType.NotEqual, left, right ?? new SqlConstantExpression( null ) );
+      => new SqlComparisonExpression( ExpressionType.NotEqual, left, right ?? Constant( null ) );
 
     public static SqlComparisonExpression operator !=( SqlValueExpression left, object right )
-      => new SqlComparisonExpression( ExpressionType.NotEqual, left, new SqlConstantExpression( right ) );
+      => new SqlComparisonExpression( ExpressionType.NotEqual, left, Constant( right ) );
   }
 }

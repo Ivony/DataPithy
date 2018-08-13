@@ -126,9 +126,14 @@ namespace Ivony.Data.SqlClient
       return command;
     }
 
-    protected override string ParseDbName( DbName name )
+    /// <summary>
+    /// 解析数据库对象名称
+    /// </summary>
+    /// <param name="name">对象名称</param>
+    /// <returns></returns>
+    protected override string ParseDbName( string name )
     {
-      return $"[{name.Name}]";
+      return $"[{name.Replace( "]", "]]" )}]";
     }
   }
 }

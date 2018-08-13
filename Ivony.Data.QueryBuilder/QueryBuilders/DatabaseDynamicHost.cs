@@ -10,8 +10,14 @@ namespace Ivony.Data.QueryBuilders
 
     public override bool TryGetMember( GetMemberBinder binder, out object result )
     {
-      result = new TableDynamicHost( binder.Name );
+      result = this[binder.Name];
       return true;
     }
+
+    public TableDynamicHost this[string tableName]
+    {
+      get { return new TableDynamicHost( tableName ); }
+    }
+
   }
 }

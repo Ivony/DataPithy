@@ -46,16 +46,30 @@ namespace Ivony.Data.Common
 
         var text = regex.Replace( query.TextTemplate, ( match ) =>
         {
-          var index = int.Parse( match.Groups["index"].Value );
+          if ( match.Groups["index"].Success )
+          {
 
-          if ( index >= length )
-            throw new IndexOutOfRangeException( "分析参数化查询时遇到错误，参数索引超出边界" );
+            var index = int.Parse( match.Groups["index"].Value );
 
-          var placeholder = parameterPlaceholders[index];
-          if ( placeholder == null )
-            placeholder = parameterPlaceholders[index] = GetParameterPlaceholder( DbValueConverter.ConvertTo( query.ParameterValues[index], null ), index, out parameters[index] );
+            if ( index >= length )
+              throw new IndexOutOfRangeException( "分析参数化查询时遇到错误，参数索引超出边界" );
 
-          return placeholder;
+            var placeholder = parameterPlaceholders[index];
+            if ( placeholder == null )
+              placeholder = parameterPlaceholders[index] = GetParameterPlaceholder( DbValueConverter.ConvertTo( query.ParameterValues[index], null ), index, out parameters[index] );
+
+            return placeholder;
+          }
+          else if ( match.Groups["dbName"].Success )
+          {
+            var name = match.Groups["dbName"].Value.Replace( "##", "#" );
+
+            return ParseDbName( name );
+
+
+          }
+          else
+            return null;
         } );
 
 
@@ -88,7 +102,7 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="name">名称标识符</param>
     /// <returns>解析后的字符串表达形式</returns>
-    protected abstract string ParseDbName( DbName name );
+    protected abstract string ParseDbName( string name );
 
 
   }

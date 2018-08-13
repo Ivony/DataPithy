@@ -46,6 +46,16 @@ namespace Ivony.Data.SqlDom.Expressions
           throw new InvalidOperationException();
       }
 
+
+      if ( Right is SqlConstantExpression constant && constant.Value is DBNull )
+      {
+        if ( Operation == ExpressionType.Equal )
+          return $"{Left} IS NULL";
+        else if ( Operation == ExpressionType.NotEqual )
+          return $"{Left} IS NOT NULL";
+      }
+
+
       return $"({Left} {op} {Right})";
     }
   }

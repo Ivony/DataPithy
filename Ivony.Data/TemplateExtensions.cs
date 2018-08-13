@@ -84,5 +84,16 @@ namespace Ivony.Data
       return new ParameterList( array, separator );
     }
 
+
+    /// <summary>
+    /// 将一个字符串当作数据库对象名称添加到参数化查询构建器中
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="name">数据库对象名称</param>
+    public static void AppendName( this IParameterizedQueryBuilder builder, string name )
+    {
+      builder.Append( new DbName( name ) );
+    }
+
   }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using Ivony.Data.Queries;
 
 namespace Ivony.Data.SqlDom
 {
@@ -14,11 +15,9 @@ namespace Ivony.Data.SqlDom
 
     public IReadOnlyList<SelectElement> Elements { get; }
 
-
     public override string ToString()
     {
       return $"SELECT {string.Join( ", ", Elements )}";
     }
-
   }
 }

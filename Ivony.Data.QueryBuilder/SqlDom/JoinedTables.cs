@@ -25,7 +25,7 @@ namespace Ivony.Data.SqlDom
 
     public FromSource Right { get; }
 
-    public Expression JoinCondition { get; }
+    public SqlBooleanExpression JoinCondition { get; }
 
 
 
@@ -56,6 +56,32 @@ namespace Ivony.Data.SqlDom
 
       return $"({Left} {op} {Right} ON ({JoinCondition})";
 
+    }
+
+
+    public static JoinedTables InnerJoin( TableSource left, TableSource right, SqlBooleanExpression condition )
+    {
+      return new JoinedTables( TableJoinType.InnerJoin, left, right, condition );
+    }
+
+    public static JoinedTables LeftOuterJoin( TableSource left, TableSource right, SqlBooleanExpression condition )
+    {
+      return new JoinedTables( TableJoinType.LeftOuterJoin, left, right, condition );
+    }
+
+    public static JoinedTables RightOuterJoin( TableSource left, TableSource right, SqlBooleanExpression condition )
+    {
+      return new JoinedTables( TableJoinType.RightOuterJoin, left, right, condition );
+    }
+
+    public static JoinedTables FullOuterJoin( TableSource left, TableSource right, SqlBooleanExpression condition )
+    {
+      return new JoinedTables( TableJoinType.FullOuterJoin, left, right, condition );
+    }
+
+    public static JoinedTables CrossJoin( TableSource left, TableSource right )
+    {
+      return new JoinedTables( left, right );
     }
 
 

@@ -27,6 +27,13 @@
 
 
     /// <summary>
+    /// 添加一个数据库对象名称
+    /// </summary>
+    /// <param name="name">数据库对象名称</param>
+    void Append( DbName name );
+
+
+    /// <summary>
     /// 添加一个查询参数
     /// </summary>
     /// <param name="value">参数值</param>

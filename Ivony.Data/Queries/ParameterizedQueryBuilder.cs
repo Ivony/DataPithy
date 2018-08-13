@@ -57,6 +57,20 @@ namespace Ivony.Data.Queries
 
 
     /// <summary>
+    /// 添加一个数据库对象名称（构建实际查询对象时将进行必要的编码）。
+    /// </summary>
+    /// <param name="name">数据库对象名称</param>
+    public void Append( DbName name )
+    {
+      lock ( SyncRoot )
+      {
+        textBuilder.Append( $"#@{name.Name.Replace( "#", "##" )}#" );
+      }
+    }
+
+
+
+    /// <summary>
     /// 添加一个查询参数
     /// </summary>
     /// <param name="value">参数值</param>
@@ -75,6 +89,15 @@ namespace Ivony.Data.Queries
         AppendPartial( partial );
         return;
       }
+
+
+      if ( value is DbName dbName )
+      {
+        Append( dbName );
+        return;
+      }
+
+
 
 
       lock ( SyncRoot )

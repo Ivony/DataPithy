@@ -1,5 +1,7 @@
 ﻿using Ivony.Data;
+using Ivony.Data.MySqlClient;
 using Ivony.Data.QueryBuilders;
+using Ivony.Data.SqlClient;
 using System;
 using System.Dynamic;
 
@@ -9,22 +11,37 @@ namespace DynamicTest
   {
     static void Main( string[] args )
     {
-      Console.WriteLine( "Hello World!" );
+
+      Db.Initialize( configure =>
+      {
+        configure.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" );
+      } );
+
+      var builder = new SqlSelectQueryBuilder()
+        .Select( host => (host.Users.ID, host.Users.Username, host.UserProfie.Email) )
+        .Where( host => host.Users.Age > 30 & host.Users.ID != null )
+        .From( host => host.Users.InnerJoin( host.UserProfile, host.Users.ID == host.UserProfile.ID ) );
 
 
 
 
-      var builder = new SelectQueryBuilder();
-      builder.Select( host => (host.Users.ID, host.Users.Username) );
-      builder.Where( host => host.Users.Age > 30 & host.Users.ID != null );
-      builder.From( host => host.Users );
+      var sqlQuery = builder.Build();
 
-
-
-
-      var query = builder.Build();
-
+      var query = new SqlQueryParser().ParseSelectQuery( sqlQuery );
       Console.WriteLine( query );
+
+      Console.WriteLine();
+      Console.WriteLine();
+
+
+      var command = new SqlParameterizedQueryParser().Parse( query );
+
+      Console.WriteLine( command.CommandText );
+
+
+
+
+
 
       Console.ReadKey();
 
