@@ -18,7 +18,6 @@ namespace Ivony.Data.QueryBuilders
 
     protected object SyncRoot { get; } = new object();
 
-
     public virtual ParameterizedQuery ParseSelectQuery( SelectQuery query )
     {
       Builder = Db.DbContext.GetParameterizedQueryBuilder();
@@ -48,7 +47,7 @@ namespace Ivony.Data.QueryBuilders
 
     protected void ParseSelectElement( SelectElement element )
     {
-      ParseExpression( element.Expression );
+      ParseExpression( element.Expression, 0 );
       Builder.Append( " AS " );
       Builder.AppendName( element.Alias );
     }
@@ -80,7 +79,7 @@ namespace Ivony.Data.QueryBuilders
         return;
 
       Builder.Append( "\nWHERE " );
-      ParseExpression( clause.Condition );
+      ParseExpression( clause.Condition, 0 );
     }
 
     protected virtual void ParseOrderByClause( OrderByClause clause )
@@ -140,38 +139,52 @@ namespace Ivony.Data.QueryBuilders
       ParseFromSource( tables.Right );
 
       if ( tables.JoinType != TableJoinType.CrossJoin )
-      {
-        Builder.Append( " ON " );
-        ParseOnExpression( tables.JoinCondition );
-      }
-
-
+        ParseOnClause( tables.JoinCondition );
     }
 
-    protected virtual void ParseOnExpression( SqlBooleanExpression expression )
+
+    protected virtual void ParseOnClause( SqlBooleanExpression expression )
     {
-      Builder.Append( '(' );
-      ParseBooleanExpression( expression );
-      Builder.Append( ')' );
+      Builder.Append( " ON " );
+      ParseExpression( expression, true );
     }
+
+
 
 
     protected virtual void ParseExpression( SqlExpression expression )
     {
+      ParseExpression( expression, true );
+    }
+
+    protected virtual void ParseExpression( SqlExpression expression, int priority )
+    {
+      ParseExpression( expression, GetExpressionPriority( expression ) < priority );
+    }
+
+    protected virtual void ParseExpression( SqlExpression expression, bool withParenthesis )
+    {
+      if ( withParenthesis )
+        Builder.Append( '(' );
+
       switch ( expression )
       {
-        case SqlBooleanExpression boolean:
-          ParseBooleanExpression( boolean );
-          return;
-
         case SqlValueExpression value:
           ParseValueExpression( value );
-          return;
+          break; ;
+
+        case SqlBooleanExpression boolean:
+          ParseBooleanExpression( boolean );
+          break;
 
         default:
           UnknowExpression( expression );
-          return;
+          break;
       }
+
+      if ( withParenthesis )
+        Builder.Append( ')' );
+
     }
 
     protected virtual void ParseValueExpression( SqlValueExpression expression )
@@ -179,7 +192,7 @@ namespace Ivony.Data.QueryBuilders
       switch ( expression )
       {
         case FieldReference field:
-          ParseFieldReference( field );
+          ParseField( field );
           return;
 
         case SqlConstantExpression constant:
@@ -198,17 +211,13 @@ namespace Ivony.Data.QueryBuilders
 
     protected virtual void ParseArithmeticalExpression( SqlArithmeticalExpression expression )
     {
-      Builder.Append( '(' );
-      ParseExpression( expression.Left );
-
+      ParseExpression( expression.Left, GetExpressionPriority( expression ) );
       Builder.Append( GetOperator( expression.Operation ) );
-
-      ParseExpression( expression.Right );
-      Builder.Append( ')' );
+      ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
 
 
-    protected virtual void ParseFieldReference( FieldReference field )
+    protected virtual void ParseField( FieldReference field )
     {
       Builder.AppendName( field.TableAlias );
       Builder.Append( '.' );
@@ -220,75 +229,65 @@ namespace Ivony.Data.QueryBuilders
       Builder.AppendParameter( constant.Value );
     }
 
+
+
+
+
     protected virtual void ParseBooleanExpression( SqlBooleanExpression expression )
     {
       switch ( expression )
       {
-        case SqlLogicalExpression logical:
-          ParseLogicalExpression( logical );
+        case SqlLikeExpression like:
+          ParseLikeExpression( like );
           return;
 
         case SqlComparisonExpression comparision:
           ParseComparisionExpression( comparision );
           return;
 
-        case SqlLikeExpression like:
-          ParseLikeExpression( like );
+        case SqlLogicalExpression logical:
+          ParseLogicalExpression( logical );
           return;
       }
     }
 
     protected virtual void ParseLikeExpression( SqlLikeExpression expression )
     {
-      Builder.Append( '(' );
-
-      ParseExpression( expression.Left );
+      ParseExpression( expression.Left, GetExpressionPriority( expression ) );
       Builder.Append( " LIKE " );
-      ParseExpression( expression.Right );
-
-      Builder.Append( ')' );
+      ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
 
     protected virtual void ParseComparisionExpression( SqlComparisonExpression expression )
     {
-      Builder.Append( '(' );
-
       if ( expression.Right is SqlDbNullExpression )
       {
         if ( expression.Operation == ExpressionType.Equal )
         {
-          ParseExpression( expression.Left );
+          ParseExpression( expression.Left, 0 );
           Builder.Append( " IS NULL" );
         }
         else if ( expression.Operation == ExpressionType.NotEqual )
         {
-          ParseExpression( expression.Left );
+          ParseExpression( expression.Left, 0 );
           Builder.Append( " IS NOT NULL" );
         }
       }
       else
       {
 
-        ParseExpression( expression.Left );
+        ParseExpression( expression.Left, GetExpressionPriority( expression ) );
         Builder.Append( GetOperator( expression.Operation ) );
-        ParseExpression( expression.Right );
+        ParseExpression( expression.Right, GetExpressionPriority( expression ) );
       }
-
-
-      Builder.Append( ')' );
     }
 
     protected virtual void ParseLogicalExpression( SqlLogicalExpression expression )
     {
-      Builder.Append( '(' );
-      ParseExpression( expression.Left );
-
-      Builder.Append( GetOperator( expression.Operation ) );
-
-      ParseExpression( expression.Right );
-      Builder.Append( ')' );
+      ParseExpression( expression.Left, GetExpressionPriority( expression ) );
+      Builder.Append( " " + GetOperator( expression.Operation ) + " " );
+      ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
-
 
 
     protected virtual string GetJoinOperator( TableJoinType joinType )
@@ -349,6 +348,76 @@ namespace Ivony.Data.QueryBuilders
           return UnknowOperator( operation );
       }
     }
+
+
+    protected virtual int GetExpressionPriority( SqlExpression expression )
+    {
+      switch ( expression )
+      {
+
+        case SqlArithmeticalExpression arithmetical:
+          return GetOperationPriority( arithmetical.Operation );
+
+        case SqlLogicalExpression logical:
+          return GetOperationPriority( logical.Operation );
+
+        case SqlComparisonExpression comparison:
+          return GetOperationPriority( comparison.Operation );
+
+        case SqlLikeExpression _:
+          return 5;
+
+        case FieldReference _:
+          return 20;
+
+        case TableReference _:
+          return 20;
+
+        case SqlDbNullExpression _:
+          return 20;
+
+        default:
+          return 100;
+      }
+    }
+
+    protected virtual int GetOperationPriority( ExpressionType operation )
+    {
+      switch ( operation )
+      {
+        case ExpressionType.Multiply:
+        case ExpressionType.Divide:
+          return 10;
+
+        case ExpressionType.Add:
+        case ExpressionType.Subtract:
+          return 9;
+
+        case ExpressionType.GreaterThan:
+        case ExpressionType.GreaterThanOrEqual:
+        case ExpressionType.LessThan:
+        case ExpressionType.LessThanOrEqual:
+        case ExpressionType.Equal:
+        case ExpressionType.NotEqual:
+          return 5;
+
+        case ExpressionType.AndAlso:
+          return 4;
+
+        case ExpressionType.OrElse:
+          return 3;
+
+
+        default:
+          return 100;
+      }
+    }
+
+
+
+
+
+
 
     protected virtual string UnknowOperator( ExpressionType operation )
     {

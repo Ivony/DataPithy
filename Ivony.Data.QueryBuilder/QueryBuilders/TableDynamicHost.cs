@@ -42,6 +42,9 @@ namespace Ivony.Data.QueryBuilders
 
 
 
+    public TableSource As( string alias ) => ((TableReference) this).As( alias );
+
+
     public JoinWithoutOnExpression InnerJoin( TableSource right )
       => JoinWithoutOnExpression.InnerJoin( this, right );
 

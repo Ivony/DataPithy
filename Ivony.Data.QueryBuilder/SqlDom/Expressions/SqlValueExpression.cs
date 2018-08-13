@@ -15,7 +15,7 @@ namespace Ivony.Data.SqlDom.Expressions
       switch ( value )
       {
         case null:
-          return Constant( DBNull.Value );
+          return Constant( System.DBNull.Value );
 
         case SqlValueExpression expression:
           return expression;
@@ -29,10 +29,28 @@ namespace Ivony.Data.SqlDom.Expressions
     public static SqlValueExpression Constant( object value )
     {
       if ( value == null || value is DBNull )
-        return new SqlDbNullExpression();
+        return DBNull();
 
       else
         return new SqlConstantExpression( value );
+    }
+
+    public static SqlDbNullExpression DBNull()
+    {
+      return new SqlDbNullExpression();
+    }
+
+
+
+    public SqlLikeExpression Like( string value )
+    {
+      return new SqlLikeExpression( this, Constant( value ) );
+    }
+
+
+    public SqlLikeExpression Like( SqlValueExpression value )
+    {
+      return new SqlLikeExpression( this, value );
     }
 
 

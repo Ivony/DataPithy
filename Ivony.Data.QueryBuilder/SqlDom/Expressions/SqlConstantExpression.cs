@@ -8,7 +8,7 @@ namespace Ivony.Data.SqlDom.Expressions
 
     internal SqlConstantExpression( object value )
     {
-      Value = value ?? DBNull.Value;
+      Value = value ?? System.DBNull.Value;
     }
 
     public object Value { get; }
