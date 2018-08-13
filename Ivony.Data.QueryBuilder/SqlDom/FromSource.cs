@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ivony.Data
+namespace Ivony.Data.SqlDom
 {
-  public class RowSetExpression 
-  {
-
-  }
+    public class FromSource
+    {
+    }
 }

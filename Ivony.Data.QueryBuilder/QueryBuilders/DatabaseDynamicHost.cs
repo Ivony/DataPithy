@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 
-namespace Ivony.Data.SqlDom.Builders.DynamicHosts
+namespace Ivony.Data.QueryBuilders
 {
   public class DatabaseDynamicHost : DynamicObject
   {

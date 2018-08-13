@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Ivony.Data.SqlDom;
+using Ivony.Data.SqlDom.Expressions;
+using System;
 using System.Linq.Expressions;
 
-namespace Ivony.Data
+namespace Ivony.Data.SqlDom
 {
-  public class FieldReference : Expression
+  public sealed class FieldReference : SqlValueExpression
   {
 
     internal FieldReference( string tableAlias, string fieldName )
@@ -15,15 +17,9 @@ namespace Ivony.Data
     public string TableAlias { get; }
     public string FieldName { get; }
 
-
-    public override ExpressionType NodeType => ExpressionType.Extension;
-
-    public override Type Type => typeof( int );
-
     public override string ToString()
     {
       return TableAlias + "." + FieldName;
     }
-
   }
 }

@@ -1,10 +1,12 @@
-﻿using Ivony.Data.SqlDom.Builders.DynamicHosts;
+﻿using Ivony.Data.QueryBuilders;
+using Ivony.Data.SqlDom;
+using Ivony.Data.SqlDom.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Ivony.Data.SqlDom.Builders
+namespace Ivony.Data.QueryBuilders
 {
   public class SqlExpressionBuilder
   {
@@ -20,14 +22,6 @@ namespace Ivony.Data.SqlDom.Builders
     {
       return new FieldReference( tableName, fieldName );
     }
-
-    public static Expression Dynamic( Func<dynamic, SqlDynamicHost> builder )
-    {
-      return builder( new DatabaseDynamicHost() ).Expression;
-    }
-
-
-
 
   }
 }

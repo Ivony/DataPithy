@@ -1,5 +1,5 @@
 ﻿using Ivony.Data;
-using Ivony.Data.SqlDom.Builders;
+using Ivony.Data.QueryBuilders;
 using System;
 using System.Dynamic;
 
@@ -13,9 +13,18 @@ namespace DynamicTest
 
 
 
-      var expression = SqlExpressionBuilder.Dynamic( host => host.Users.Age > 30 );
-      
 
+      var builder = new SelectQueryBuilder();
+      builder.Select( host => (host.Users.ID, host.Users.Username) );
+      builder.Where( host => host.Users.Age > 30 & host.Users.ID != null );
+      builder.From( host => host.Users );
+
+
+
+
+      var query = builder.Build();
+
+      Console.WriteLine( query );
 
       Console.ReadKey();
 

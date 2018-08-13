@@ -1,11 +1,25 @@
-﻿using System;
+﻿using Ivony.Data.SqlDom.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ivony.Data
+namespace Ivony.Data.SqlDom
 {
   public class FromClause
   {
-    public RowSetExpression Expression { get; }
+    public FromClause( FromSource fromSource )
+    {
+      Source = fromSource;
+    }
+
+    public FromSource Source { get; }
+
+
+
+    public override string ToString()
+    {
+      return $"FROM {Source}";
+    }
+
   }
 }

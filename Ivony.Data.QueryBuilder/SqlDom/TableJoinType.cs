@@ -1,4 +1,4 @@
-﻿namespace Ivony.Data
+﻿namespace Ivony.Data.SqlDom
 {
   public enum TableJoinType
   {
