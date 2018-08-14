@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>Ivony.Data.SqlQueries</RootNamespace>
-    <Version>4.2.0</Version>
+    <Version>4.3.0</Version>
     <AssemblyName>Ivony.Data.SqlQueries</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
