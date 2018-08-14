@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public sealed class DataSchemaReference
+  public class DataSchemaReference
   {
     internal DataSchemaReference( string name )
     {
@@ -13,7 +13,21 @@ namespace Ivony.Data.SqlQueries.SqlDom
 
     public string SchemaName { get; }
 
-    public TableReference this[string tableName] => new TableReference( SchemaName, tableName );
+    public virtual TableReference this[string tableName] => new TableReference( SchemaName, tableName );
 
   }
+
+
+  internal class NullSchemaReference : DataSchemaReference
+  {
+    private NullSchemaReference() : base( null )
+    {
+
+    }
+
+    public override TableReference this[string tableName] => new TableReference( tableName );
+
+    public static DataSchemaReference Instance { get; } = new NullSchemaReference();
+  }
+
 }

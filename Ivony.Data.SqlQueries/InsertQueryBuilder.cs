@@ -20,6 +20,14 @@ namespace Ivony.Data.SqlQueries
     public InsertValuesSource Values { get; private set; }
 
 
+    public InsertQueryBuilder InsertInto( TableReference table, params string[] columns )
+    {
+      Into = new InsertIntoClause( table );
+      AddColumns( columns );
+
+      return this;
+
+    }
     public InsertQueryBuilder InsertInto( TableReference table, ITuple columns = null )
     {
       Into = new InsertIntoClause( table );
@@ -30,13 +38,18 @@ namespace Ivony.Data.SqlQueries
       return this;
     }
 
+    private void AddColumns( string[] array )
+    {
+      Columns = new InsertColumns( array );
+    }
+
     private void AddColumns( ITuple tuple )
     {
       var array = new string[tuple.Length];
       for ( int i = 0; i < array.Length; i++ )
         array[i] = tuple[i].ToString();
 
-      Columns = new InsertColumns( array );
+      AddColumns( array );
     }
 
     public InsertQueryBuilder WithValues( ValuesClause values )

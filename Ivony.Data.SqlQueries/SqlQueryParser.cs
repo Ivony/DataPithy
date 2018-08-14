@@ -18,6 +18,7 @@ namespace Ivony.Data.SqlQueries
 
     protected object SyncRoot { get; } = new object();
 
+
     public virtual ParameterizedQuery ParseSelectQuery( SelectQuery query )
     {
       Builder = Db.DbContext.GetParameterizedQueryBuilder();

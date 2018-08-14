@@ -6,27 +6,34 @@ using System.Dynamic;
 using Ivony.Data.SqlQueries;
 using Ivony.Data.SqlQueries.SqlDom;
 
+
+
 using static Ivony.Data.SqlQueries.DbDynamicHost;
+
 
 namespace DynamicTest
 {
+
   class Program
   {
+
     static void Main( string[] args )
     {
 
       var select = new SelectQueryBuilder()
-        .Select( (Tables.U.ID, Tables.U.Username, Tables.P.Email) )
+        .Select( Tables.U.ID, Tables.U.Username, Tables.P.Email )
         .Where( Tables.U.Age > 30 | Tables.P.Email.Like( "%@163.com" ) )
         .Where( Tables.U.ID != null )
-        .From( Tables.Users.As( "U" ).InnerJoin( Tables.UserProfile.As( "P" ) ).On( Tables.Users.ID == Tables.UserProfile.ID ) )
+        .From( Tables.Users.As( "U" ).InnerJoin( Tables.UserProfile.As( "P" ) ).On( Tables.U.ID == Tables.P.ID ) )
         .Build();
 
       var insert = new InsertQueryBuilder()
-        .InsertInto( Tables.Users, (Names.ID, Names.Username, Names.Email) )
+        .InsertInto( Tables.Users, Names.ID, Names.Username, Names.Email )
         .WithValues( ValuesClause.Values( (1, "Ivony", "Ivony@live.com") ) )
         .Build();
 
+
+      DbObjectHost.Tables["Users"].
 
       var parser = new SqlQueryParser();
 

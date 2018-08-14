@@ -16,6 +16,11 @@ namespace Ivony.Data.SqlQueries
 
 
 
+    public SelectQueryBuilder Select( params FieldReference[] fields )
+    {
+      AddElements( fields );
+      return this;
+    }
     public SelectQueryBuilder Select( object obj )
     {
       if ( obj is ITuple tuple )
