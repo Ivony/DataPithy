@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Ivony.Data.SqlQueries</RootNamespace>
+    <Version>4.2.0</Version>
+    <AssemblyName>Ivony.Data.SqlQueries</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
+    <Authors>Ivony</Authors>
+    <Description>build standard SQL queries</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ivony.Data\Ivony.Data.csproj" />
+  </ItemGroup>
+
+</Project>

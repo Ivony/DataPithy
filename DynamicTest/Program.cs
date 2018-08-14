@@ -1,9 +1,9 @@
 ﻿using Ivony.Data;
 using Ivony.Data.MySqlClient;
-using Ivony.Data.QueryBuilders;
 using Ivony.Data.SqlClient;
 using System;
 using System.Dynamic;
+using Ivony.Data.SqlQueries;
 
 namespace DynamicTest
 {

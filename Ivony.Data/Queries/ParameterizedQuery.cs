@@ -22,7 +22,7 @@ namespace Ivony.Data.Queries
     /// <summary>
     /// 定义匹配占位符的正则表达式
     /// </summary>
-    public static readonly Regex ParameterPlaceholdRegex = new Regex( @"#((?<index>[0-9]+)|(@(?<dbName>([^#]|##)+)))#", RegexOptions.Compiled );
+    public static readonly Regex ParameterPlaceholdRegex = new Regex( @"(&#(?<index>[0-9]+)#)|(@#(?<dbName>([^#]|##)+)#)", RegexOptions.Compiled );
 
 
     /// <summary>

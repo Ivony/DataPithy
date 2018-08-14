@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ivony.Data.MySql\Ivony.Data.MySql.csproj" />
-    <ProjectReference Include="..\Ivony.Data.QueryBuilder\Ivony.Data.QueryBuilder.csproj" />
+    <ProjectReference Include="..\Ivony.Data.SqlQueries\Ivony.Data.SqlQueries.csproj" />
     <ProjectReference Include="..\Ivony.Data.SqlServer\Ivony.Data.SqlServer.csproj" />
   </ItemGroup>
 

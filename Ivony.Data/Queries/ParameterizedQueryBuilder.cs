@@ -64,7 +64,7 @@ namespace Ivony.Data.Queries
     {
       lock ( SyncRoot )
       {
-        textBuilder.Append( $"#@{name.Name.Replace( "#", "##" )}#" );
+        textBuilder.Append( $"@#{name.Name.Replace( "#", "##" )}#" );
       }
     }
 
@@ -103,7 +103,7 @@ namespace Ivony.Data.Queries
       lock ( SyncRoot )
       {
         values.Add( value );
-        textBuilder.AppendFormat( "#{0}#", values.Count - 1 );
+        textBuilder.AppendFormat( $"&#{values.Count - 1}#" );
       }
     }
 
