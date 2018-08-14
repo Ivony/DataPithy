@@ -25,5 +25,15 @@ namespace Ivony.Data.Queries
     /// </summary>
     public string Name { get; }
 
+
+    /// <summary>
+    /// 重写 ToString 方法，输出数据对象名称
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+      return Name;
+    }
+
   }
 }

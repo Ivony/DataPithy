@@ -30,6 +30,17 @@ namespace Ivony.Data.SqlQueries
       return Builder.BuildQuery( new DbQueryConfigures() );
     }
 
+    public virtual ParameterizedQuery ParseInsertQuery( InsertQuery query )
+    {
+      Builder = Db.DbContext.GetParameterizedQueryBuilder();
+
+      ParseInsertIntoClause( query.Into );
+      ParseInsertColumnsClause( query.Columns );
+      ParseInsertValues( query.Values );
+
+      return Builder.BuildQuery( new DbQueryConfigures() );
+    }
+
 
     protected virtual void ParseSelectClause( SelectClause clause )
     {
@@ -151,6 +162,59 @@ namespace Ivony.Data.SqlQueries
 
 
 
+
+
+    protected virtual void ParseInsertIntoClause( InsertIntoClause into )
+    {
+      Builder.Append( "INSERT INTO " );
+      ParseTable( into.Table );
+    }
+
+    protected virtual void ParseInsertColumnsClause( InsertColumns columns )
+    {
+
+      Builder.Append( '(' );
+
+      bool flag = false;
+      foreach ( var name in columns.Columns )
+      {
+        if ( flag )
+          Builder.Append( ", " );
+        flag = true;
+        Builder.AppendName( name );
+      }
+
+      Builder.Append( ')' );
+    }
+
+    protected virtual void ParseInsertValues( InsertValuesSource list )
+    {
+      switch ( list )
+      {
+        case ValuesClause valuesClase:
+          ParseValues( valuesClase );
+          return;
+      }
+    }
+
+    protected virtual void ParseValues( ValuesClause values )
+    {
+      Builder.Append( "VALUES" );
+
+      foreach ( var tuple in values.ValuesList )
+      {
+        Builder.Append( '(' );
+
+        for ( int i = 0; i < tuple.Length; i++ )
+        {
+          if ( i > 0 )
+            Builder.Append( ", " );
+
+          Builder.AppendParameter( tuple[i] );
+        }
+        Builder.Append( ')' );
+      }
+    }
 
     protected virtual void ParseExpression( SqlExpression expression )
     {

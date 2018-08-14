@@ -4,7 +4,10 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries
 {
-  class SqlUpdateQueryBuilder
-    {
-    }
+  public class DeleteQueryBuilder
+  {
+
+
+
+  }
 }

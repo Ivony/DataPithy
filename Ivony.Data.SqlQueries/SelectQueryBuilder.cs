@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries
 {
-  public class SqlSelectQueryBuilder
+  public class SelectQueryBuilder
   {
 
 
@@ -17,7 +17,7 @@ namespace Ivony.Data.SqlQueries
     private DatabaseDynamicHost _host = new DatabaseDynamicHost();
 
 
-    public SqlSelectQueryBuilder Select( Func<dynamic, object> func )
+    public SelectQueryBuilder Select( Func<dynamic, object> func )
     {
       var result = func( _host );
 
@@ -44,14 +44,14 @@ namespace Ivony.Data.SqlQueries
 
     }
 
-    public SqlSelectQueryBuilder AddElements( IEnumerable array )
+    public SelectQueryBuilder AddElements( IEnumerable array )
     {
       foreach ( var item in array )
         AddElement( item );
       return this;
     }
 
-    public SqlSelectQueryBuilder AddElements( ITuple tuple )
+    public SelectQueryBuilder AddElements( ITuple tuple )
     {
       for ( int i = 0; i < tuple.Length; i++ )
         AddElement( tuple[i] );
@@ -59,7 +59,7 @@ namespace Ivony.Data.SqlQueries
       return this;
     }
 
-    public SqlSelectQueryBuilder AddElement( object value )
+    public SelectQueryBuilder AddElement( object value )
     {
 
       AddElement( value, null );
@@ -67,7 +67,7 @@ namespace Ivony.Data.SqlQueries
       return this;
     }
 
-    public SqlSelectQueryBuilder AddElement( object value, string alias )
+    public SelectQueryBuilder AddElement( object value, string alias )
     {
 
       elements.Add( CreateSelectElement( SqlValueExpression.From( value ), alias ) );
@@ -94,7 +94,7 @@ namespace Ivony.Data.SqlQueries
 
     private SqlBooleanExpression filter;
 
-    public SqlSelectQueryBuilder Where( Func<dynamic, SqlBooleanExpression> func )
+    public SelectQueryBuilder Where( Func<dynamic, SqlBooleanExpression> func )
     {
       var expression = func( _host );
 
@@ -106,7 +106,7 @@ namespace Ivony.Data.SqlQueries
 
     private FromSource fromSource;
 
-    public SqlSelectQueryBuilder From( Func<dynamic, FromSource> func )
+    public SelectQueryBuilder From( Func<dynamic, FromSource> func )
     {
       fromSource = func( _host );
       return this;
