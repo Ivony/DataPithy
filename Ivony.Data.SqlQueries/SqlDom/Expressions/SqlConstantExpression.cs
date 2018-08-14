@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Ivony.Data.SqlQueries.SqlDom.Expressions
 {
-  public class SqlConstantExpression : SqlValueExpression
+  public sealed class SqlConstantExpression : SqlValueExpression
   {
 
     internal SqlConstantExpression( object value )

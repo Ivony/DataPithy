@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Ivony.Data.SqlQueries.SqlDom.Expressions
 {
-  public class SqlLogicalExpression : SqlBooleanExpression
+  public sealed class SqlLogicalExpression : SqlBooleanExpression
   {
 
     internal SqlLogicalExpression( ExpressionType operation, SqlExpression left, SqlExpression right )

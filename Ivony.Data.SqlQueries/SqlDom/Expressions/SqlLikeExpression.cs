@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom.Expressions
 {
-  public class SqlLikeExpression : SqlBooleanExpression
+  public sealed class SqlLikeExpression : SqlBooleanExpression
   {
     internal SqlLikeExpression( SqlValueExpression left, SqlValueExpression right )
     {

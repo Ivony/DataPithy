@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class OrderByItem
+  public sealed class OrderByItem
   {
 
     public string FieldAlias { get; }

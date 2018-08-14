@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom.Expressions
 {
-  public class SqlDbNullExpression : SqlValueExpression
+  public sealed class SqlDbNullExpression : SqlValueExpression
   {
 
     public override string ToString()

@@ -6,7 +6,7 @@ using Ivony.Data.Queries;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class SelectClause
+  public sealed class SelectClause
   {
     public SelectClause( List<SelectElement> elements )
     {

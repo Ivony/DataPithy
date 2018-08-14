@@ -6,9 +6,9 @@ using Ivony.Data.SqlQueries.SqlDom.Expressions;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class WhereClause
+  public sealed class WhereClause
   {
-    public WhereClause( SqlBooleanExpression condition )
+    internal WhereClause( SqlBooleanExpression condition )
     {
       Condition = condition;
     }

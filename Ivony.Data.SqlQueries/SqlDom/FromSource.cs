@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class FromSource
-    {
-    }
+  public abstract class FromSource
+  {
+  }
 }

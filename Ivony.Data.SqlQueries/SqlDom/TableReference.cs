@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class TableReference : SqlTableExpression
+  public sealed class TableReference : SqlTableExpression
   {
     internal TableReference( string tableName )
     {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class JoinWithoutOnExpression
+  public sealed class JoinWithoutOnExpression
   {
     private readonly TableJoinType joinType;
     private readonly TableSource left;

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom
 {
-  public class FromClause
+  public sealed class FromClause
   {
     public FromClause( FromSource fromSource )
     {
