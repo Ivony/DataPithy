@@ -20,12 +20,12 @@ namespace Ivony.Data.SqlQueries
     public InsertValuesSource Values { get; private set; }
 
 
-    public InsertQueryBuilder InsertInto( Func<dynamic, TableReference> tableSelector, Func<dynamic, ITuple> columnsFactory = null )
+    public InsertQueryBuilder InsertInto( TableReference table, ITuple columns = null )
     {
-      Into = new InsertIntoClause( tableSelector( new DatabaseDynamicHost() ) );
+      Into = new InsertIntoClause( table );
 
-      if ( columnsFactory != null )
-        AddColumns( columnsFactory( new DbNameHost() ) );
+      if ( columns != null )
+        AddColumns( columns );
 
       return this;
     }

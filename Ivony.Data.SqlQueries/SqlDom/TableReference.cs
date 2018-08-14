@@ -12,6 +12,15 @@ namespace Ivony.Data.SqlQueries.SqlDom
       TableName = tableName;
     }
 
+    internal TableReference( string schemaName, string tableName )
+    {
+      SchemaName = schemaName;
+      TableName = tableName;
+    }
+
+
+    public string SchemaName { get; }
+
     public string TableName { get; }
 
 
@@ -30,6 +39,11 @@ namespace Ivony.Data.SqlQueries.SqlDom
     {
       return TableName;
     }
+
+
+
+    public FieldReference this[string fieldName] => new FieldReference( SchemaName, TableName, fieldName );
+
 
 
 

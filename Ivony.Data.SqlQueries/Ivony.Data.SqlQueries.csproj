@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <None Remove="SqlInsertQueryBuilder.cs~RFf876cad.TMP" />
+    <None Remove="SqlQueryParser.cs~RF1038ddaa.TMP" />
   </ItemGroup>
 
   <ItemGroup>

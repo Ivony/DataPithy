@@ -7,18 +7,25 @@ namespace Ivony.Data.SqlQueries.SqlDom
   public sealed class FieldReference : SqlValueExpression
   {
 
-    internal FieldReference( string tableAlias, string fieldName )
+    internal FieldReference( string schemaName, string tableName, string fieldName )
     {
-      TableAlias = tableAlias;
+      SchemaName = schemaName;
+      TableName = tableName;
       FieldName = fieldName;
     }
+    internal FieldReference( string tableAlias, string fieldName ) : this( null, tableAlias, fieldName )
+    {
+    }
 
-    public string TableAlias { get; }
+    public string SchemaName { get; }
+
+    public string TableName { get; }
+
     public string FieldName { get; }
 
     public override string ToString()
     {
-      return TableAlias + "." + FieldName;
+      return TableName + "." + FieldName;
     }
   }
 }

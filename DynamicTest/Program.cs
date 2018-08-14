@@ -6,6 +6,8 @@ using System.Dynamic;
 using Ivony.Data.SqlQueries;
 using Ivony.Data.SqlQueries.SqlDom;
 
+using static Ivony.Data.SqlQueries.DbDynamicHost;
+
 namespace DynamicTest
 {
   class Program
@@ -14,14 +16,14 @@ namespace DynamicTest
     {
 
       var select = new SelectQueryBuilder()
-        .Select( host => (host.U.ID, host.U.Username, host.P.Email) )
-        .Where( host => host.U.Age > 30 | host.P.Email.Like( "%@163.com" ) )
-        .Where( host => host.U.ID != null )
-        .From( host => host.Users.As( "U" ).InnerJoin( host.UserProfile.As( "P" ) ).On( host.Users.ID == host.UserProfile.ID ) )
+        .Select( (Tables.U.ID, Tables.U.Username, Tables.P.Email) )
+        .Where( Tables.U.Age > 30 | Tables.P.Email.Like( "%@163.com" ) )
+        .Where( Tables.U.ID != null )
+        .From( Tables.Users.As( "U" ).InnerJoin( Tables.UserProfile.As( "P" ) ).On( Tables.Users.ID == Tables.UserProfile.ID ) )
         .Build();
 
       var insert = new InsertQueryBuilder()
-        .InsertInto( host => host.Users, host => (host.ID, host.Username, host.Email) )
+        .InsertInto( Tables.Users, (Names.ID, Names.Username, Names.Email) )
         .WithValues( ValuesClause.Values( (1, "Ivony", "Ivony@live.com") ) )
         .Build();
 

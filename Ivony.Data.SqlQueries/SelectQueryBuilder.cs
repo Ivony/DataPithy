@@ -14,26 +14,23 @@ namespace Ivony.Data.SqlQueries
 
 
 
-    private DatabaseDynamicHost _host = new DatabaseDynamicHost();
 
 
-    public SelectQueryBuilder Select( Func<dynamic, object> func )
+    public SelectQueryBuilder Select( object obj )
     {
-      var result = func( _host );
-
-      if ( result is ITuple tuple )
+      if ( obj is ITuple tuple )
       {
         AddElements( tuple );
       }
-      else if ( result is Array list )
+      else if ( obj is Array list )
       {
         AddElements( list );
       }
       else
       {
-        foreach ( var property in result.GetType().GetProperties() )
+        foreach ( var property in obj.GetType().GetProperties() )
         {
-          var value = property.GetValue( result );
+          var value = property.GetValue( obj );
           var alias = property.Name;
 
           AddElement( value, alias );
@@ -81,10 +78,10 @@ namespace Ivony.Data.SqlQueries
       switch ( value )
       {
         case FieldReference field:
-          return new SelectElement( field, alias ?? field.FieldName );
+          return new SelectElementExpression( field, alias ?? field.FieldName );
 
         default:
-          return new SelectElement( value, alias );
+          return new SelectElementExpression( value, alias );
       }
     }
 
@@ -94,10 +91,8 @@ namespace Ivony.Data.SqlQueries
 
     private SqlBooleanExpression filter;
 
-    public SelectQueryBuilder Where( Func<dynamic, SqlBooleanExpression> func )
+    public SelectQueryBuilder Where( SqlBooleanExpression expression )
     {
-      var expression = func( _host );
-
       filter &= expression;
 
       return this;
@@ -106,9 +101,9 @@ namespace Ivony.Data.SqlQueries
 
     private FromSource fromSource;
 
-    public SelectQueryBuilder From( Func<dynamic, FromSource> func )
+    public SelectQueryBuilder From( FromSource source )
     {
-      fromSource = func( _host );
+      fromSource = source;
       return this;
     }
 

@@ -58,9 +58,34 @@ namespace Ivony.Data.SqlQueries
 
     protected void ParseSelectElement( SelectElement element )
     {
+      switch ( element )
+      {
+        case SelectElementExpression expression:
+          ParseSelectElementExpression( expression );
+          return;
+
+        case SelectElementStar star:
+          ParseSelectElementStar( star );
+          return;
+      }
+    }
+
+    protected void ParseSelectElementExpression( SelectElementExpression element )
+    {
       ParseExpression( element.Expression, 0 );
       Builder.Append( " AS " );
       Builder.AppendName( element.Alias );
+    }
+
+    protected void ParseSelectElementStar( SelectElementStar element )
+    {
+      if ( element.TableAlias != null )
+      {
+        Builder.AppendName( element.TableAlias );
+        Builder.Append( '.' );
+      }
+
+      Builder.Append( "*" );
     }
 
     protected virtual void ParseFromClause( FromClause clause )
@@ -283,7 +308,7 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseField( FieldReference field )
     {
-      Builder.AppendName( field.TableAlias );
+      Builder.AppendName( field.TableName );
       Builder.Append( '.' );
       Builder.AppendName( field.FieldName );
     }
