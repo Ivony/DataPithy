@@ -71,7 +71,7 @@ namespace Ivony.Data.MySqlClient
     protected MySqlDbConfiguration Configuration => Db.DbContext.GetConfiguration<MySqlDbConfiguration>();
 
 
-    public IDbExecuteContext Execute( IDbQuery query )
+    public IDbExecuteContext Execute( DbQuery query )
     {
 
       var parameterizedQuery = query as ParameterizedQuery;

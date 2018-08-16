@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Ivony.Data.Common
     /// <param name="executor">查询执行器</param>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>
-    protected IDbTracing TryCreateTracing( IDbExecutor executor, IDbQuery query )
+    protected IDbTracing TryCreateTracing( IDbExecutor executor, DbQuery query )
     {
 
       if ( TraceService == null )
@@ -68,7 +69,7 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="query">即将执行的查询对象</param>
     /// <returns>追踪该查询执行过程的 IDbTracing 对象</returns>
-    protected IDbTracing TryCreateTracing( IDbQuery query )
+    protected IDbTracing TryCreateTracing( DbQuery query )
     {
 
       return TryCreateTracing( (IDbExecutor) this, query );

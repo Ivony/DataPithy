@@ -49,7 +49,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询</param>
     /// <returns>查询结果</returns>
-    public static dynamic[] ExecuteDynamics( this IDbQuery query )
+    public static dynamic[] ExecuteDynamics( this IDbExecutable query )
     {
       var data = query.ExecuteDataTable();
       return ToDynamics( data );
@@ -61,7 +61,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public static async Task<dynamic[]> ExecuteDynamicsAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<dynamic[]> ExecuteDynamicsAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       var data = await query.ExecuteDataTableAsync( token );
       return ToDynamics( data );
@@ -74,7 +74,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询</param>
     /// <returns>查询结果</returns>
-    public static dynamic ExecuteDynamicObject( this IDbQuery query )
+    public static dynamic ExecuteDynamicObject( this IDbExecutable query )
     {
       var dataItem = query.ExecuteFirstRow();
       return ToDynamic( dataItem );
@@ -86,7 +86,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询</param>
     /// <returns>查询结果</returns>
-    public static async Task<dynamic> ExecuteDynamicObjectAsync( this IDbQuery query )
+    public static async Task<dynamic> ExecuteDynamicObjectAsync( this IDbExecutable query )
     {
       var dataItem = await query.ExecuteFirstRowAsync();
       return ToDynamic( dataItem );

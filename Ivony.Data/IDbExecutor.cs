@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">查询对象</param>
     /// <returns>查询执行上下文</returns>
-    IDbExecuteContext Execute( IDbQuery query );
+    IDbExecuteContext Execute( DbQuery query );
 
   }
 
@@ -39,7 +40,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询执行上下文</returns>
-    Task<IAsyncDbExecuteContext> ExecuteAsync( IDbQuery query, CancellationToken token );
+    Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token );
 
   }
 }

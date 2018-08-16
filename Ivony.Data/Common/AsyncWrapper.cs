@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -16,12 +17,12 @@ namespace Ivony.Data.Common
       Executor = executor;
     }
 
-    IDbExecuteContext IDbExecutor.Execute( IDbQuery query )
+    IDbExecuteContext IDbExecutor.Execute( DbQuery query )
     {
       return Executor.Execute( query );
     }
 
-    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( IDbQuery query, CancellationToken token )
+    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( DbQuery query, CancellationToken token )
     {
       return Task.FromResult( (IAsyncDbExecuteContext) new AsyncDbExecuteContextWrapper( Executor.Execute( query ) ) );
     }
