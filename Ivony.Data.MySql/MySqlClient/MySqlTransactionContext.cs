@@ -24,6 +24,8 @@ namespace Ivony.Data.MySqlClient
     /// </summary>
     public MySqlConnection Connection { get; }
 
+    public override IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
+
     protected override MySqlTransaction BeginTransactionCore()
     {
       Connection.Open();

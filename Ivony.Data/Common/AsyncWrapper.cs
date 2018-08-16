@@ -77,6 +77,7 @@ namespace Ivony.Data.Common
 
     public TransactionStatus Status => Context.Status;
 
+    public IServiceProvider DbServiceProvider => Context.DbServiceProvider;
 
     public void BeginTransaction() => Context.BeginTransaction();
 

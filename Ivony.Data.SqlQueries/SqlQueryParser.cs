@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries
 {
-  public class SqlQueryParser
+  public class SqlQueryParser : ISelectQueryParser, IInsertQueryParser
   {
 
 

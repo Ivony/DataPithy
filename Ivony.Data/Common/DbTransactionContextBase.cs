@@ -22,9 +22,9 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 用于同步的对象
     /// </summary>
-    public object Sync => _sync;
+    public object Sync { get; } = new object();
 
-    private readonly object _sync = new object();
+    public abstract IServiceProvider DbServiceProvider { get; }
 
     /// <summary>
     /// 开始事务

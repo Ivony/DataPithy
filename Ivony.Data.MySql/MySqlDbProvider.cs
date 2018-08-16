@@ -17,7 +17,7 @@ namespace Ivony.Data
 
     public string ConnectionString { get; }
 
-
+    public IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
 
     public IDbTransactionContext CreateTransaction( DatabaseContext context )
     {

@@ -27,5 +27,9 @@ namespace Ivony.Data
       return new SqlServerTransactionContext( ConnectionString );
     }
 
+
+    public IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
+
+
   }
 }

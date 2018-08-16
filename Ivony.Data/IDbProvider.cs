@@ -28,5 +28,12 @@ namespace Ivony.Data
     IDbTransactionContext CreateTransaction( DatabaseContext context);
 
 
+
+    /// <summary>
+    /// 获取一个服务提供程序，用于获取数据库相关的服务
+    /// </summary>
+    IServiceProvider DbServiceProvider { get; }
+
+
   }
 }

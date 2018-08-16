@@ -28,7 +28,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="name">存储过程名称</param>
     /// <param name="parameters">存储过程参数列表</param>
-    public StoredProcedureQuery( string name, IDictionary<string, object> parameters, DbQueryConfigures configures = null )
+    public StoredProcedureQuery( string name, IDictionary<string, object> parameters, DbQueryConfigures configures = null ) : base( configures )
     {
 
       _name = name;

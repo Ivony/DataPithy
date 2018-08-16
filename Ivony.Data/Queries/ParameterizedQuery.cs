@@ -50,13 +50,6 @@ namespace Ivony.Data.Queries
     }
 
 
-
-
-    /// <summary>
-    /// 应用于此查询的配置项
-    /// </summary>
-    public DbQueryConfigures Configures { get; }
-
     /// <summary>
     /// 判断该参数化查询是否为一个空的查询
     /// </summary>
@@ -69,7 +62,7 @@ namespace Ivony.Data.Queries
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
     /// <param name="configures">查询配置数据</param>
-    internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null )
+    internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null ) : base( configures )
     {
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
 
@@ -79,8 +72,6 @@ namespace Ivony.Data.Queries
 
       ParameterValues = new object[values.Length];
       values.CopyTo( ParameterValues, 0 );
-
-      Configures = configures ?? new DbQueryConfigures();
     }
 
 

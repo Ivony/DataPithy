@@ -53,5 +53,7 @@ namespace Ivony.Data.SqlClient
       Connection.Dispose();
     }
 
+    public override IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
+
   }
 }

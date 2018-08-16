@@ -14,6 +14,10 @@ namespace Ivony.Data.Queries
   public abstract class DbQuery : IDbExecutable
   {
 
+
+    internal DbQuery( DbQueryConfigures configures ) { Configures = configures; }//禁止直接从此类型派生
+
+
     /// <summary>
     /// 获取查询配置
     /// </summary>
@@ -63,5 +67,18 @@ namespace Ivony.Data.Queries
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
     }
+
+  }
+
+
+  /// <summary>
+  /// 代表一个查询对象
+  /// </summary>
+  public abstract class DbQuery<T> : DbQuery where T : DbQuery<T>
+  {
+
+    public DbQuery() : base( new DbQueryConfigures() ) { }
+
+    public DbQuery( DbQueryConfigures configures ) : base( configures ) { }
   }
 }
