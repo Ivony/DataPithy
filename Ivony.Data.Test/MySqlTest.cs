@@ -218,5 +218,18 @@ PRIMARY KEY (Id)
 
       }
     }
+
+
+    [TestMethod]
+    public void DynamicObjectTest()
+    {
+      Db.T( $"INSERT INTO testTable ( Content ) VALUES ( {"Test"} )" ).ExecuteNonQuery();
+
+      var data = Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicObject();
+
+      Assert.IsNull( (string) data.Name );
+      Assert.IsNull( (int?) data.Name );
+    }
+
   }
 }

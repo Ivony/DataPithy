@@ -324,9 +324,7 @@ namespace Ivony.Data
           return dbValueConverterDictionary[valueType];
 
 
-        var method = typeof( EntityExtensions )
-          .GetMethod( "FieldValue", new[] { typeof( DataRow ), typeof( DataColumn ) } )
-          .MakeGenericMethod( valueType );
+        var method = fieldValueMethod.MakeGenericMethod( valueType );
 
         return dbValueConverterDictionary[valueType] = (Func<DataRow, DataColumn, object>) Delegate.CreateDelegate( typeof( Func<DataRow, DataColumn, object> ), method );
       }
@@ -360,6 +358,11 @@ namespace Ivony.Data
       return FieldValue<T>( dataRow, dataRow.Table.Columns[columnName] );
     }
 
+
+
+    private static readonly MethodInfo fieldValueMethod = typeof( EntityExtensions )
+      .GetMethods( BindingFlags.NonPublic | BindingFlags.Static )
+      .First( method => method.Name == "FieldValue" && method.IsGenericMethod );
 
 
     private static T FieldValue<T>( this DataRow dataRow, DataColumn column )

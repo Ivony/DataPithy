@@ -115,13 +115,16 @@ namespace Ivony.Data
         if ( column != null )
         {
 
-          if ( binder.ReturnType.IsAssignableFrom( column.DataType ) )
-            result = _dataRow[column];
+          if ( _dataRow[column] is DBNull || (binder.ReturnType.IsGenericType && binder.ReturnType.GetGenericTypeDefinition() == typeof( Nullable<> )) )
+          {
+            if ( binder.ReturnType.IsClass )
+            {
+              result = null;
+              return true;
+            }
+          }
 
-          else
-            result = _dataRow.FieldValue( column, binder.ReturnType );
-
-
+          result = _dataRow.FieldValue( column, binder.ReturnType );
           return true;
         }
 
