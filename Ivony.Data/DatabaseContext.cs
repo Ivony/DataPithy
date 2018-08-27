@@ -124,10 +124,27 @@ namespace Ivony.Data
     /// <summary>
     /// 获取指定类型的服务对象实例
     /// </summary>
+    /// <param name="serviceType">服务类型</param>
+    /// <returns>服务实例</returns>
+    public object GetService( Type serviceType )
+    {
+      return typeof( DatabaseContext ).GetMethod( "GetService", 1, new Type[0] ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
+    }
+
+
+    /// <summary>
+    /// 获取指定类型的服务对象实例
+    /// </summary>
     /// <typeparam name="T">服务类型</typeparam>
     /// <returns>服务实例</returns>
     public T GetService<T>() where T : class
     {
+
+      {
+        var instance = DbProvider.GetService( typeof( T ) );
+        if ( instance != null )
+          return (T) instance;
+      }
 
       {
         var instance = this as T;
@@ -152,12 +169,6 @@ namespace Ivony.Data
 
       return default( T );
     }
-
-    object IServiceProvider.GetService( Type serviceType )
-    {
-      return typeof( DatabaseContext ).GetMethod( "GetService" ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
-    }
-
 
 
 

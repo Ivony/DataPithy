@@ -36,7 +36,7 @@ namespace Ivony.Data.SqlQueries.SqlDom
 
     protected virtual ISelectQueryParser CreateParser()
     {
-      return Db.DbContext.DbProvider.DbServiceProvider.GetService<ISelectQueryParser>() ?? Db.DbContext.GetService<ISelectQueryParser>();
+      return Db.DbContext.GetService<ISelectQueryParser>() ?? new SqlQueryParser();
     }
 
 

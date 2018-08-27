@@ -13,7 +13,7 @@ namespace Ivony.Data.SqlClient
   /// </summary>
   public class SqlServerTransactionContext : DbTransactionContextBase<SqlTransaction>
   {
-    internal SqlServerTransactionContext( string connectionString )
+    internal SqlServerTransactionContext( DatabaseContext context, string connectionString )
     {
       Connection = new SqlConnection( connectionString );
     }
@@ -53,7 +53,9 @@ namespace Ivony.Data.SqlClient
       Connection.Dispose();
     }
 
-    public override IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
-
+    public override object GetService( Type serviceType )
+    {
+      return null;
+    }
   }
 }

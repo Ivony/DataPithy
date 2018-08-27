@@ -77,8 +77,6 @@ namespace Ivony.Data.Common
 
     public TransactionStatus Status => Context.Status;
 
-    public IServiceProvider DbServiceProvider => Context.DbServiceProvider;
-
     public void BeginTransaction() => Context.BeginTransaction();
 
     public Task BeginTransactionAsync()
@@ -111,6 +109,11 @@ namespace Ivony.Data.Common
     public IDbExecutor GetDbExecutor( DatabaseContext context )
     {
       return Context.GetDbExecutor( context );
+    }
+
+    public object GetService( Type serviceType )
+    {
+      return Context.GetService( serviceType );
     }
 
     public void RegisterDispose( Action disposeMethod )

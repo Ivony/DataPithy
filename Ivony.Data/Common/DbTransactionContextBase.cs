@@ -8,6 +8,8 @@ namespace Ivony.Data.Common
   public abstract class DbTransactionContextBase<T> : IDbTransactionContext where T : IDbTransaction
   {
 
+
+
     /// <summary>
     /// 数据库事务对象
     /// </summary>
@@ -23,8 +25,6 @@ namespace Ivony.Data.Common
     /// 用于同步的对象
     /// </summary>
     public object Sync { get; } = new object();
-
-    public abstract IServiceProvider DbServiceProvider { get; }
 
     /// <summary>
     /// 开始事务
@@ -163,5 +163,12 @@ namespace Ivony.Data.Common
     {
       disposeAction += disposeMethod;
     }
+
+    /// <summary>
+    /// 获取数据库相关服务对象
+    /// </summary>
+    /// <param name="serviceType">服务类型</param>
+    /// <returns>服务对象</returns>
+    public abstract object GetService( Type serviceType );
   }
 }

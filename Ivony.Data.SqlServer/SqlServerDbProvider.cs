@@ -24,12 +24,13 @@ namespace Ivony.Data
 
     public IDbTransactionContext CreateTransaction( DatabaseContext context )
     {
-      return new SqlServerTransactionContext( ConnectionString );
+      return new SqlServerTransactionContext( context, ConnectionString );
     }
 
-
-    public IServiceProvider DbServiceProvider { get; } = new BlankServiceProvider();
-
+    public object GetService( Type serviceType )
+    {
+      return null;
+    }
 
   }
 }
