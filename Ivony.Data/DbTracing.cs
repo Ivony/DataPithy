@@ -142,8 +142,7 @@ namespace Ivony.Data
       queryStopwatch.Stop();
       QueryTime = queryStopwatch.Elapsed;
 
-      if ( callback != null )
-        callback( this );
+      callback?.Invoke( this );
     }
 
     void IDbTracing.OnException( Exception exception )
@@ -156,8 +155,7 @@ namespace Ivony.Data
 
       Exception = exception;
 
-      if ( callback != null )
-        callback( this );
+      callback?.Invoke( this );
     }
 
 
@@ -172,16 +170,12 @@ namespace Ivony.Data
       internal TraceEventDescriptor( string name, DateTime time )
       {
         _time = time;
-        _eventName = name;
+        EventName = name;
       }
-
-
-
-      private string _eventName;
       /// <summary>
       /// 事件名称
       /// </summary>
-      public string EventName { get { return _eventName; } }
+      public string EventName { get; }
 
 
       private DateTime _time;
