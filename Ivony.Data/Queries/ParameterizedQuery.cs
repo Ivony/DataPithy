@@ -68,7 +68,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    /// <param name="configures">查询配置数据</param>
+    /// <param name="configures">查询配置信息</param>
     internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null )
     {
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
@@ -190,6 +190,32 @@ namespace Ivony.Data.Queries
     internal bool IsStartWithWhiteSpace()
     {
       return char.IsWhiteSpace( TextTemplate[0] );
+    }
+
+
+
+    /// <summary>
+    /// 创建参数化查询的副本
+    /// </summary>
+    /// <returns>与当前对象一致的参数化查询对象</returns>
+    public ParameterizedQuery Clone()
+    {
+      return Clone( null );
+    }
+
+    /// <summary>
+    /// 创建参数化查询的副本
+    /// </summary>
+    /// <param name="configures">查询配置</param>
+    /// <returns>与当前对象一致的参数化查询对象</returns>
+    public ParameterizedQuery Clone( DbQueryConfigures configures )
+    {
+      return new ParameterizedQuery( TextTemplate, ParameterValues, configures );
+    }
+
+    IDbQuery IDbQuery.Clone( DbQueryConfigures configures )
+    {
+      return Clone( configures );
     }
   }
 }

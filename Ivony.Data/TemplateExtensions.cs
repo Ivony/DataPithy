@@ -56,11 +56,11 @@ namespace Ivony.Data
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
           continue;
 
-        configures = configures.Merge( query.Configures );
+        configures = DbQueryConfigures.Merge( configures, query.Configures );
         builder.AppendParameter( query );
       }
 
-      return builder.BuildQuery( configures );
+      return builder.BuildQuery().Clone( configures );
     }
 
 

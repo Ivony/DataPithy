@@ -158,13 +158,21 @@ namespace Ivony.Data
 
 
 
-
+      /// <summary>
+      /// 获取或设置数据上下文属性信息
+      /// </summary>
       protected IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
 
-      public Builder SetProperty( string key, object value )
+      /// <summary>
+      /// 设置上下文属性
+      /// </summary>
+      /// <param name="name">属性名</param>
+      /// <param name="value">属性值</param>
+      /// <returns></returns>
+      public Builder SetProperty( string name, object value )
       {
-        Properties[key] = value;
+        Properties[name] = value;
         return this;
       }
 

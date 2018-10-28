@@ -33,7 +33,6 @@ namespace DynamicTest
         .Build();
 
 
-      DbObjectHost.Tables["Users"].
 
       var parser = new SqlQueryParser();
 

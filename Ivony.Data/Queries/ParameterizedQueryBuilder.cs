@@ -111,13 +111,12 @@ namespace Ivony.Data.Queries
     /// <summary>
     /// 创建参数化查询对象实例
     /// </summary>
-    /// <param name="configures">要应用于查询的配置项</param>
     /// <returns>参数化查询对象</returns>
-    public ParameterizedQuery BuildQuery( DbQueryConfigures configures )
+    public ParameterizedQuery BuildQuery()
     {
       lock ( SyncRoot )
       {
-        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray(), configures );
+        return new ParameterizedQuery( textBuilder.ToString(), values.ToArray() );
       }
     }
 
