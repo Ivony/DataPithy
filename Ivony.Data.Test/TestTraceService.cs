@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Common;
+using Ivony.Data.Queries;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Ivony.Data.Test
     IList<DbTracing> _list = new List<DbTracing>();
 
 
-    public IDbTracing CreateTracing( IDbExecutor executor, IDbQuery query )
+    public IDbTracing CreateTracing( IDbExecutor executor, DbQuery query )
     {
       var tracing = new DbTracing( query );
       _list.Add( tracing );

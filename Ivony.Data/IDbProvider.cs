@@ -9,7 +9,7 @@ namespace Ivony.Data
   /// <summary>
   /// IDbExecutor 提供程序
   /// </summary>
-  public interface IDbProvider
+  public interface IDbProvider : IServiceProvider
   {
 
     /// <summary>
@@ -25,8 +25,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="context">当前数据库访问上下文</param>
     /// <returns></returns>
-    IDbTransactionContext CreateTransaction( DatabaseContext context);
-
+    IDbTransactionContext CreateTransaction( DatabaseContext context );
 
   }
 }

@@ -14,15 +14,21 @@ namespace Ivony.Data.MySqlClient
   public class MySqlDbTransactionContext : DbTransactionContextBase<MySqlTransaction>
   {
 
-    internal MySqlDbTransactionContext( string connectionString )
+    internal MySqlDbTransactionContext( MySqlDbProvider provider )
     {
-      Connection = new MySqlConnection( connectionString );
+      Provider = provider ?? throw new ArgumentNullException( nameof( provider ) );
+      Connection = new MySqlConnection( provider.ConnectionString );
     }
 
     /// <summary>
     /// 获取数据库连接对象
     /// </summary>
     public MySqlConnection Connection { get; }
+
+    /// <summary>
+    /// 创建事务对象的数据提供程序
+    /// </summary>
+    public MySqlDbProvider Provider { get; }
 
     protected override MySqlTransaction BeginTransactionCore()
     {
@@ -39,6 +45,11 @@ namespace Ivony.Data.MySqlClient
     {
       base.DisposeTransaction( transaction );
       Connection.Dispose();
+    }
+
+    public override object GetService( Type serviceType )
+    {
+      return Provider.GetService( serviceType );
     }
 
   }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ivony.Data
@@ -11,14 +12,13 @@ namespace Ivony.Data
   /// <summary>
   /// 这个接口指示该对象是一个可以执行的查询对象
   /// </summary>
-  public interface IDbQuery
+  public interface IDbExecutable
   {
 
+    IDbExecuteContext Execute();
 
-    /// <summary>
-    /// 获取查询配置对象
-    /// </summary>
-    DbQueryConfigures Configures { get; }
+
+    Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token );
 
 
 
@@ -36,7 +36,7 @@ namespace Ivony.Data
   internal interface IDbQueryContainer
   {
 
-    IDbQuery Query { get; }
+    DbQuery Query { get; }
 
   }
 

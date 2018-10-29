@@ -14,7 +14,7 @@ namespace Ivony.Data.Queries
   /// <summary>
   /// 代表一个参数化查询
   /// </summary>
-  public class ParameterizedQuery : IDbQuery, IParameterizedQueryPartial
+  public class ParameterizedQuery : DbQuery, IParameterizedQueryPartial
   {
 
 
@@ -50,13 +50,6 @@ namespace Ivony.Data.Queries
     }
 
 
-
-
-    /// <summary>
-    /// 应用于此查询的配置项
-    /// </summary>
-    public DbQueryConfigures Configures { get; }
-
     /// <summary>
     /// 判断该参数化查询是否为一个空的查询
     /// </summary>
@@ -68,8 +61,8 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="template">查询文本模板</param>
     /// <param name="values">参数值</param>
-    /// <param name="configures">查询配置信息</param>
-    internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null )
+    /// <param name="configures">查询配置数据</param>
+    internal ParameterizedQuery( string template, object[] values, DbQueryConfigures configures = null ) : base( configures )
     {
       TextTemplate = template ?? throw new ArgumentNullException( nameof( template ) );
 
@@ -79,8 +72,6 @@ namespace Ivony.Data.Queries
 
       ParameterValues = new object[values.Length];
       values.CopyTo( ParameterValues, 0 );
-
-      Configures = configures ?? new DbQueryConfigures();
     }
 
 
@@ -190,32 +181,6 @@ namespace Ivony.Data.Queries
     internal bool IsStartWithWhiteSpace()
     {
       return char.IsWhiteSpace( TextTemplate[0] );
-    }
-
-
-
-    /// <summary>
-    /// 创建参数化查询的副本
-    /// </summary>
-    /// <returns>与当前对象一致的参数化查询对象</returns>
-    public ParameterizedQuery Clone()
-    {
-      return Clone( null );
-    }
-
-    /// <summary>
-    /// 创建参数化查询的副本
-    /// </summary>
-    /// <param name="configures">查询配置</param>
-    /// <returns>与当前对象一致的参数化查询对象</returns>
-    public ParameterizedQuery Clone( DbQueryConfigures configures )
-    {
-      return new ParameterizedQuery( TextTemplate, ParameterValues, configures );
-    }
-
-    IDbQuery IDbQuery.Clone( DbQueryConfigures configures )
-    {
-      return Clone( configures );
     }
   }
 }

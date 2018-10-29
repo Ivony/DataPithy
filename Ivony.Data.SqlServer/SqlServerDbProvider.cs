@@ -24,7 +24,12 @@ namespace Ivony.Data
 
     public IDbTransactionContext CreateTransaction( DatabaseContext context )
     {
-      return new SqlServerTransactionContext( ConnectionString );
+      return new SqlServerTransactionContext( context, ConnectionString );
+    }
+
+    public object GetService( Type serviceType )
+    {
+      return null;
     }
 
   }

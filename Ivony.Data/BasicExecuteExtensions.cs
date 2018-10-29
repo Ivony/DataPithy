@@ -21,7 +21,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询结果</returns>
-    public static DataTable ExecuteDataTable( this IDbQuery query )
+    public static DataTable ExecuteDataTable( this IDbExecutable query )
     {
       using ( var context = query.Execute() )
       {
@@ -35,7 +35,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public static async Task<DataTable> ExecuteDataTableAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<DataTable> ExecuteDataTableAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       using ( var context = await query.ExecuteAsync( token ) )
       {
@@ -52,7 +52,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询结果</returns>
-    public static DataTable[] ExecuteAllDataTables( this IDbQuery query )
+    public static DataTable[] ExecuteAllDataTables( this IDbExecutable query )
     {
 
       List<DataTable> dataTables = new List<DataTable>();
@@ -76,7 +76,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public static async Task<DataTable[]> ExecuteAllDataTablesAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<DataTable[]> ExecuteAllDataTablesAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
 
       List<DataTable> dataTables = new List<DataTable>();
@@ -102,7 +102,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询结果</returns>
-    public static object ExecuteScalar( this IDbQuery query )
+    public static object ExecuteScalar( this IDbExecutable query )
     {
       using ( var context = query.Execute() )
       {
@@ -121,7 +121,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public static async Task<object> ExecuteScalarAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<object> ExecuteScalarAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       using ( var context = await query.ExecuteAsync( token ) )
       {
@@ -143,7 +143,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询所影响的行数</returns>
-    public static int ExecuteNonQuery( this IDbQuery query )
+    public static int ExecuteNonQuery( this IDbExecutable query )
     {
       using ( var context = query.Execute() )
       {
@@ -157,7 +157,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询所影响的行数</returns>
-    public static async Task<int> ExecuteNonQueryAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<int> ExecuteNonQueryAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       using ( var context = await query.ExecuteAsync( token ) )
       {
@@ -172,7 +172,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询结果</returns>
-    public static DataRow ExecuteFirstRow( this IDbQuery query )
+    public static DataRow ExecuteFirstRow( this IDbExecutable query )
     {
       //UNDONE
 
@@ -193,7 +193,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public static async Task<DataRow> ExecuteFirstRowAsync( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public static async Task<DataRow> ExecuteFirstRowAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       //UNDONE
 
@@ -216,7 +216,7 @@ namespace Ivony.Data
     /// <typeparam name="T">返回值类型</typeparam>
     /// <param name="query">要执行的查询对象</param>
     /// <returns>查询结果</returns>
-    public static T ExecuteScalar<T>( this IDbQuery query )
+    public static T ExecuteScalar<T>( this IDbExecutable query )
     {
       return DbValueConverter.ConvertFrom<T>( ExecuteScalar( query ) );
     }
@@ -229,7 +229,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询对象</param>
     /// <param name="token">取消指示</param>
     /// <returns>查询结果</returns>
-    public async static Task<T> ExecuteScalarAsync<T>( this IDbQuery query, CancellationToken token = default( CancellationToken ) )
+    public async static Task<T> ExecuteScalarAsync<T>( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
       return DbValueConverter.ConvertFrom<T>( await ExecuteScalarAsync( query, token ) );
     }

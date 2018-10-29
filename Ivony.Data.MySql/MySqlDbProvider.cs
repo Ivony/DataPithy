@@ -1,6 +1,7 @@
 ﻿using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
 using Ivony.Data.Queries;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,15 +19,22 @@ namespace Ivony.Data
     public string ConnectionString { get; }
 
 
-
     public IDbTransactionContext CreateTransaction( DatabaseContext context )
     {
-      return new MySqlDbTransactionContext( ConnectionString );
+      return new MySqlDbTransactionContext( this );
     }
 
     public IDbExecutor GetDbExecutor( DatabaseContext context )
     {
       return new MySqlDbExecutor( ConnectionString );
+    }
+
+    public object GetService( Type serviceType )
+    {
+      if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
+        return new MySqlParameterizedQueryParser();
+
+      return null;
     }
   }
 }

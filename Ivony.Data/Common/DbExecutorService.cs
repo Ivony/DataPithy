@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行方法</param>
-    void Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, Task<IAsyncDbExecuteContext>> executor );
+    void Register( Func<DbQuery, bool> predicate, Func<DbQuery, Task<IAsyncDbExecuteContext>> executor );
   }
 
   /// <summary>
@@ -30,7 +31,7 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行方法</param>
-    void Register( Func<IDbQuery, bool> predicate, Func<IDbQuery, IDbExecuteContext> executor );
+    void Register( Func<DbQuery, bool> predicate, Func<DbQuery, IDbExecuteContext> executor );
   }
 
 
@@ -78,7 +79,7 @@ namespace Ivony.Data.Common
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<IDbQuery, bool> predicate, Func<IDbQuery, IDbExecuteContext> executor )
+    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<DbQuery, bool> predicate, Func<DbQuery, IDbExecuteContext> executor )
     {
       service.Register( predicate, executor );
       return service;
@@ -91,7 +92,7 @@ namespace Ivony.Data.Common
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<IDbQuery, bool> predicate, IDbExecutor executor )
+    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<DbQuery, bool> predicate, IDbExecutor executor )
     {
       return service.AddExecutor( predicate, executor.Execute );
     }
@@ -104,7 +105,7 @@ namespace Ivony.Data.Common
     /// <param name="predicate">需要满足的条件</param>
     /// <param name="executorFactory">创建查询执行器的工厂方法</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<IDbQuery, bool> predicate, Func<IDbExecutor> executorFactory )
+    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Func<DbQuery, bool> predicate, Func<IDbExecutor> executorFactory )
     {
       return service.AddExecutor( predicate, executorFactory().Execute );
     }
@@ -117,7 +118,7 @@ namespace Ivony.Data.Common
     /// <param name="queryType">适用的查询类型</param>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Type queryType, Func<IDbQuery, IDbExecuteContext> executor )
+    public static IDbExecutorRegisterService AddExecutor( this IDbExecutorRegisterService service, Type queryType, Func<DbQuery, IDbExecuteContext> executor )
     {
       return service.AddExecutor( query => queryType.IsAssignableFrom( query.GetType() ), executor );
     }
@@ -141,7 +142,7 @@ namespace Ivony.Data.Common
     /// <typeparam name="T">适用的查询类型</typeparam>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor<T>( this IDbExecutorRegisterService service, Func<IDbQuery, IDbExecuteContext> executor ) where T : IDbQuery
+    public static IDbExecutorRegisterService AddExecutor<T>( this IDbExecutorRegisterService service, Func<DbQuery, IDbExecuteContext> executor ) where T : DbQuery
     {
       return service.AddExecutor( typeof( T ), executor );
     }
@@ -153,7 +154,7 @@ namespace Ivony.Data.Common
     /// <typeparam name="T">适用的查询类型</typeparam>
     /// <param name="executor">查询执行器</param>
     /// <returns></returns>
-    public static IDbExecutorRegisterService AddExecutor<T>( this IDbExecutorRegisterService service, IDbExecutor executor ) where T : IDbQuery
+    public static IDbExecutorRegisterService AddExecutor<T>( this IDbExecutorRegisterService service, IDbExecutor executor ) where T : DbQuery
     {
       return service.AddExecutor( typeof( T ), executor );
     }

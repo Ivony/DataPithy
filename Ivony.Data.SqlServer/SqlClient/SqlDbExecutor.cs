@@ -163,7 +163,7 @@ namespace Ivony.Data.SqlClient
         connection.Dispose();
     }
 
-    IDbExecuteContext IDbExecutor.Execute( IDbQuery query )
+    IDbExecuteContext IDbExecutor.Execute( DbQuery query )
     {
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )
@@ -172,7 +172,7 @@ namespace Ivony.Data.SqlClient
       return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
     }
 
-    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( IDbQuery query, CancellationToken token )
+    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( DbQuery query, CancellationToken token )
     {
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ivony.Data.Queries;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Ivony.Data
     /// 创建一个 DbTracing 实例
     /// </summary>
     /// <param name="query">即将执行的查询对象</param>
-    public DbTracing( IDbQuery query ) : this( query, null ) { }
+    public DbTracing( DbQuery query ) : this( query, null ) { }
 
 
 
@@ -29,7 +30,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">即将执行的查询对象</param>
     /// <param name="complateCallback">当查询执行完成之后需要回调的方法</param>
-    public DbTracing( IDbQuery query, Action<DbTracing> complateCallback )
+    public DbTracing( DbQuery query, Action<DbTracing> complateCallback )
     {
 
       QueryObject = query;
@@ -52,7 +53,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取此次查询执行的查询对象
     /// </summary>
-    public IDbQuery QueryObject
+    public DbQuery QueryObject
     {
       get;
       private set;
@@ -141,8 +142,7 @@ namespace Ivony.Data
       queryStopwatch.Stop();
       QueryTime = queryStopwatch.Elapsed;
 
-      if ( callback != null )
-        callback( this );
+      callback?.Invoke( this );
     }
 
     void IDbTracing.OnException( Exception exception )
@@ -155,8 +155,7 @@ namespace Ivony.Data
 
       Exception = exception;
 
-      if ( callback != null )
-        callback( this );
+      callback?.Invoke( this );
     }
 
 
@@ -171,16 +170,12 @@ namespace Ivony.Data
       internal TraceEventDescriptor( string name, DateTime time )
       {
         _time = time;
-        _eventName = name;
+        EventName = name;
       }
-
-
-
-      private string _eventName;
       /// <summary>
       /// 事件名称
       /// </summary>
-      public string EventName { get { return _eventName; } }
+      public string EventName { get; }
 
 
       private DateTime _time;

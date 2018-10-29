@@ -5,7 +5,7 @@
     <RootNamespace>Ivony.Data</RootNamespace>
     <Product />
     <Authors>Ivony</Authors>
-    <Version>4.3.0</Version>
+    <Version>4.4</Version>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
     <Company />
