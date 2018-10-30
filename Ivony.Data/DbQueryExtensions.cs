@@ -62,5 +62,18 @@ namespace Ivony.Data
       return query;
     }
 
+
+
+    /// <summary>
+    /// 创建查询的只读副本
+    /// </summary>
+    /// <typeparam name="T">查询类型</typeparam>
+    /// <param name="query">查询对象</param>
+    /// <returns>查询的只读副本</returns>
+    public static T AsReadonly<T>( this T query ) where T : DbQuery
+    {
+      return (T) query.Clone( query.Configures.AsReadonly() );
+    }
+
   }
 }

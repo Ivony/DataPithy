@@ -182,5 +182,17 @@ namespace Ivony.Data.Queries
     {
       return char.IsWhiteSpace( TextTemplate[0] );
     }
+
+
+    /// <summary>
+    /// 创建使用新的查询配置的副本
+    /// </summary>
+    /// <param name="configures">要使用的查询配置</param>
+    /// <returns></returns>
+    public override ParameterizedQuery Clone( DbQueryConfigures configures )
+    {
+      return new ParameterizedQuery( TextTemplate, ParameterValues, configures );
+    }
+
   }
 }

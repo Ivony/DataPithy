@@ -50,7 +50,7 @@ namespace Ivony.Data.Queries
     /// <returns></returns>
     public IDbExecuteContext Execute()
     {
-      var executor = Configures?.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
+      var executor = Configures?.GetService<IDbExecutor>() ?? Db.DbContext?.GetExecutor();
       return executor?.Execute( this ) ?? throw NotSupported(); ;
     }
 
@@ -63,22 +63,19 @@ namespace Ivony.Data.Queries
     public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default( CancellationToken ) )
     {
 
-      var executor = Configures?.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
+      var executor = Configures?.GetService<IAsyncDbExecutor>() ?? Db.DbContext?.GetAsyncExecutor();
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
     }
 
-  }
 
 
-  /// <summary>
-  /// 代表一个查询对象
-  /// </summary>
-  public abstract class DbQuery<T> : DbQuery where T : DbQuery<T>
-  {
+    /// <summary>
+    /// 制作查询对象的副本
+    /// </summary>
+    /// <param name="configures">所需要采用的配置对象</param>
+    /// <returns>查询对象的副本</returns>
+    protected internal abstract DbQuery Clone( DbQueryConfigures configures );
 
-    public DbQuery() : base( new DbQueryConfigures() ) { }
-
-    public DbQuery( DbQueryConfigures configures ) : base( configures ) { }
   }
 }

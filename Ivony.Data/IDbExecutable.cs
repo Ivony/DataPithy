@@ -20,16 +20,6 @@ namespace Ivony.Data
 
     Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token );
 
-
-
-    /// <summary>
-    /// 制作查询对象的副本
-    /// </summary>
-    /// <param name="configures">所需要采用的配置对象</param>
-    /// <returns>查询对象的副本</returns>
-    IDbQuery Clone( DbQueryConfigures configures );
-
-
   }
 
 
