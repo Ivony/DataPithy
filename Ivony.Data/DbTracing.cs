@@ -142,8 +142,9 @@ namespace Ivony.Data
       queryStopwatch.Stop();
       QueryTime = queryStopwatch.Elapsed;
 
-      callback?.Invoke( this );
+      OnCompleted();
     }
+
 
     void IDbTracing.OnException( Exception exception )
     {
@@ -155,8 +156,16 @@ namespace Ivony.Data
 
       Exception = exception;
 
+      OnCompleted();
+    }
+
+
+    private void OnCompleted()
+    {
       callback?.Invoke( this );
     }
+
+
 
 
 

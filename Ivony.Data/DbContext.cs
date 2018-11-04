@@ -121,6 +121,8 @@ namespace Ivony.Data
     private IReadOnlyDictionary<Type, object> services;
 
 
+    private static readonly MethodInfo getServiceMethod = typeof( DbContext ).GetMethod( "GetService", 1, new Type[0] );
+
     /// <summary>
     /// 获取指定类型的服务对象实例
     /// </summary>
@@ -128,7 +130,7 @@ namespace Ivony.Data
     /// <returns>服务实例</returns>
     public object GetService( Type serviceType )
     {
-      return typeof( DbContext ).GetMethod( "GetService", 1, new Type[0] ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
+      return getServiceMethod.MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
     }
 
 
