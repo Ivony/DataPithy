@@ -14,17 +14,17 @@ namespace Ivony.Data
   /// <summary>
   /// 数据访问上下文
   /// </summary>
-  public partial class DatabaseContext : IServiceProvider, IDisposable
+  public partial class DbContext : IServiceProvider, IDisposable
   {
 
 
-    private DatabaseContext() { }
+    private DbContext() { }
 
 
     /// <summary>
     /// 获取父级上下文
     /// </summary>
-    public DatabaseContext Parent { get; private set; }
+    public DbContext Parent { get; private set; }
 
 
 
@@ -68,7 +68,7 @@ namespace Ivony.Data
 
 
 
-    private Action GetExiter( DatabaseContext scope )
+    private Action GetExiter( DbContext scope )
     {
       if ( Parent == null )//顶级上下文不能退出
         return null;
@@ -128,7 +128,7 @@ namespace Ivony.Data
     /// <returns>服务实例</returns>
     public object GetService( Type serviceType )
     {
-      return typeof( DatabaseContext ).GetMethod( "GetService", 1, new Type[0] ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
+      return typeof( DbContext ).GetMethod( "GetService", 1, new Type[0] ).MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
     }
 
 
@@ -211,11 +211,9 @@ namespace Ivony.Data
     /// <returns></returns>
     public IAsyncDbExecutor GetAsyncExecutor()
     {
-      var executor = GetExecutor();
-      if ( executor == null )
-        return null;
 
-      return executor as IAsyncDbExecutor ?? new AsyncExecutorWrapper( executor );
+      return DbProvider.GetAsyncDbExecutor( this );
+
     }
 
 

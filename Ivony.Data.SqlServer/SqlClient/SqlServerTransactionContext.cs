@@ -13,7 +13,7 @@ namespace Ivony.Data.SqlClient
   /// </summary>
   public class SqlServerTransactionContext : DbTransactionContextBase<SqlTransaction>
   {
-    internal SqlServerTransactionContext( DatabaseContext context, string connectionString )
+    internal SqlServerTransactionContext( DbContext context, string connectionString )
     {
       Connection = new SqlConnection( connectionString );
     }
@@ -41,7 +41,7 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    protected override IDbExecutor GetDbExecutorCore( DatabaseContext context )
+    protected override IDbExecutor GetDbExecutorCore( DbContext context )
     {
       return new SqlDbExecutor( this );
     }

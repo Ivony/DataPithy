@@ -189,7 +189,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="configures">要使用的查询配置</param>
     /// <returns></returns>
-    public override ParameterizedQuery Clone( DbQueryConfigures configures )
+    protected internal override DbQuery Clone( DbQueryConfigures configures )
     {
       return new ParameterizedQuery( TextTemplate, ParameterValues, configures );
     }

@@ -66,7 +66,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="configures">查询配置</param>
     /// <returns>使用指定查询配置的副本</returns>
-    public override StoredProcedureQuery Clone( DbQueryConfigures configures )
+    protected internal override DbQuery Clone( DbQueryConfigures configures )
     {
       return new StoredProcedureQuery( Name, Parameters, configures );
     }

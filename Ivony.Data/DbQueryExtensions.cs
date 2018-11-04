@@ -55,6 +55,7 @@ namespace Ivony.Data
     /// 指定查询所属的数据库连接
     /// </summary>
     /// <param name="query">数据库查询</param>
+    /// <param name="dbProvider">数据库提供程序</param>
     /// <returns></returns>
     public static T WithDatabase<T>( this T query, IDbProvider dbProvider ) where T : DbQuery
     {
@@ -74,6 +75,18 @@ namespace Ivony.Data
     {
       return (T) query.Clone( query.Configures.AsReadonly() );
     }
+
+    /// <summary>
+    /// 创建查询的副本
+    /// </summary>
+    /// <typeparam name="T">查询类型</typeparam>
+    /// <param name="query">查询对象</param>
+    /// <returns>查询的副本</returns>
+    public static T Clone<T>( this T query ) where T : DbQuery
+    {
+      return (T) query.Clone( query.Configures.Clone() );
+    }
+
 
   }
 }

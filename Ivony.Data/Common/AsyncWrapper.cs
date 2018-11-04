@@ -96,7 +96,7 @@ namespace Ivony.Data.Common
       return Task.CompletedTask;
     }
 
-    public IDbTransactionContext CreateTransaction( DatabaseContext context )
+    public IDbTransactionContext CreateTransaction( DbContext context )
     {
       return Context.CreateTransaction( context );
     }
@@ -106,7 +106,7 @@ namespace Ivony.Data.Common
       Context.Dispose();
     }
 
-    public IDbExecutor GetDbExecutor( DatabaseContext context )
+    public IDbExecutor GetDbExecutor( DbContext context )
     {
       return Context.GetDbExecutor( context );
     }

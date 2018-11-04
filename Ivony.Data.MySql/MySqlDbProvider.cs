@@ -19,12 +19,12 @@ namespace Ivony.Data
     public string ConnectionString { get; }
 
 
-    public IDbTransactionContext CreateTransaction( DatabaseContext context )
+    public IDbTransactionContext CreateTransaction( DbContext context )
     {
       return new MySqlDbTransactionContext( this );
     }
 
-    public IDbExecutor GetDbExecutor( DatabaseContext context )
+    public IDbExecutor GetDbExecutor( DbContext context )
     {
       return new MySqlDbExecutor( ConnectionString );
     }

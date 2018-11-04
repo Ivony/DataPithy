@@ -127,7 +127,7 @@ namespace Ivony.Data
         }
 
 
-        return builder.BuildQuery();
+        return builder.BuildQuery( null );
       }
     }
 

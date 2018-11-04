@@ -19,16 +19,16 @@ namespace Ivony.Data
     private static readonly object _sync = new object();
 
 
-    private static DatabaseContext _root;
+    private static DbContext _root;
 
-    private static AsyncLocal<DatabaseContext> _current = new AsyncLocal<DatabaseContext>();
+    private static AsyncLocal<DbContext> _current = new AsyncLocal<DbContext>();
 
 
     /// <summary>
     /// 获取当前数据访问上下文
     /// </summary>
     /// <returns></returns>
-    public static DatabaseContext DbContext
+    public static DbContext DbContext
     {
       get
       {
@@ -52,9 +52,9 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="configure">配置数据访问上下文的方法</param>
     /// <returns></returns>
-    public static IDisposable Enter( Action<DatabaseContext.Builder> configure )
+    public static IDisposable Enter( Action<DbContext.Builder> configure )
     {
-      var builder = new DatabaseContext.Builder( DbContext );
+      var builder = new DbContext.Builder( DbContext );
       configure( builder );
 
       return _current.Value = builder.Build();
@@ -73,7 +73,7 @@ namespace Ivony.Data
 
 
 
-    internal static void ExitContext( DatabaseContext current )
+    internal static void ExitContext( DbContext current )
     {
       if ( _current.Value != current )
         throw new InvalidOperationException();
@@ -89,7 +89,7 @@ namespace Ivony.Data
     /// <summary>
     /// 初始化根数据访问上下文
     /// </summary>
-    public static DatabaseContext Initialize( Action<DatabaseContext.Builder> configure )
+    public static DbContext Initialize( Action<DbContext.Builder> configure )
     {
       lock ( _sync )
       {
@@ -109,9 +109,9 @@ namespace Ivony.Data
 
 
 
-    private static DatabaseContext InitializeCore( Action<DatabaseContext.Builder> configure )
+    private static DbContext InitializeCore( Action<DbContext.Builder> configure )
     {
-      var builder = new DatabaseContext.Builder();
+      var builder = new DbContext.Builder();
       configure( builder );
       return builder.Build();
     }
@@ -183,7 +183,7 @@ namespace Ivony.Data
     /// 在当前上下文开启一个事务执行
     /// </summary>
     /// <returns></returns>
-    public static IDbTransactionContext EnterTransaction( Action<DatabaseContext.Builder> configure )
+    public static IDbTransactionContext EnterTransaction( Action<DbContext.Builder> configure )
 
     {
       var transaction = DbContext.DbProvider.CreateTransaction( DbContext ) ?? throw new NotSupportedException();

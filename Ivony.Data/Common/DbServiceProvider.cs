@@ -7,7 +7,7 @@ namespace Ivony.Data.Common
   public class DbServiceProvider : IServiceProvider
   {
 
-    public DatabaseContext Context { get; }
+    public DbContext Context { get; }
 
     public object GetService( Type serviceType )
     {

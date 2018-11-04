@@ -7,8 +7,7 @@ namespace Ivony.Data
 {
 
 
-
-  public partial class DatabaseContext
+  public partial class DbContext
   {
 
     /// <summary>
@@ -22,7 +21,7 @@ namespace Ivony.Data
       }
 
 
-      internal Builder( DatabaseContext parent )
+      internal Builder( DbContext parent )
       {
         Parent = parent;
         Properties = new Dictionary<string, object>( parent.Properties );
@@ -34,7 +33,7 @@ namespace Ivony.Data
       /// <summary>
       /// 获取父级 DbContext 对象
       /// </summary>
-      protected DatabaseContext Parent { get; }
+      protected DbContext Parent { get; }
 
 
 
@@ -178,9 +177,9 @@ namespace Ivony.Data
 
 
 
-      internal DatabaseContext Build()
+      internal DbContext Build()
       {
-        DatabaseContext context = new DatabaseContext();
+        DbContext context = new DbContext();
 
         context.Parent = Parent;
 

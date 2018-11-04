@@ -214,32 +214,32 @@ namespace Ivony.Data.Queries
       return ((IDictionary<string, object>) _settings).TryGetValue( key, out value );
     }
 
-    public void Add( KeyValuePair<string, object> item )
+    void ICollection<KeyValuePair<string, object>>.Add( KeyValuePair<string, object> item )
     {
       ((IDictionary<string, object>) _settings).Add( item );
     }
 
-    public void Clear()
+    void ICollection<KeyValuePair<string, object>>.Clear()
     {
       ((IDictionary<string, object>) _settings).Clear();
     }
 
-    public bool Contains( KeyValuePair<string, object> item )
+    bool ICollection<KeyValuePair<string, object>>.Contains( KeyValuePair<string, object> item )
     {
       return ((IDictionary<string, object>) _settings).Contains( item );
     }
 
-    public void CopyTo( KeyValuePair<string, object>[] array, int arrayIndex )
+    void ICollection<KeyValuePair<string, object>>.CopyTo( KeyValuePair<string, object>[] array, int arrayIndex )
     {
       ((IDictionary<string, object>) _settings).CopyTo( array, arrayIndex );
     }
 
-    public bool Remove( KeyValuePair<string, object> item )
+    bool ICollection<KeyValuePair<string, object>>.Remove( KeyValuePair<string, object> item )
     {
       return ((IDictionary<string, object>) _settings).Remove( item );
     }
 
-    public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+    IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
     {
       return ((IDictionary<string, object>) _settings).GetEnumerator();
     }

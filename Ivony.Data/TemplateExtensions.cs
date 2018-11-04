@@ -60,7 +60,7 @@ namespace Ivony.Data
         builder.AppendParameter( query );
       }
 
-      return builder.BuildQuery().Clone( configures );
+      return builder.BuildQuery( configures );
     }
 
 

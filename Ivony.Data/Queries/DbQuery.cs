@@ -15,7 +15,11 @@ namespace Ivony.Data.Queries
   {
 
 
-    internal DbQuery( DbQueryConfigures configures ) { Configures = configures; }//禁止直接从此类型派生
+    /// <summary>
+    /// 创建 DbQuery 对象
+    /// </summary>
+    /// <param name="configures">查询配置</param>
+    protected DbQuery( DbQueryConfigures configures ) { Configures = configures ?? new DbQueryConfigures(); }//禁止直接从此类型派生
 
 
     /// <summary>
@@ -50,7 +54,7 @@ namespace Ivony.Data.Queries
     /// <returns></returns>
     public IDbExecuteContext Execute()
     {
-      var executor = Configures?.GetService<IDbExecutor>() ?? Db.DbContext?.GetExecutor();
+      var executor = Configures.GetService<IDbExecutor>() ?? Configures?.GetService<IDbProvider>()?.GetDbExecutor( Db.DbContext ) ?? Db.DbContext?.GetExecutor();
       return executor?.Execute( this ) ?? throw NotSupported(); ;
     }
 
@@ -63,7 +67,7 @@ namespace Ivony.Data.Queries
     public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default( CancellationToken ) )
     {
 
-      var executor = Configures?.GetService<IAsyncDbExecutor>() ?? Db.DbContext?.GetAsyncExecutor();
+      var executor = Configures.GetService<IAsyncDbExecutor>() ?? Db.DbContext?.GetAsyncExecutor();
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
     }
