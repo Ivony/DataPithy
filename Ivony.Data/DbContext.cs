@@ -14,7 +14,7 @@ namespace Ivony.Data
   /// <summary>
   /// 数据访问上下文
   /// </summary>
-  public partial class DbContext : IServiceProvider, IDisposable
+  public partial class DbContext : IServiceProvider
   {
 
 
@@ -28,86 +28,125 @@ namespace Ivony.Data
 
 
 
+
+
+
+    private static readonly object _sync = new object();
+
+    private static AsyncLocal<DbContext> _current = new AsyncLocal<DbContext>();
+
     /// <summary>
-    /// 尝试退出当前上下文
+    /// 获取当前数据访问上下文
     /// </summary>
-    public void TryExit()
+    /// <returns></returns>
+    public static DbContext Current
     {
-      Exit( false );
-
-    }
-
-
-    private void Exit()
-    {
-      Db.ExitContext( this );
-    }
-
-
-    private void Exit( bool throwException )
-    {
-      if ( Parent == null )
+      get
       {
-        if ( throwException )
-          throw new InvalidOperationException( "Cannot exit the root context." );
-        else
-          return;
+        lock ( _sync )
+        {
+          if ( _current.Value != null )
+            return _current.Value;
+
+          SetContext( Initialize() );
+          return _current.Value;
+        }
+      }
+    }
+
+
+    private static DbContext Initialize()
+    {
+      var builder = new DbContext.Builder();
+
+      builder.RegisterService<IParameterizedQueryBuilder>( () => new ParameterizedQueryBuilder() );
+      builder.RegisterService( typeof( ITemplateParser ), typeof( TemplateParser ) );
+
+      return builder.Build();
+    }
+
+
+
+
+    private class Scope : IDisposable
+    {
+      public DbContext DbContext { get; }
+
+      public Scope( DbContext context )
+      {
+        DbContext = context;
       }
 
-      var exiter = Db.DbContext.GetExiter( this );
-      if ( exiter == null )
+
+      public void Dispose()
       {
-        if ( throwException )
-          throw new InvalidOperationException( "Context is not in current call stack." );
-        else
-          return;
+        Exit( Current );
+
       }
 
-      exiter();
-    }
-
-
-
-    private Action GetExiter( DbContext scope )
-    {
-      if ( Parent == null )//顶级上下文不能退出
-        return null;
-
-
-      if ( this.Equals( scope ) )
-        return () => this.Exit();
-
-      var exiter = this.Parent.GetExiter( scope );
-      if ( exiter == null )
-        return null;
-
-      return () =>
+      private void Exit( DbContext current )
       {
-        this.Exit();
-        exiter();
-      };
+        if ( current == null )
+          return;
+
+        if ( current == DbContext )
+        {
+          if ( current.Parent != null )
+            SetContext( current.Parent );
+        }
+
+
+        Exit( current.Parent );
+      }
     }
 
 
-
-
-    private bool _disposed = false;
-
-
-    void IDisposable.Dispose()
+    private static void SetContext( DbContext context )
     {
-      if ( _disposed )//确保只被执行一次。
-        return;
-
-      Exit( true );
-      _disposed = true;
-
-
-
-      var disposable = DbProvider as IDisposable;
-      disposable?.Dispose();
+      _current.Value = context;
     }
 
+
+
+    private bool IsAncestorOf( DbContext context )
+    {
+      if ( context.Parent == this )
+        return true;
+
+      else
+        return IsAncestorOf( context.Parent );
+    }
+
+
+
+
+
+    /// <summary>
+    /// 从数据库访问上下文派生出另一个数据库访问上下文
+    /// </summary>
+    /// <param name="configure">配置派生上下文的方法</param>
+    /// <returns>派生的数据库访问上下文</returns>
+    public DbContext Derive( Action<Builder> configure )
+    {
+      var builder = new Builder( this );
+      configure( builder );
+
+      return builder.Build();
+    }
+
+
+
+    /// <summary>
+    /// 派生一个数据库访问上下文并设置为当前上下文
+    /// </summary>
+    /// <param name="configure">配置派生上下文的方法</param>
+    /// <returns>一个实现了 IDisosable 的对象，用于退出派生的上下文</returns>
+    public static IDisposable Enter( Action<Builder> configure )
+    {
+      var context = Current.Derive( configure );
+      SetContext( context );
+      return new Scope( context );
+    }
 
 
 

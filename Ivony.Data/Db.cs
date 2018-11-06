@@ -16,34 +16,12 @@ namespace Ivony.Data
   {
 
 
-    private static readonly object _sync = new object();
-
-
-    private static DbContext _root;
-
-    private static AsyncLocal<DbContext> _current = new AsyncLocal<DbContext>();
 
 
     /// <summary>
-    /// 获取当前数据访问上下文
+    /// 获取当前数据库访问上下文
     /// </summary>
-    /// <returns></returns>
-    public static DbContext DbContext
-    {
-      get
-      {
-        lock ( _sync )
-        {
-          if ( _current.Value != null )
-            return _current.Value;
-
-          if ( _root == null )
-            Initialize( configure => { } );
-
-          return _current.Value = _root;
-        }
-      }
-    }
+    public static DbContext DbContext { get { return DbContext.Current; } }
 
 
 
@@ -54,67 +32,12 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable Enter( Action<DbContext.Builder> configure )
     {
-      var builder = new DbContext.Builder( DbContext );
-      configure( builder );
-
-      return _current.Value = builder.Build();
+      return DbContext.Enter( configure );
     }
 
 
 
 
-    /// <summary>
-    /// 退出当前上下文
-    /// </summary>
-    public static void Exit()
-    {
-      DbContext.TryExit();
-    }
-
-
-
-    internal static void ExitContext( DbContext current )
-    {
-      if ( _current.Value != current )
-        throw new InvalidOperationException();
-
-      _current.Value = current.Parent;
-    }
-
-
-
-
-
-
-    /// <summary>
-    /// 初始化根数据访问上下文
-    /// </summary>
-    public static DbContext Initialize( Action<DbContext.Builder> configure )
-    {
-      lock ( _sync )
-      {
-        if ( _root != null )
-          throw new InvalidOperationException( "DataPithy is already initialized." );
-
-        return _root = InitializeCore( builder =>
-        {
-          builder.RegisterService<IParameterizedQueryBuilder>( () => new ParameterizedQueryBuilder() );
-          builder.RegisterService( typeof( ITemplateParser ), typeof( TemplateParser ) );
-
-          configure( builder );
-        } );
-      }
-    }
-
-
-
-
-    private static DbContext InitializeCore( Action<DbContext.Builder> configure )
-    {
-      var builder = new DbContext.Builder();
-      configure( builder );
-      return builder.Build();
-    }
 
 
     /// <summary>

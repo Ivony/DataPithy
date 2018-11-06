@@ -9,16 +9,69 @@ using Ivony.Data.SqlQueries.SqlDom;
 
 
 using static Ivony.Data.SqlQueries.DbDynamicHost;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DynamicTest
 {
+
+
+  public interface ITest
+  {
+
+  }
+
+  public interface ITest1
+  { }
+
+
+
+  public class TestClass1 : ITest1
+  {
+
+  }
+
+
+  public class TestClass : ITest
+  {
+    public TestClass()
+    {
+      Console.WriteLine( "blank" );
+    }
+
+
+    public TestClass( IServiceProvider serviceProvider )
+    {
+      Console.WriteLine( "provider" );
+    }
+
+    public TestClass( ITest1 test )
+    {
+      Console.WriteLine( "Test" );
+    }
+
+
+
+  }
+
+
 
   class Program
   {
 
     static void Main( string[] args )
     {
+
+
+      var services = new ServiceCollection();
+      services.AddSingleton<ITest1, TestClass1>();
+      services.AddSingleton<ITest, TestClass>();
+
+      var serviceProvider = services.BuildServiceProvider();
+      ActivatorUtilities.CreateInstance<TestClass>( serviceProvider );
+
+      Console.ReadKey();
+      return;
+
 
       var select = new SelectQueryBuilder()
         .Select( Tables.U.ID, Tables.U.Username, Tables.P.Email )
