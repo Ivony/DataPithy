@@ -143,7 +143,7 @@ namespace Ivony.Data
     {
 
       {
-        var instance = DbProvider?.GetService( typeof( T ) );
+        var instance = (DbProvider as IServiceProvider)?.GetService( typeof( T ) );
         if ( instance != null )
           return (T) instance;
       }

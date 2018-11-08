@@ -64,8 +64,28 @@ namespace Ivony.Data.SqlClient
     protected SqlServerTransactionContext Transaction { get; }
 
 
+    /// <summary>
+    /// SqlServer 数据库访问配置信息
+    /// </summary>
     protected SqlServerConfiguration Configuration { get; }
 
+
+
+
+    /// <summary>
+    /// 为 SqlCommand 对象添加数据库连接
+    /// </summary>
+    /// <param name="command">要添加数据库连接的 SqlCommand 对象</param>
+    /// <returns>添加的数据库连接对象</returns>
+    protected SqlConnection ApplyConnection( SqlCommand command )
+    {
+      var connection = Transaction?.Connection ?? new SqlConnection( ConnectionString );
+      if ( connection.State == ConnectionState.Closed )
+        connection.Open();
+      command.Connection = connection;
+      command.Transaction = Transaction?.Transaction;
+      return connection;
+    }
 
 
 
@@ -80,13 +100,10 @@ namespace Ivony.Data.SqlClient
 
       try
       {
+        var connection = ApplyConnection( command );
+
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        var connection = Transaction?.Connection ?? new SqlConnection( ConnectionString );
-        if ( connection.State == ConnectionState.Closed )
-          connection.Open();
-        command.Connection = connection;
-        command.Transaction = Transaction?.Transaction;
 
         if ( Configuration.QueryExecutingTimeout.HasValue )
           command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
@@ -107,20 +124,6 @@ namespace Ivony.Data.SqlClient
       }
     }
 
-    private SqlConnection GetConnection()
-    {
-
-      if ( Transaction != null )
-        return Transaction.Connection;
-
-      else
-      {
-        var connection = new SqlConnection( ConnectionString );
-        connection.Open();
-        return connection;
-      }
-    }
-
     /// <summary>
     /// 异步执行查询命令并返回执行上下文
     /// </summary>
@@ -132,12 +135,10 @@ namespace Ivony.Data.SqlClient
     {
       try
       {
-        TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        var connection = Transaction?.Connection ?? new SqlConnection( ConnectionString );
-        if ( connection.State == ConnectionState.Closed )
-          await connection.OpenAsync( token );
-        command.Connection = connection;
+        var connection = ApplyConnection( command );
+
+        TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
         if ( Configuration.QueryExecutingTimeout.HasValue )
           command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
@@ -190,7 +191,5 @@ namespace Ivony.Data.SqlClient
     {
       return new SqlParameterizedQueryParser().Parse( query );
     }
-
   }
-
 }
