@@ -21,7 +21,7 @@ namespace Ivony.Data.SqlQueries
 
     public virtual ParameterizedQuery ParseSelectQuery( SelectQuery query )
     {
-      Builder = Db.DbContext.GetParameterizedQueryBuilder();
+      Builder = Builder ?? Db.DbContext.GetParameterizedQueryBuilder();
 
       ParseSelectClause( query.SelectClause );
       ParseFromClause( query.FromClause );
@@ -33,7 +33,7 @@ namespace Ivony.Data.SqlQueries
 
     public virtual ParameterizedQuery ParseInsertQuery( InsertQuery query )
     {
-      Builder = Db.DbContext.GetParameterizedQueryBuilder();
+      Builder = Builder ?? Db.DbContext.GetParameterizedQueryBuilder();
 
       ParseInsertIntoClause( query.Into );
       ParseInsertColumnsClause( query.Columns );
@@ -91,8 +91,25 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseFromClause( FromClause clause )
     {
-      Builder.Append( "\nFROM " );
+      AppendNewLine();
+      Builder.Append( "FROM " );
       ParseFromSource( clause.Source );
+    }
+
+    /// <summary>
+    /// 获取当前左侧缩进
+    /// </summary>
+    protected int PaddingSize { get; private set; }
+
+    /// <summary>
+    /// 获取缩进大小
+    /// </summary>
+    public int IndentSize { get; } = 2;
+
+    protected void AppendNewLine()
+    {
+      Builder.Append( '\n' );
+      Builder.Append( new string( ' ', PaddingSize ) );
     }
 
     protected virtual void ParseFromSource( FromSource source )
@@ -115,7 +132,8 @@ namespace Ivony.Data.SqlQueries
       if ( clause == null | clause.Condition == null )
         return;
 
-      Builder.Append( "\nWHERE " );
+      AppendNewLine();
+      Builder.Append( "WHERE " );
       ParseExpression( clause.Condition, 0 );
     }
 
@@ -125,7 +143,8 @@ namespace Ivony.Data.SqlQueries
       if ( clause == null | clause.OrderByItems.Any() == false )
         return;
 
-      Builder.Append( "\\nORDER BY " );
+      AppendNewLine();
+      Builder.Append( "ORDER BY " );
 
       bool flag = false;
       foreach ( var item in clause.OrderByItems )
@@ -159,6 +178,19 @@ namespace Ivony.Data.SqlQueries
         case TableReference table:
           ParseTable( table );
           return;
+
+        case SelectQuery query:
+
+          AppendNewLine();
+          Builder.Append( '(' );
+          PaddingSize += IndentSize;
+          AppendNewLine();
+          ParseSelectQuery( query );
+          PaddingSize -= IndentSize;
+          AppendNewLine();
+          Builder.Append( ')' );
+          return;
+
       }
     }
 

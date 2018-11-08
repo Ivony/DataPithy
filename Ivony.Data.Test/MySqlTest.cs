@@ -12,11 +12,14 @@ namespace Ivony.Data.Test
   public class MySqlTest
   {
 
+    private IDisposable scope;
+
+
     [TestInitialize]
     public void Enter()
     {
 
-      Db.Enter( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
+      scope = Db.Enter( builder => builder.UseMySql( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
       Db.T( $@"
@@ -32,7 +35,7 @@ PRIMARY KEY (Id)
     [TestCleanup]
     public void Exit()
     {
-      Db.Exit();
+      scope.Dispose();
     }
 
 

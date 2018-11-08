@@ -21,12 +21,15 @@ namespace Ivony.Data.Test
     private SqlDbExecutor db;
 
 
+    private IDisposable scope;
+
+
 
     [TestInitialize]
     public void Enter()
     {
 
-      Db.Enter( builder => builder
+      scope = Db.Enter( builder => builder
         .UseSqlServer( "Data Source=(localdb)\\ProjectsV13;Initial Catalog=Test;" )
         .RegisterService<IDbTraceService>( traceService = new TestTraceService() )
       );
@@ -48,7 +51,7 @@ CREATE TABLE [dbo].[Test1]
     [TestCleanup]
     public void Exit()
     {
-      Db.Exit();
+      scope.Dispose();
     }
 
 

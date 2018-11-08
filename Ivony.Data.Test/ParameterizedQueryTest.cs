@@ -9,18 +9,21 @@ namespace Ivony.Data.Test
   public class ParameterizedQueryTest
   {
 
+    private IDisposable scope;
+
+
     [TestInitialize]
     public void Enter()
     {
 
-      Db.Enter( builder => { } );
+      scope = Db.Enter( builder => { } );
 
     }
 
     [TestCleanup]
     public void Exit()
     {
-      Db.Exit();
+      scope.Dispose();
     }
 
     [TestMethod]
