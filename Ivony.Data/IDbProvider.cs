@@ -9,7 +9,7 @@ namespace Ivony.Data
   /// <summary>
   /// IDbExecutor 提供程序
   /// </summary>
-  public interface IDbProvider : IServiceProvider
+  public interface IDbProvider
   {
 
     /// <summary>
