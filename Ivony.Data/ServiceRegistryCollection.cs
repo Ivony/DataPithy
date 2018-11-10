@@ -77,5 +77,10 @@ namespace Ivony.Data
     {
       throw new NotImplementedException();
     }
+
+    internal object GetService( Type serviceType )
+    {
+      throw new NotImplementedException();
+    }
   }
 }

@@ -70,17 +70,6 @@ namespace Ivony.Data
       }
 
 
-      private IDictionary<Type, object> services = new Dictionary<Type, object>();
-
-
-
-      private static void ChecktInstanceType( Type serviceType, Type instanceType )
-      {
-        if ( serviceType.IsAssignableFrom( instanceType ) == false )
-          throw new InvalidOperationException( $"Type of instance is \"{instanceType}\", it's cannot register for a service type of \"{serviceType}\"" );
-      }
-
-
       /// <summary>
       /// 获取服务容器，用于服务注册。
       /// </summary>
@@ -115,8 +104,8 @@ namespace Ivony.Data
 
         context.AutoWhitespaceSeparator = autoWhiteSpace ?? DbContext?.AutoWhitespaceSeparator ?? false;
 
-        context.services = new ReadOnlyDictionary<Type, object>( services );
         context.Properties = new ReadOnlyDictionary<string, object>( Properties );
+        context.Services = Services;
 
         context.DbProvider = DbProvider;
 

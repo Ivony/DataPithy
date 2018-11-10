@@ -66,18 +66,18 @@ namespace Ivony.Data.Common
   }
 
 
-  internal class AsyncDbTransactionContextWrapper : IAsyncDbTransactionContext
+  internal class AsyncDbTransactionContextWrapper : IAsyncDbTransactionContext, IServiceProvider
   {
     public AsyncDbTransactionContextWrapper( IDbTransactionContext context )
     {
-      Context = context;
+      _context = context;
     }
 
-    public IDbTransactionContext Context { get; }
+    private readonly IDbTransactionContext _context;
 
-    public TransactionStatus Status => Context.Status;
+    public TransactionStatus Status => _context.Status;
 
-    public void BeginTransaction() => Context.BeginTransaction();
+    public void BeginTransaction() => _context.BeginTransaction();
 
     public Task BeginTransactionAsync()
     {
@@ -87,7 +87,7 @@ namespace Ivony.Data.Common
 
     public void Commit()
     {
-      Context.Commit();
+      _context.Commit();
     }
 
     public Task CommitAsync()
@@ -98,32 +98,27 @@ namespace Ivony.Data.Common
 
     public IDbTransactionContext CreateTransaction( DbContext context )
     {
-      return Context.CreateTransaction( context );
+      return _context.CreateTransaction( context );
     }
 
     public void Dispose()
     {
-      Context.Dispose();
+      _context.Dispose();
     }
 
     public IDbExecutor GetDbExecutor( DbContext context )
     {
-      return Context.GetDbExecutor( context );
-    }
-
-    public object GetService( Type serviceType )
-    {
-      return Context.GetService( serviceType );
+      return _context.GetDbExecutor( context );
     }
 
     public void RegisterDispose( Action disposeMethod )
     {
-      Context.RegisterDispose( disposeMethod );
+      _context.RegisterDispose( disposeMethod );
     }
 
     public void Rollback()
     {
-      Context.Rollback();
+      _context.Rollback();
     }
 
     public Task RollbackAsync()
@@ -131,7 +126,10 @@ namespace Ivony.Data.Common
       Rollback();
       return Task.CompletedTask;
     }
+
+    object IServiceProvider.GetService( Type serviceType )
+    {
+      return (_context as IServiceProvider)?.GetService( serviceType );
+    }
   }
-
-
 }

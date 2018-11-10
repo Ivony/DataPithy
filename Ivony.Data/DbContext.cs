@@ -156,7 +156,7 @@ namespace Ivony.Data
     public IDbProvider DbProvider { get; private set; }
 
 
-    private IReadOnlyDictionary<Type, object> services;
+    private ServiceRegistryCollection Services { get; set; }
 
 
     private static readonly MethodInfo getServiceMethod = typeof( DbContext ).GetMethod( "GetService", 1, new Type[0] );
@@ -169,7 +169,7 @@ namespace Ivony.Data
     public object GetService( Type serviceType )
     {
 
-      var instance = DbProvider?.GetService( serviceType );
+      var instance = (DbProvider as IServiceProvider)?.GetService( serviceType );
       if ( instance != null )
         return instance;
 
@@ -177,16 +177,8 @@ namespace Ivony.Data
         return this;
 
 
-      if ( services.TryGetValue( serviceType, out var service ) )
-      {
+      return Services.GetService( serviceType );
 
-
-      }
-
-
-
-
-      return getServiceMethod.MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
     }
 
 
@@ -197,35 +189,7 @@ namespace Ivony.Data
     /// <returns>服务实例</returns>
     public T GetService<T>() where T : class
     {
-
-      {
-        var instance = (DbProvider as IServiceProvider)?.GetService( typeof( T ) );
-        if ( instance != null )
-          return (T) instance;
-      }
-
-      {
-        var instance = this as T;
-        if ( instance != null )
-          return instance;
-      }
-
-      if ( services.TryGetValue( typeof( T ), out var service ) )
-      {
-        if ( service is T instance )
-          return instance;
-
-        if ( service is Type instanceType )
-          return (T) CreateInstance( instanceType );
-
-        return ((Func<T>) service)();
-      }
-
-
-      if ( Parent != null )
-        return Parent.GetService<T>();
-
-      return default( T );
+      return (T) GetService( typeof( T ) );
     }
 
     private object CreateInstance( Type instanceType )

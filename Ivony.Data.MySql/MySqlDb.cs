@@ -1,14 +1,5 @@
-﻿using Ivony.Data.Common;
-using Ivony.Data.MySqlClient;
-using Ivony.Data.Queries;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Ivony.Data.MySqlClient;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ivony.Data
 {

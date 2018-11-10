@@ -28,25 +28,25 @@ namespace DynamicTest
   public class TestClass1 : ITest1
   {
 
+    public TestClass1( ITest service )
+    {
+
+    }
+
   }
 
 
   public class TestClass : ITest
   {
-    public TestClass()
+    public TestClass( string test )
     {
-      Console.WriteLine( "blank" );
+      Console.WriteLine( "Test" );
     }
 
 
     public TestClass( IServiceProvider serviceProvider )
     {
       Console.WriteLine( "provider" );
-    }
-
-    public TestClass( ITest1 test )
-    {
-      Console.WriteLine( "Test" );
     }
 
 
