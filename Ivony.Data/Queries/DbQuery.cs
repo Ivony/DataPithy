@@ -19,7 +19,9 @@ namespace Ivony.Data.Queries
     /// 创建 DbQuery 对象
     /// </summary>
     /// <param name="configures">查询配置</param>
-    protected DbQuery( DbQueryConfigures configures ) { Configures = configures ?? new DbQueryConfigures(); }//禁止直接从此类型派生
+    protected DbQuery( DbQueryConfigures configures )
+    {
+      Configures = configures ?? new DbQueryConfigures(); }//禁止直接从此类型派生
 
 
     /// <summary>

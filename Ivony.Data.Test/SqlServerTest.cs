@@ -8,7 +8,6 @@ using Ivony.Data.SqlClient;
 using System.Xml.Linq;
 using Ivony.Data.Common;
 using System.Data.SqlClient;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data.Test
 {
@@ -31,7 +30,7 @@ namespace Ivony.Data.Test
 
       scope = Db.Enter( builder => builder
         .UseSqlServer( "Data Source=(localdb)\\ProjectsV13;Initial Catalog=Test;" )
-        .RegisterService<IDbTraceService>( traceService = new TestTraceService() )
+        .Services.AddService<IDbTraceService>( traceService = new TestTraceService() )
       );
 
       Db.T( $"IF OBJECT_ID(N'[dbo].[Test1]') IS NOT NULL DROP TABLE [dbo].[Test1]" ).ExecuteNonQuery();

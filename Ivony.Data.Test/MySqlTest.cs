@@ -4,7 +4,6 @@ using System.Linq;
 using Ivony.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ivony.Data.Queries;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data.Test
 {
@@ -188,7 +187,7 @@ PRIMARY KEY (Id)
     public void TraceTest()
     {
       var traceService = new TestTraceService();
-      using ( Db.Enter( configure => configure.RegisterService<IDbTraceService>( traceService ) ) )
+      using ( Db.Enter( configure => configure.Services.AddService<IDbTraceService>( traceService ) ) )
       {
         Db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
 

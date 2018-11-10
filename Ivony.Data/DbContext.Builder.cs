@@ -21,11 +21,13 @@ namespace Ivony.Data
       }
 
 
-      internal Builder( DbContext parent )
+      internal Builder( DbContext context )
       {
-        Parent = parent;
-        Properties = new Dictionary<string, object>( parent.Properties );
-        DbProvider = parent.DbProvider;
+        DbContext = context;
+        Properties = new Dictionary<string, object>( context.Properties );
+        DbProvider = context.DbProvider;
+
+        Services = new ServiceRegistryCollection();
       }
 
 
@@ -33,7 +35,7 @@ namespace Ivony.Data
       /// <summary>
       /// 获取父级 DbContext 对象
       /// </summary>
-      protected DbContext Parent { get; }
+      public DbContext DbContext { get; }
 
 
 
@@ -80,81 +82,9 @@ namespace Ivony.Data
 
 
       /// <summary>
-      /// 注册一个服务
+      /// 获取服务容器，用于服务注册。
       /// </summary>
-      /// <param name="serviceType">服务类型</param>
-      /// <param name="instanceType">实现类型</param>
-      /// <returns>DbContext构建器</returns>
-      public Builder RegisterService( Type serviceType, Type instanceType )
-      {
-        if ( serviceType == null )
-          throw new ArgumentNullException( nameof( serviceType ) );
-        if ( instanceType == null )
-          throw new ArgumentNullException( nameof( instanceType ) );
-
-        ChecktInstanceType( serviceType, instanceType );
-
-        services[serviceType] = instanceType;
-
-        return this;
-      }
-
-
-      /// <summary>
-      /// 注册一个服务
-      /// </summary>
-      /// <param name="serviceType"></param>
-      /// <param name="serviceInstance"></param>
-      /// <returns></returns>
-      public Builder RegisterService( Type serviceType, object serviceInstance )
-      {
-        if ( serviceType == null )
-          throw new ArgumentNullException( nameof( serviceType ) );
-        if ( serviceInstance == null )
-          throw new ArgumentNullException( nameof( serviceInstance ) );
-
-
-        var instanceType = serviceInstance.GetType();
-        ChecktInstanceType( serviceType, instanceType );
-        services[serviceType] = serviceInstance;
-
-        return this;
-      }
-
-
-      /// <summary>
-      /// 注册一个服务
-      /// </summary>
-      /// <typeparam name="T"></typeparam>
-      /// <param name="serviceInstance"></param>
-      /// <returns></returns>
-      public Builder RegisterService<T>( T serviceInstance )
-      {
-        if ( serviceInstance == null )
-          throw new ArgumentNullException( nameof( serviceInstance ) );
-
-        services[typeof( T )] = serviceInstance;
-
-        return this;
-      }
-
-
-      /// <summary>
-      /// 注册一个服务
-      /// </summary>
-      /// <typeparam name="T"></typeparam>
-      /// <param name="serviceFactory"></param>
-      /// <returns></returns>
-      public Builder RegisterService<T>( Func<T> serviceFactory )
-      {
-        if ( serviceFactory == null )
-          throw new ArgumentNullException( nameof( serviceFactory ) );
-
-        services[typeof( T )] = serviceFactory;
-
-        return this;
-      }
-
+      public ServiceRegistryCollection Services { get; }
 
 
       /// <summary>
@@ -181,9 +111,9 @@ namespace Ivony.Data
       {
         DbContext context = new DbContext();
 
-        context.Parent = Parent;
+        context.Parent = DbContext;
 
-        context.AutoWhitespaceSeparator = autoWhiteSpace ?? Parent?.AutoWhitespaceSeparator ?? false;
+        context.AutoWhitespaceSeparator = autoWhiteSpace ?? DbContext?.AutoWhitespaceSeparator ?? false;
 
         context.services = new ReadOnlyDictionary<Type, object>( services );
         context.Properties = new ReadOnlyDictionary<string, object>( Properties );

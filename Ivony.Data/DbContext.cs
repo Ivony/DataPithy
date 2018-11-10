@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ivony.Data.Common;
 using Ivony.Data.Queries;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data
 {
@@ -59,8 +58,8 @@ namespace Ivony.Data
     {
       var builder = new DbContext.Builder();
 
-      builder.RegisterService<IParameterizedQueryBuilder>( () => new ParameterizedQueryBuilder() );
-      builder.RegisterService( typeof( ITemplateParser ), typeof( TemplateParser ) );
+      builder.Services.AddService<IParameterizedQueryBuilder>( provider => new ParameterizedQueryBuilder() );
+      builder.Services.AddService<ITemplateParser, TemplateParser>();
 
       return builder.Build();
     }
@@ -169,6 +168,24 @@ namespace Ivony.Data
     /// <returns>服务实例</returns>
     public object GetService( Type serviceType )
     {
+
+      var instance = DbProvider?.GetService( serviceType );
+      if ( instance != null )
+        return instance;
+
+      if ( serviceType.IsAssignableFrom( GetType() ) )
+        return this;
+
+
+      if ( services.TryGetValue( serviceType, out var service ) )
+      {
+
+
+      }
+
+
+
+
       return getServiceMethod.MakeGenericMethod( serviceType ).Invoke( this, new object[0] );
     }
 
@@ -199,7 +216,7 @@ namespace Ivony.Data
           return instance;
 
         if ( service is Type instanceType )
-          return (T) ActivatorUtilities.CreateInstance( this, instanceType );
+          return (T) CreateInstance( instanceType );
 
         return ((Func<T>) service)();
       }
@@ -209,6 +226,11 @@ namespace Ivony.Data
         return Parent.GetService<T>();
 
       return default( T );
+    }
+
+    private object CreateInstance( Type instanceType )
+    {
+      throw new NotImplementedException();
     }
 
 
@@ -269,7 +291,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public T GetConfiguration<T>()
     {
-      return ActivatorUtilities.CreateInstance<T>( this );
+      return (T) CreateInstance( typeof( T ) );
     }
 
 

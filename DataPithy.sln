@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicTest", "DynamicTest\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivony.Data.SqlQueries", "Ivony.Data.SqlQueries\Ivony.Data.SqlQueries.csproj", "{232A7B31-1CE2-468C-B2A0-19CE8AE36E9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ivony.Data.Tracing", "Ivony.Data.Tracing\Ivony.Data.Tracing.csproj", "{0D3DA624-F3AA-47A0-AE33-1E9999140BFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivony.Data.Tracing", "Ivony.Data.Tracing\Ivony.Data.Tracing.csproj", "{0D3DA624-F3AA-47A0-AE33-1E9999140BFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ivony.Data.Queries;
 using Ivony.Data.Common;
-using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
 namespace Ivony.Data
@@ -37,7 +36,7 @@ namespace Ivony.Data
 
     public ParameterizedQuery ParseTemplate( FormattableString template )
     {
-      return ParseTemplate( _services.GetService<IParameterizedQueryBuilder>(), template );
+      return ParseTemplate( (IParameterizedQueryBuilder) _services.GetService( typeof( IParameterizedQueryBuilder ) ), template );
     }
 
 

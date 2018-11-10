@@ -4,7 +4,6 @@ using System.Linq;
 using Ivony.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ivony.Data.Queries;
-using Microsoft.Extensions.DependencyInjection;
 using static Ivony.Data.Db;
 using System.Collections.Generic;
 using System.Threading.Tasks;

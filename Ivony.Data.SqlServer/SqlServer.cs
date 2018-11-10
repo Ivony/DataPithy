@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Ivony.Data.Common;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 using Ivony.Data.Queries;
 
 namespace Ivony.Data
