@@ -20,6 +20,7 @@ namespace Ivony.Data.Queries
 
 
 
+#if !NETSTANDARD2_0
     /// <summary>
     /// 从 Tuple 创建 ParameterList 对象
     /// </summary>
@@ -34,7 +35,7 @@ namespace Ivony.Data.Queries
 
       return new ParameterList( array );
     }
-
+#endif
 
     /// <summary>
     /// 创建 ParameterArray 对象

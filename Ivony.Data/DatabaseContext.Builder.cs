@@ -25,7 +25,10 @@ namespace Ivony.Data
       internal Builder( DatabaseContext parent )
       {
         Parent = parent;
-        Properties = new Dictionary<string, object>( parent.Properties );
+        Properties = new Dictionary<string, object>();
+        foreach ( var pair in parent.Properties )
+          Properties.Add( pair.Key, pair.Value );
+
         DbProvider = parent.DbProvider;
       }
 
