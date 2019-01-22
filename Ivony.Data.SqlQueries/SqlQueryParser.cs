@@ -21,7 +21,7 @@ namespace Ivony.Data.SqlQueries
 
     public virtual ParameterizedQuery ParseSelectQuery( SelectQuery query )
     {
-      Builder = Builder ?? Db.DbContext.GetParameterizedQueryBuilder();
+      Builder = Builder ?? Db.ServiceProvider.GetService<IParameterizedQueryBuilder>();
 
       ParseSelectClause( query.SelectClause );
       ParseFromClause( query.FromClause );
@@ -33,7 +33,7 @@ namespace Ivony.Data.SqlQueries
 
     public virtual ParameterizedQuery ParseInsertQuery( InsertQuery query )
     {
-      Builder = Builder ?? Db.DbContext.GetParameterizedQueryBuilder();
+      Builder = Builder ?? Db.ServiceProvider.GetService<IParameterizedQueryBuilder>();
 
       ParseInsertIntoClause( query.Into );
       ParseInsertColumnsClause( query.Columns );

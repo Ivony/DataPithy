@@ -36,6 +36,14 @@ namespace Ivony.Data
     /// </summary>
     TransactionStatus Status { get; }
 
+
+
+    /// <summary>
+    /// 获取父级事务，如果有的话
+    /// </summary>
+    IDbTransactionContext ParentTransaction { get; }
+
+
   }
 
 

@@ -14,7 +14,7 @@ namespace Ivony.Data.MySqlClient
   public class MySqlDbTransactionContext : DbTransactionContextBase<MySqlTransaction>
   {
 
-    internal MySqlDbTransactionContext( MySqlDbProvider provider )
+    internal MySqlDbTransactionContext( MySqlDbProvider provider ) : base( provider )
     {
       Provider = provider ?? throw new ArgumentNullException( nameof( provider ) );
       Connection = new MySqlConnection( provider.ConnectionString );
@@ -36,7 +36,7 @@ namespace Ivony.Data.MySqlClient
       return Connection.BeginTransaction();
     }
 
-    protected override IDbExecutor GetDbExecutorCore( DbContext context )
+    protected override IDbExecutor GetDbExecutorCore()
     {
       return new MySqlDbExecutorWithTransaction( this );
     }
@@ -47,10 +47,6 @@ namespace Ivony.Data.MySqlClient
       Connection.Dispose();
     }
 
-    public override object GetService( Type serviceType )
-    {
-      return Provider.GetService( serviceType );
-    }
 
   }
 }

@@ -9,7 +9,7 @@ namespace Ivony.Data.Configuration
     public IDbProvider GetDbProvider( string name, string connectionString )
     {
 
-      
+      throw new NotImplementedException();
     }
   }
 }

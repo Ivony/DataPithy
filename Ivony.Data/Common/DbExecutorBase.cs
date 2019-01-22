@@ -19,9 +19,9 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
-    protected DbExecutorBase()
+    protected DbExecutorBase( IDbProvider dbProvider )
     {
-      TraceService = Db.DbContext.GetTraceService();
+      TraceService = dbProvider.ServiceProvider.GetService<IDbTraceService>();
     }
 
 

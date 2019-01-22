@@ -16,27 +16,83 @@ namespace Ivony.Data
   {
 
 
+    private static readonly object sync = new object();
+    private static readonly IDictionary<string, IDbProvider> _databases;
+
+
+
+
+    private static IDbProvider _default;
+
+    private static AsyncLocal<IDbProvider> currentHost = new AsyncLocal<IDbProvider>();
 
 
     /// <summary>
-    /// 获取当前数据库访问上下文
+    /// 默认的数据库访问提供程序
     /// </summary>
-    public static DbContext DbContext { get { return DbContext.Current; } }
-
+    public static IDbProvider CurrentDatabase => currentHost.Value ?? _default;
 
 
     /// <summary>
-    /// 进入新的数据访问上下文
+    /// 获取指定的数据库
     /// </summary>
-    /// <param name="configure">配置数据访问上下文的方法</param>
-    /// <returns></returns>
-    public static IDisposable Enter( Action<DbContext.Builder> configure )
+    /// <param name="name">数据库名称</param>
+    /// <returns>是否成功获取</returns>
+    public static IDbProvider Database( string name )
     {
-      return DbContext.Enter( configure );
+      if ( _databases.TryGetValue( name, out var dbProvider ) )
+        return dbProvider;
+
+      else
+        return null;
     }
 
 
 
+    /// <summary>
+    /// 获取默认的服务提供程序
+    /// </summary>
+    public static IServiceProvider ServiceProvider { get; }
+
+
+    /// <summary>
+    /// 临时使用另一个数据库
+    /// </summary>
+    /// <param name="database">数据库名称</param>
+    /// <returns></returns>
+    public static IDisposable UseDatabase( string database )
+    {
+      return UseDatabase( Database( database ) );
+    }
+
+    /// <summary>
+    /// 临时使用另一个数据库
+    /// </summary>
+    /// <param name="database">数据库名称</param>
+    /// <returns></returns>
+    public static IDisposable UseDatabase( IDbProvider database )
+    {
+      return new DbContext( currentHost.Value, database );
+    }
+
+
+
+
+
+    /// <summary>
+    /// 注册一个数据库
+    /// </summary>
+    /// <param name="name">数据库名称</param>
+    /// <param name="database">数据访问提供程序</param>
+    public static void RegisterDatabase( string name, IDbProvider database )
+    {
+      lock ( sync )
+      {
+        _databases.Add( name, database );
+        if ( CurrentDatabase == null )
+          _default = database;
+      }
+    }
 
 
 
@@ -61,7 +117,7 @@ namespace Ivony.Data
       if ( template == null )
         return null;
 
-      return DbContext.GetTemplateParser().ParseTemplate( template );
+      return ServiceProvider.GetService<ITemplateParser>().ParseTemplate( template );
     }
 
 
@@ -75,7 +131,7 @@ namespace Ivony.Data
       if ( text == null )
         return null;
 
-      return DbContext.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
+      return Db.ServiceProvider.GetService<ITemplateParser>().ParseTemplate( FormattableStringFactory.Create( text ) );
     }
 
 
@@ -92,35 +148,54 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 在当前上下文开启一个事务执行
+    /// 开启并进入一个事务上下文
     /// </summary>
     /// <returns></returns>
     public static IDbTransactionContext EnterTransaction()
     {
-      return EnterTransaction( builder => { } );
+      var transaction = CurrentDatabase.CreateTransaction() ?? throw new NotSupportedException();
+      return EnterTransaction( transaction );
     }
-
 
 
     /// <summary>
-    /// 在当前上下文开启一个事务执行
+    /// 进入一个事务上下文
     /// </summary>
+    /// <param name="transaction"></param>
     /// <returns></returns>
-    public static IDbTransactionContext EnterTransaction( Action<DbContext.Builder> configure )
-
+    public static IDbTransactionContext EnterTransaction( IDbTransactionContext transaction )
     {
-      var transaction = DbContext.DbProvider.CreateTransaction( DbContext ) ?? throw new NotSupportedException();
+      if ( transaction == null )
+        throw new ArgumentNullException( nameof( transaction ) );
 
-      var transactionContext = Enter( builder =>
-      {
-        configure( builder ); builder.SetDbProvider( transaction );
-      } );
-      transaction.RegisterDispose( () => transactionContext.Dispose() );
 
-      return transaction;
+      transaction.RegisterDispose( new DbContext( currentHost.Value, transaction ).Dispose );
+
+      throw new NotImplementedException();
     }
 
 
+
+
+    private class DbContext : IDisposable
+    {
+      public DbContext( IDbProvider parent, IDbProvider current )
+      {
+        Parent = parent;
+        currentHost.Value = Current = current;
+      }
+
+      public IDbProvider Parent { get; }
+      public IDbProvider Current { get; }
+
+      public void Dispose()
+      {
+        if ( currentHost.Value != Current )
+          throw new InvalidOperationException();//UNDONE 异常详细信息
+
+        currentHost.Value = Parent;
+      }
+    }
 
 
 
@@ -189,7 +264,7 @@ namespace Ivony.Data
     /// </summary>
     public static void Rollback()
     {
-      if ( DbContext.DbProvider is IDbTransactionContext == false )
+      if ( Db.CurrentDatabase is IDbTransactionContext == false )
         throw new InvalidOperationException( "Rollback method must invoked in transaction context" );
 
       throw new RollbackException();

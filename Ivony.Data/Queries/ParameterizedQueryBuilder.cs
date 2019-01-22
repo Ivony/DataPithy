@@ -130,7 +130,7 @@ namespace Ivony.Data.Queries
       lock ( SyncRoot )
       {
         if ( textBuilder.Length > 0
-          && Db.DbContext.AutoWhitespaceSeparator == true
+          //&& Db.DbContext.AutoWhitespaceSeparator == true
           && char.IsWhiteSpace( textBuilder[textBuilder.Length - 1] ) == false
           && (partial as ParameterizedQuery)?.IsStartWithWhiteSpace() == false )
 

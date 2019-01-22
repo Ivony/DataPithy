@@ -15,15 +15,21 @@ namespace Ivony.Data
   {
 
 
+
+    public static TService GetService<TService>( this IServiceProvider serviceProvider )
+    {
+      return (TService) serviceProvider.GetService( typeof( TService ) );
+    }
+
+
     /// <summary>
     /// 获取异步数据库查询执行器
     /// </summary>
     /// <param name="db">数据库提供程序</param>
-    /// <param name="context">当前数据库上下文</param>
     /// <returns>异步数据库查询执行器</returns>
-    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDbProvider db, DbContext context )
+    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDbProvider db )
     {
-      var executor = db?.GetDbExecutor( context );
+      var executor = db?.GetDbExecutor();
       if ( executor == null )
         return null;
 
@@ -42,7 +48,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static void Run( this IDbProvider dbProvider, Action action )
     {
-      using ( DbContext.Enter( builder => builder.SetDbProvider( dbProvider ) ) )
+      using ( Db.UseDatabase( dbProvider ) )
       {
         action();
       }
@@ -57,7 +63,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static T Run<T>( this IDbProvider dbProvider, Func<T> action )
     {
-      using ( DbContext.Enter( builder => builder.SetDbProvider( dbProvider ) ) )
+      using ( Db.UseDatabase( dbProvider ) )
       {
         return action();
       }
@@ -71,7 +77,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static async Task RunAsync( this IDbProvider dbProvider, Func<Task> action )
     {
-      using ( DbContext.Enter( builder => builder.SetDbProvider( dbProvider ) ) )
+      using ( Db.UseDatabase( dbProvider ) )
       {
         await action();
       }
@@ -85,7 +91,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static async Task<T> RunAsync<T>( this IDbProvider dbProvider, Func<Task<T>> action )
     {
-      using ( DbContext.Enter( builder => builder.SetDbProvider( dbProvider ) ) )
+      using ( Db.UseDatabase( dbProvider ) )
       {
         return await action();
       }

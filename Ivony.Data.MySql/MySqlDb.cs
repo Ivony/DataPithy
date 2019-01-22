@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 namespace Ivony.Data
 {
 
+#if false
   /// <summary>
   /// 提供 MySql 数据库支持
   /// </summary>
@@ -171,4 +172,7 @@ namespace Ivony.Data
 
 
   }
+
+  #endif
+
 }
