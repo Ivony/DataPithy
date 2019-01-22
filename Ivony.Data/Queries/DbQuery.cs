@@ -50,7 +50,7 @@ namespace Ivony.Data.Queries
     /// <returns></returns>
     public IDbExecuteContext Execute()
     {
-      var executor = Configures?.GetService<IDbExecutor>() ?? Db.DbContext.GetExecutor();
+      var executor = Configures?.GetService<IDbExecutor>() ?? Db.DefaultDatebase.GetDbExecutor();
       return executor?.Execute( this ) ?? throw NotSupported(); ;
     }
 
@@ -63,7 +63,7 @@ namespace Ivony.Data.Queries
     public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default( CancellationToken ) )
     {
 
-      var executor = Configures?.GetService<IAsyncDbExecutor>() ?? Db.DbContext.GetAsyncExecutor();
+      var executor = Configures?.GetService<IAsyncDbExecutor>() ?? Db.DefaultDatebase.GetAsyncDbExecutor();
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
     }

@@ -15,24 +15,29 @@ namespace Ivony.Data
     /// <summary>
     /// 获取数据库查询执行器
     /// </summary>
-    /// <param name="context">当前数据库访问上下文</param>
     /// <returns></returns>
-    IDbExecutor GetDbExecutor( DatabaseContext context );
+    IDbExecutor GetDbExecutor();
 
 
     /// <summary>
     /// 创建事务上下文
     /// </summary>
-    /// <param name="context">当前数据库访问上下文</param>
     /// <returns></returns>
-    IDbTransactionContext CreateTransaction( DatabaseContext context);
+    IDbTransactionContext CreateTransaction();
 
 
 
     /// <summary>
     /// 获取一个服务提供程序，用于获取数据库相关的服务
     /// </summary>
-    IServiceProvider DbServiceProvider { get; }
+    IServiceProvider ServiceProvider { get; }
+
+
+    /// <summary>
+    /// 获取当前上下文的属性设置
+    /// </summary>
+    IReadOnlyDictionary<string, object> Properties { get; }
+
 
 
   }

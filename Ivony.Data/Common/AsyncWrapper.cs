@@ -77,7 +77,11 @@ namespace Ivony.Data.Common
 
     public TransactionStatus Status => Context.Status;
 
-    public IServiceProvider DbServiceProvider => Context.DbServiceProvider;
+    public IServiceProvider ServiceProvider => Context.ServiceProvider;
+
+    public IDbTransactionContext ParentTransaction => Context.ParentTransaction;
+
+    public IReadOnlyDictionary<string, object> Properties => Context.Properties;
 
     public void BeginTransaction() => Context.BeginTransaction();
 
@@ -98,9 +102,9 @@ namespace Ivony.Data.Common
       return Task.CompletedTask;
     }
 
-    public IDbTransactionContext CreateTransaction( DatabaseContext context )
+    public IDbTransactionContext CreateTransaction()
     {
-      return Context.CreateTransaction( context );
+      return Context.CreateTransaction();
     }
 
     public void Dispose()
@@ -108,9 +112,9 @@ namespace Ivony.Data.Common
       Context.Dispose();
     }
 
-    public IDbExecutor GetDbExecutor( DatabaseContext context )
+    public IDbExecutor GetDbExecutor()
     {
-      return Context.GetDbExecutor( context );
+      return Context.GetDbExecutor();
     }
 
     public void RegisterDispose( Action disposeMethod )

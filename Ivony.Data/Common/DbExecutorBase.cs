@@ -13,15 +13,17 @@ namespace Ivony.Data.Common
   /// </summary>
   public abstract class DbExecutorBase
   {
+    public IDbProvider DbProvider { get; }
 
 
 
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
-    protected DbExecutorBase()
+    protected DbExecutorBase( IDbProvider dbProvider )
     {
-      TraceService = Db.DbContext.GetTraceService();
+      DbProvider = dbProvider;
+      TraceService = (IDbTraceService) DbProvider.ServiceProvider.GetService( typeof( IDbTraceService ) );
     }
 
 

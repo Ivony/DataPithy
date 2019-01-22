@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Ivony.Data.Common;
 
 namespace Ivony.Data
 {
@@ -12,6 +13,15 @@ namespace Ivony.Data
   /// </summary>
   public static class DbExtensions
   {
+
+
+
+
+    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDbProvider dbProvider )
+    {
+      var executor = dbProvider.GetDbExecutor();
+      return executor as IAsyncDbExecutor ?? new AsyncExecutorWrapper( executor );
+    }
 
 
   }

@@ -8,6 +8,15 @@ namespace Ivony.Data.Common
   public abstract class DbTransactionContextBase<T> : IDbTransactionContext where T : IDbTransaction
   {
 
+    private readonly IDbProvider _dbProvider;
+
+
+    protected DbTransactionContextBase( IDbProvider dbProvider )
+    {
+      _dbProvider = dbProvider;
+    }
+
+
     /// <summary>
     /// 数据库事务对象
     /// </summary>
@@ -24,7 +33,24 @@ namespace Ivony.Data.Common
     /// </summary>
     public object Sync { get; } = new object();
 
-    public abstract IServiceProvider DbServiceProvider { get; }
+    /// <summary>
+    /// 服务提供程序，从数据访问提供程序继承
+    /// </summary>
+    public IServiceProvider ServiceProvider => _dbProvider.ServiceProvider;
+
+    /// <summary>
+    /// 获取父级事务，如果有的话
+    /// </summary>
+    public IDbTransactionContext ParentTransaction => _dbProvider as IDbTransactionContext;
+
+    /// <summary>
+    /// 获取属性配置，从数据访问提供程序继承
+    /// </summary>
+    public IReadOnlyDictionary<string, object> Properties => _dbProvider.Properties;
+
+
+
+
 
     /// <summary>
     /// 开始事务
@@ -122,9 +148,9 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 获取查询执行器
     /// </summary>
-    /// <param name="context"></param>
+    /// 
     /// <returns></returns>
-    public virtual IDbExecutor GetDbExecutor( DatabaseContext context )
+    public virtual IDbExecutor GetDbExecutor()
     {
       lock ( Sync )
       {
@@ -134,7 +160,7 @@ namespace Ivony.Data.Common
         if ( Status == TransactionStatus.Completed )
           throw new InvalidOperationException();
 
-        return GetDbExecutorCore( context );
+        return GetDbExecutorCore();
       }
     }
 
@@ -144,14 +170,14 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="context">数据访问上下文</param>
     /// <returns>查询执行器</returns>
-    protected abstract IDbExecutor GetDbExecutorCore( DatabaseContext context );
+    protected abstract IDbExecutor GetDbExecutorCore();
 
     /// <summary>
     /// 创建内嵌事务
     /// </summary>
-    /// <param name="context"></param>
+    /// 
     /// <returns></returns>
-    public virtual IDbTransactionContext CreateTransaction( DatabaseContext context )
+    public virtual IDbTransactionContext CreateTransaction()
     {
       throw new NotSupportedException( "Database is not supported nested Transaction." );
     }
