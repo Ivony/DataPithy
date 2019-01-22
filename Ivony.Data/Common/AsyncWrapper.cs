@@ -83,8 +83,6 @@ namespace Ivony.Data.Common
 
     public IDbTransactionContext ParentTransaction => _context.ParentTransaction;
 
-    public IReadOnlyDictionary<string, object> Properties => _context.Properties;
-
 
     public Task BeginTransactionAsync()
     {

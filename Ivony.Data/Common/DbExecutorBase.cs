@@ -22,7 +22,14 @@ namespace Ivony.Data.Common
     protected DbExecutorBase( IDbProvider dbProvider )
     {
       TraceService = dbProvider.ServiceProvider.GetService<IDbTraceService>();
+      DbProvider = dbProvider;
     }
+
+    
+    /// <summary>
+    /// 数据库访问提供程序
+    /// </summary>
+    public IDbProvider DbProvider { get; }
 
 
     /// <summary>

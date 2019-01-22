@@ -28,12 +28,12 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 创建 SqlServer 数据库查询执行程序
     /// </summary>
-    /// <param name="connectionString">连接字符串</param>
-    public SqlDbExecutor( string connectionString )
+    /// <param name="dbProvider">数据库访问提供程序</param>
+    public SqlDbExecutor( SqlServerDbProvider dbProvider ) : base( dbProvider )
     {
 
-      ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      Configuration = Db.DbContext.GetConfiguration<SqlServerConfiguration>();
+      ConnectionString = dbProvider.ConnectionString;
+      Configuration = dbProvider.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 
@@ -42,11 +42,11 @@ namespace Ivony.Data.SqlClient
     /// 创建在事务中执行的 SqlServer 数据库查询执行程序
     /// </summary>
     /// <param name="transaction">数据库事务上下文（如果在事务中执行的话）</param>
-    public SqlDbExecutor( SqlServerTransactionContext transaction )
+    public SqlDbExecutor( SqlServerTransactionContext transaction ) : base( transaction )
     {
       Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
       ConnectionString = Transaction.Connection.ConnectionString;
-      Configuration = Db.DbContext.GetConfiguration<SqlServerConfiguration>();
+      Configuration = transaction.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 

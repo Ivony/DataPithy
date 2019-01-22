@@ -13,9 +13,9 @@ namespace Ivony.Data.SqlClient
   /// </summary>
   public class SqlServerTransactionContext : DbTransactionContextBase<SqlTransaction>
   {
-    internal SqlServerTransactionContext( DbContext context, string connectionString )
+    internal SqlServerTransactionContext( SqlServerDbProvider dbProvider ) : base( dbProvider )
     {
-      Connection = new SqlConnection( connectionString );
+      Connection = new SqlConnection( dbProvider.ConnectionString );
     }
 
     /// <summary>
@@ -39,23 +39,23 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 获取查询执行器
     /// </summary>
-    /// <param name="context"></param>
     /// <returns></returns>
-    protected override IDbExecutor GetDbExecutorCore( DbContext context )
+    protected override IDbExecutor GetDbExecutorCore()
     {
       return new SqlDbExecutor( this );
     }
 
 
+
+    /// <summary>
+    /// 销毁事务上下文对象
+    /// </summary>
+    /// <param name="transaction">Sql Server 事务</param>
     protected override void DisposeTransaction( SqlTransaction transaction )
     {
       base.DisposeTransaction( transaction );
       Connection.Dispose();
     }
 
-    public override object GetService( Type serviceType )
-    {
-      return null;
-    }
   }
 }

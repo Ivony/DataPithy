@@ -11,7 +11,7 @@ namespace Ivony.Data
   /// <summary>
   /// SqlServer 数据库提供程序
   /// </summary>
-  public class SqlServerDbProvider : IDbProvider
+  public class SqlServerDbProvider : IDbProvider, IServiceProvider
   {
     /// <summary>
     /// 创建 SqlServerDbProvider 对象
@@ -27,15 +27,16 @@ namespace Ivony.Data
     /// </summary>
     public string ConnectionString { get; private set; }
 
+    public IServiceProvider ServiceProvider => this;
+
 
     /// <summary>
     /// 获取 SQL Server 查询执行器
     /// </summary>
-    /// <param name="context">当前数据库上下文</param>
     /// <returns></returns>
-    public IDbExecutor GetDbExecutor( DbContext context )
+    public IDbExecutor GetDbExecutor()
     {
-      return new SqlDbExecutor( ConnectionString );
+      return new SqlDbExecutor( this );
     }
 
     /// <summary>
@@ -43,9 +44,14 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="context">当前数据库上下文</param>
     /// <returns></returns>
-    public IDbTransactionContext CreateTransaction( DbContext context )
+    public IDbTransactionContext CreateTransaction()
     {
-      return new SqlServerTransactionContext( context, ConnectionString );
+      return new SqlServerTransactionContext( this );
+    }
+
+    public object GetService( Type serviceType )
+    {
+      return Db.ServiceProvider.GetService( serviceType );
     }
   }
 }

@@ -5,15 +5,22 @@ using System.Text;
 
 namespace Ivony.Data.Common
 {
+
+  /// <summary>
+  /// 辅助实现 IDbTransactionContext 接口
+  /// </summary>
+  /// <typeparam name="T">数据库事务对象类型</typeparam>
   public abstract class DbTransactionContextBase<T> : IDbTransactionContext where T : IDbTransaction
   {
 
-    private readonly IDbProvider _dbProvider;
 
-
+    /// <summary>
+    /// 创建和初始化 DbTransactionContextBase 对象
+    /// </summary>
+    /// <param name="dbProvider">数据库访问提供程序</param>
     protected DbTransactionContextBase( IDbProvider dbProvider )
     {
-      _dbProvider = dbProvider;
+      DbProvider = dbProvider;
     }
 
 
@@ -35,21 +42,24 @@ namespace Ivony.Data.Common
     public object Sync { get; } = new object();
 
 
+    /// <summary>
+    /// 数据库访问提供程序
+    /// </summary>
+    public IDbProvider DbProvider { get; }
+
+
 
     /// <summary>
     /// 服务提供程序，从数据访问提供程序继承
     /// </summary>
-    public IServiceProvider ServiceProvider => _dbProvider.ServiceProvider;
+    public IServiceProvider ServiceProvider => DbProvider.ServiceProvider;
 
     /// <summary>
     /// 获取父级事务，如果有的话
     /// </summary>
-    public IDbTransactionContext ParentTransaction => _dbProvider as IDbTransactionContext;
+    public IDbTransactionContext ParentTransaction => DbProvider as IDbTransactionContext;
 
-    /// <summary>
-    /// 获取属性配置，从数据访问提供程序继承
-    /// </summary>
-    public IReadOnlyDictionary<string, object> Properties => _dbProvider.Properties;
+
 
 
 

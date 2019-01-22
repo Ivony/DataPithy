@@ -5,6 +5,8 @@ using System.Text;
 
 namespace Ivony.Data.SqlQueries.SqlDom.Expressions
 {
+#pragma warning disable CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+#pragma warning disable CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
   public class SqlValueExpression : SqlExpression
   {
 
@@ -26,7 +28,7 @@ namespace Ivony.Data.SqlQueries.SqlDom.Expressions
     }
 
 
-    public static SqlValueExpression Constant( object value )
+    public static new SqlValueExpression Constant( object value )
     {
       if ( value == null || value is DBNull )
         return DBNull();

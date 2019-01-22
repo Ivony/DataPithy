@@ -15,7 +15,7 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutor : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutor( string connectionString )
+    public MySqlDbExecutor( MySqlDbProvider provider, string connectionString ) : base( provider )
     {
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
     }
@@ -37,7 +37,7 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutorWithTransaction( MySqlDbTransactionContext transaction )
+    public MySqlDbExecutorWithTransaction( MySqlDbTransactionContext transaction ) : base( transaction.Provider )
     {
       Transaction = transaction;
     }
@@ -62,13 +62,15 @@ namespace Ivony.Data.MySqlClient
   /// </summary>
   internal abstract class MySqlDbExecutorBase : DbExecutorBase, IDbExecutor
   {
-
+    protected MySqlDbExecutorBase( IDbProvider dbProvider ) : base( dbProvider )
+    {
+    }
 
 
     /// <summary>
     /// 获取当前配置
     /// </summary>
-    protected MySqlDbConfiguration Configuration => Db.DbContext.GetConfiguration<MySqlDbConfiguration>();
+    protected MySqlDbConfiguration Configuration => DbProvider.ServiceProvider.GetService<MySqlDbConfiguration>();
 
 
     public IDbExecuteContext Execute( DbQuery query )

@@ -33,10 +33,6 @@ namespace Ivony.Data
     IServiceProvider ServiceProvider { get; }
 
 
-    /// <summary>
-    /// 获取当前上下文的属性设置
-    /// </summary>
-    IReadOnlyDictionary<string, object> Properties { get; }
 
   }
 }

@@ -17,7 +17,7 @@ namespace Ivony.Data
 
 
     private static readonly object sync = new object();
-    private static readonly IDictionary<string, IDbProvider> _databases;
+    private static readonly IDictionary<string, IDbProvider> _databases = new Dictionary<string, IDbProvider>();
 
 
 
@@ -93,6 +93,8 @@ namespace Ivony.Data
           _default = database;
       }
     }
+
+
 
 
 
