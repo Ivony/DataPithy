@@ -25,8 +25,8 @@ namespace Ivony.Data.SqlClient
     /// <param name="reader">数据读取器</param>
     /// <param name="tracing">用于记录此次查询过程的的查询追踪器</param>
     /// <param name="disposeMethod">当上下文销毁时要执行的方法</param>
-    internal SqlDbExecuteContext( SqlDataReader reader, IDbTracing tracing, Action disposeMethod )
-      : base( reader, tracing, disposeMethod )
+    internal SqlDbExecuteContext( SqlDataReader reader, IDbTracing tracing )
+      : base( reader, tracing )
     {
       SqlDataReader = reader;
     }

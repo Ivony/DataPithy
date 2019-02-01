@@ -13,8 +13,8 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 注册当对象销毁时要调用的方法
     /// </summary>
-    /// <param name="disposeMethod">对象销毁时要调用的方法</param>
-    void RegisterDispose( Action disposeMethod );
+    /// <param name="disposable">要一并销毁的对象</param>
+    void RegisterDispose( IDisposable disposable );
 
   }
 }

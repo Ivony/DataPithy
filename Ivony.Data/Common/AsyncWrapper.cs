@@ -51,7 +51,7 @@ namespace Ivony.Data.Common
 
     public IDataRecord ReadRecord() => Context.ReadRecord();
 
-    public void RegisterDispose( Action disposeMethod ) => Context.RegisterDispose( disposeMethod );
+    public void RegisterDispose( IDisposable disposable ) => Context.RegisterDispose( disposable );
 
     public void Dispose() => Context.Dispose();
 
@@ -116,9 +116,9 @@ namespace Ivony.Data.Common
       return _context.GetDbExecutor();
     }
 
-    public void RegisterDispose( Action disposeMethod )
+    public void RegisterDispose( IDisposable disposable )
     {
-      _context.RegisterDispose( disposeMethod );
+      _context.RegisterDispose( disposable );
     }
 
     public void Rollback()

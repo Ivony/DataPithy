@@ -7,7 +7,7 @@ namespace Ivony.Data
 {
 
   /// <summary>
-  /// IDbExecutor 提供程序
+  /// 数据库访问提供程序，代表一个数据库
   /// </summary>
   public interface IDbProvider
   {

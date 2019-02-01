@@ -42,7 +42,6 @@ namespace Ivony.Data
     /// <summary>
     /// 创建数据库事务
     /// </summary>
-    /// <param name="context">当前数据库上下文</param>
     /// <returns></returns>
     public IDbTransactionContext CreateTransaction()
     {

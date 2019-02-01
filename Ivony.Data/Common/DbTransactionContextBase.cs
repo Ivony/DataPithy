@@ -141,7 +141,8 @@ namespace Ivony.Data.Common
 
         Status = TransactionStatus.Completed;
         DisposeTransaction( Transaction );
-        disposeAction?.Invoke();
+        foreach ( var item in _disposables )
+          item.Dispose();
       }
     }
 
@@ -192,11 +193,11 @@ namespace Ivony.Data.Common
     }
 
 
-    private Action disposeAction;
+    private readonly HashSet<IDisposable> _disposables = new HashSet<IDisposable>();
 
-    void IDisposableObjectContainer.RegisterDispose( Action disposeMethod )
+    void IDisposableObjectContainer.RegisterDispose( IDisposable disposable )
     {
-      disposeAction += disposeMethod;
+      _disposables.Add( disposable );
     }
 
   }

@@ -24,9 +24,9 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="dataReader">用于读取数据的 IDataReader 对象</param>
     /// <param name="tracing">用于追踪此次查询过程的追踪器</param>
-    /// <param name="disposeMethod">销毁上下文时要执行的方法</param>
     /// <param name="sync">用于同步的对象，如果有的话</param>
-    protected DbExecuteContextBase( IDataReader dataReader, IDbTracing tracing = null, Action disposeMethod = null, object sync = null )
+    /// 
+    protected DbExecuteContextBase( IDataReader dataReader, IDbTracing tracing = null, object sync = null )
     {
 
       if ( dataReader == null )
@@ -34,7 +34,6 @@ namespace Ivony.Data.Common
 
 
       SyncRoot = sync;
-      this.disposeMethod = disposeMethod;
 
 
       DataReader = dataReader;
@@ -174,11 +173,16 @@ namespace Ivony.Data.Common
 
 
 
-    private Action disposeMethod;
+    private readonly HashSet<IDisposable> _disposables = new HashSet<IDisposable>();
 
-    void IDisposableObjectContainer.RegisterDispose( Action disposeAction )
+
+    /// <summary>
+    /// 注册需要随上下文一并销毁的对象
+    /// </summary>
+    /// <param name="disposable">要销毁的对象</param>
+    public void RegisterDispose( IDisposable disposable )
     {
-      disposeMethod += disposeAction;
+      _disposables.Add( disposable );
     }
 
 
@@ -191,7 +195,8 @@ namespace Ivony.Data.Common
       try
       {
         DataReader.Dispose();
-        disposeMethod?.Invoke();
+        foreach ( var item in _disposables )
+          item.Dispose();
       }
       finally
       {
@@ -232,7 +237,7 @@ namespace Ivony.Data.Common
     /// <param name="disposeMethod">当上下文销毁时要执行的方法</param>
     /// <param name="sync">用于同步的对象</param>
     protected AsyncDbExecuteContextBase( DbDataReader dataReader, IDbTracing tracing = null, Action disposeMethod = null, object sync = null )
-      : base( dataReader, tracing, disposeMethod, sync )
+      : base( dataReader, tracing, sync )
     {
 
       DataReader = dataReader;

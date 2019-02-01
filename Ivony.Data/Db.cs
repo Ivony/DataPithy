@@ -33,6 +33,27 @@ namespace Ivony.Data
     public static IDbProvider CurrentDatabase => currentHost.Value ?? _default;
 
 
+
+    private static IServiceProvider _servicePrvider;
+
+    /// <summary>
+    /// 初始化 DataPithy
+    /// </summary>
+    /// <param name="serviceProvider">要使用的系统服务提供程序</param>
+    public static void Initialize( IServiceProvider serviceProvider = null )
+    {
+      lock ( sync )
+      {
+        if ( ServiceProvider != null )
+          throw new InvalidOperationException( "Db environment is already initialized." );
+
+        _servicePrvider = serviceProvider ?? new DefaultServiceProvider();
+      }
+    }
+
+
+
+
     /// <summary>
     /// 获取指定的数据库
     /// </summary>
@@ -52,7 +73,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取默认的服务提供程序
     /// </summary>
-    public static IServiceProvider ServiceProvider { get; }
+    public static IServiceProvider ServiceProvider => _servicePrvider;
 
 
     /// <summary>
@@ -72,7 +93,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable UseDatabase( IDbProvider database )
     {
-      return new DbContext( currentHost.Value, database );
+      return DbContext.EnterContext( database );
     }
 
 
@@ -163,17 +184,18 @@ namespace Ivony.Data
     /// <summary>
     /// 进入一个事务上下文
     /// </summary>
-    /// <param name="transaction"></param>
-    /// <returns></returns>
+    /// <param name="transaction">要进入的事务</param>
+    /// <returns>事务上下文</returns>
     public static IDbTransactionContext EnterTransaction( IDbTransactionContext transaction )
     {
       if ( transaction == null )
         throw new ArgumentNullException( nameof( transaction ) );
 
 
-      transaction.RegisterDispose( new DbContext( currentHost.Value, transaction ).Dispose );
+      transaction.RegisterDispose( DbContext.EnterContext( transaction ) );
+      transaction.BeginTransaction();
 
-      throw new NotImplementedException();
+      return transaction;
     }
 
 
@@ -181,10 +203,18 @@ namespace Ivony.Data
 
     private class DbContext : IDisposable
     {
-      public DbContext( IDbProvider parent, IDbProvider current )
+
+      public static IDisposable EnterContext( IDbProvider current )
+      {
+        var context = new DbContext( currentHost.Value, current );
+        currentHost.Value = context.Current;
+        return context;
+      }
+
+      private DbContext( IDbProvider parent, IDbProvider current )
       {
         Parent = parent;
-        currentHost.Value = Current = current;
+        Current = current;
       }
 
       public IDbProvider Parent { get; }

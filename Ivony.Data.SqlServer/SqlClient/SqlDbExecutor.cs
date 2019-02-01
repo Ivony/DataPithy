@@ -110,7 +110,9 @@ namespace Ivony.Data.SqlClient
 
 
         var reader = command.ExecuteReader();
-        var context = new SqlDbExecuteContext( reader, tracing, () => OnExecuted( connection ) );
+        var context = new SqlDbExecuteContext( reader, tracing );
+        if ( Transaction == null )
+          context.RegisterDispose( connection );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
@@ -145,7 +147,10 @@ namespace Ivony.Data.SqlClient
 
 
         var reader = await command.ExecuteReaderAsync( token );
-        var context = new SqlDbExecuteContext( reader, tracing, () => OnExecuted( connection ) );
+        var context = new SqlDbExecuteContext( reader, tracing );
+        if ( Transaction == null )
+          context.RegisterDispose( connection );
+
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
@@ -158,11 +163,6 @@ namespace Ivony.Data.SqlClient
       }
     }
 
-    private void OnExecuted( SqlConnection connection )
-    {
-      if ( Transaction == null )
-        connection.Dispose();
-    }
 
     IDbExecuteContext IDbExecutor.Execute( DbQuery query )
     {

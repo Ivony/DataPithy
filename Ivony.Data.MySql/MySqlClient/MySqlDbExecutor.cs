@@ -118,7 +118,7 @@ namespace Ivony.Data.MySqlClient
     private MySqlCommand CreateCommand( ParameterizedQuery query )
     {
 
-      return new MySqlParameterizedQueryParser().Parse( query );
+      return DbProvider.ServiceProvider.GetService<IParameterizedQueryParser<MySqlCommand>>().Parse( query );
     }
   }
 }

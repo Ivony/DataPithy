@@ -34,6 +34,11 @@ namespace Ivony.Data
 
 
 
+    /// <summary>
+    /// 解析查询模板
+    /// </summary>
+    /// <param name="template">查询模板</param>
+    /// <returns>参数化查询对象</returns>
     public ParameterizedQuery ParseTemplate( FormattableString template )
     {
       return ParseTemplate( (IParameterizedQueryBuilder) _services.GetService( typeof( IParameterizedQueryBuilder ) ), template );
@@ -45,8 +50,7 @@ namespace Ivony.Data
     /// 解析查询模板
     /// </summary>
     /// <param name="builder">参数化查询构建器</param>
-    /// <param name="templateText">模板文本</param>
-    /// <param name="args">模板参数</param>
+    /// <param name="template">查询模板</param>
     /// <returns>解析结果</returns>
     private ParameterizedQuery ParseTemplate( IParameterizedQueryBuilder builder, FormattableString template )
     {

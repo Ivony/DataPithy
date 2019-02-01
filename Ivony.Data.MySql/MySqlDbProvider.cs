@@ -61,13 +61,25 @@ namespace Ivony.Data
 
 
 
+    /// <summary>
+    /// 系统服务提供程序
+    /// </summary>
     public IServiceProvider ServiceProvider => this;
 
 
+
+
+    private static MySqlParameterizedQueryParser ParameterizedQueryParser { get; } = new MySqlParameterizedQueryParser();
+
+    /// <summary>
+    /// 获取服务对象
+    /// </summary>
+    /// <param name="serviceType">服务类型</param>
+    /// <returns></returns>
     public object GetService( Type serviceType )
     {
       if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
-        return new MySqlParameterizedQueryParser();
+        return ParameterizedQueryParser;
 
       return null;
     }
