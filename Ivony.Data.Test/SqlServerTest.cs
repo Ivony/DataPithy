@@ -28,10 +28,8 @@ namespace Ivony.Data.Test
     public void Enter()
     {
 
-      scope = Db.Enter( builder => builder
-        .UseSqlServer( "Data Source=(localdb)\\ProjectsV13;Initial Catalog=Test;" )
-        .Services.AddService<IDbTraceService>( traceService = new TestTraceService() )
-      );
+      Db.UseDatabase( SqlServerDb.Connect( "Data Source=(localdb)\\ProjectsV13;Initial Catalog=Test;" ) );
+
 
       Db.T( $"IF OBJECT_ID(N'[dbo].[Test1]') IS NOT NULL DROP TABLE [dbo].[Test1]" ).ExecuteNonQuery();
       Db.T( $@"
@@ -45,12 +43,6 @@ CREATE TABLE [dbo].[Test1]
     CONSTRAINT [PK_Test1] PRIMARY KEY ([ID]) 
 )" ).ExecuteNonQuery();
 
-    }
-
-    [TestCleanup]
-    public void Exit()
-    {
-      scope.Dispose();
     }
 
 

@@ -77,6 +77,7 @@ namespace Ivony.Data
     /// 将数组转换为参数列表对象
     /// </summary>
     /// <param name="array">要转换的数组对象</param>
+    /// <param name="separator">参数列表分隔符</param>
     /// <returns>参数列表对象</returns>
     public static ParameterList AsParameters( this Array array, string separator )
     {

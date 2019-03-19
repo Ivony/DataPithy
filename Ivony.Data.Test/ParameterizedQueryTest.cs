@@ -9,12 +9,16 @@ namespace Ivony.Data.Test
   public class ParameterizedQueryTest
   {
 
+    [AssemblyInitialize]
+    public static void AssemblyInitialize( TestContext context )
+    {
+      Db.Initialize();
+    }
+
 
     [TestInitialize]
     public void Enter()
     {
-
-
     }
 
     [TestCleanup]

@@ -48,6 +48,12 @@ namespace Ivony.Data
       return new SqlServerTransactionContext( this );
     }
 
+
+    /// <summary>
+    /// 获取系统服务
+    /// </summary>
+    /// <param name="serviceType">服务类型</param>
+    /// <returns>服务实例</returns>
     public object GetService( Type serviceType )
     {
       return Db.ServiceProvider.GetService( serviceType );

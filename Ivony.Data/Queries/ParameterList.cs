@@ -24,6 +24,7 @@ namespace Ivony.Data.Queries
     /// 从 Tuple 创建 ParameterList 对象
     /// </summary>
     /// <param name="tuple">Tuple 对象</param>
+    /// <param name="separator">参数列表分隔符</param>
     /// <returns>参数列表对象</returns>
     public static ParameterList Create( ITuple tuple, string separator = ", " )
     {
