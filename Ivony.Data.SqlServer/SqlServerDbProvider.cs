@@ -27,7 +27,9 @@ namespace Ivony.Data
     /// </summary>
     public string ConnectionString { get; private set; }
 
-    public IServiceProvider ServiceProvider => this;
+
+
+    IServiceProvider IDbProvider.ServiceProvider => this;
 
 
     /// <summary>
@@ -56,7 +58,7 @@ namespace Ivony.Data
     /// <returns>服务实例</returns>
     public object GetService( Type serviceType )
     {
-      return Db.ServiceProvider.GetService( serviceType );
+      return null;
     }
   }
 }

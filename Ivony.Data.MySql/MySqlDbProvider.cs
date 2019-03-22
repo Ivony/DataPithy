@@ -81,7 +81,7 @@ namespace Ivony.Data
       if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
         return ParameterizedQueryParser;
 
-      return Db.ServiceProvider.GetService( serviceType );
+      return null;
     }
   }
 }

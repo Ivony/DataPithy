@@ -34,25 +34,6 @@ namespace Ivony.Data
 
 
 
-    private static IServiceProvider _servicePrvider;
-
-    /// <summary>
-    /// 初始化 DataPithy
-    /// </summary>
-    /// <param name="serviceProvider">要使用的系统服务提供程序</param>
-    public static void Initialize( IServiceProvider serviceProvider = null )
-    {
-      lock ( sync )
-      {
-        if ( ServiceProvider != null )
-          throw new InvalidOperationException( "Db environment is already initialized." );
-
-        _servicePrvider = serviceProvider ?? new DefaultServiceProvider();
-      }
-    }
-
-
-
 
     /// <summary>
     /// 获取指定的数据库
@@ -73,7 +54,18 @@ namespace Ivony.Data
     /// <summary>
     /// 获取默认的服务提供程序
     /// </summary>
-    public static IServiceProvider ServiceProvider => _servicePrvider;
+    public static IServiceProvider ServiceProvider => CurrentDatabase?.ServiceProvider ?? defaultServiceProvider;
+
+
+    private static IServiceProvider defaultServiceProvider = new EmptyServiceProvider();
+
+    private class EmptyServiceProvider : IServiceProvider
+    {
+      public object GetService( Type serviceType )
+      {
+        return null;
+      }
+    }
 
 
     /// <summary>
@@ -83,7 +75,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable UseDatabase( string database )
     {
-      return UseDatabase( Database( database ) );
+      return UseDatabase( Database( database ) ?? throw new InvalidOperationException( $"database \"{database}\" is not registered." ) );
     }
 
     /// <summary>
@@ -93,6 +85,9 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDisposable UseDatabase( IDbProvider database )
     {
+      if ( database == null )
+        throw new ArgumentNullException( nameof( database ) );
+
       return DbContext.EnterContext( database );
     }
 
@@ -110,7 +105,7 @@ namespace Ivony.Data
       lock ( sync )
       {
         _databases.Add( name, database );
-        if ( CurrentDatabase == null )
+        if ( _default == null )
           _default = database;
       }
     }
@@ -140,8 +135,14 @@ namespace Ivony.Data
       if ( template == null )
         return null;
 
-      return ServiceProvider.GetService<ITemplateParser>().ParseTemplate( template );
+      return ParameterizedQueryService.GetTemplateParser().ParseTemplate( template );
     }
+
+
+    /// <summary>
+    /// 获取参数化查询服务
+    /// </summary>
+    public static IParameterizedQueryService ParameterizedQueryService => ServiceProvider.GetService<IParameterizedQueryService>() ?? Data.ParameterizedQueryService.Instance;
 
 
     /// <summary>
@@ -154,7 +155,7 @@ namespace Ivony.Data
       if ( text == null )
         return null;
 
-      return Db.ServiceProvider.GetService<ITemplateParser>().ParseTemplate( FormattableStringFactory.Create( text ) );
+      return ParameterizedQueryService.GetTemplateParser().ParseTemplate( FormattableStringFactory.Create( text ) );
     }
 
 

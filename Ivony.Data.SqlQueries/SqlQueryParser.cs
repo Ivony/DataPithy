@@ -12,45 +12,65 @@ namespace Ivony.Data.SqlQueries
   public class SqlQueryParser : ISelectQueryParser, IInsertQueryParser
   {
 
+    public SqlQueryParser() : this( Db.ParameterizedQueryService)
+    {
+
+    }
 
 
-    protected IParameterizedQueryBuilder Builder { get; private set; }
+    public SqlQueryParser( IParameterizedQueryService queryService )
+    {
+      QueryService = queryService;
+    }
+
+
+    /// <summary>
+    /// 参数化查询服务
+    /// </summary>
+    protected virtual IParameterizedQueryService QueryService { get; }
+
+
+
+
 
     protected object SyncRoot { get; } = new object();
+
+    private IParameterizedQueryBuilder builder;
+
 
 
     public virtual ParameterizedQuery ParseSelectQuery( SelectQuery query )
     {
-      Builder = Builder ?? Db.ServiceProvider.GetService<IParameterizedQueryBuilder>();
+      builder = QueryService.CreateQueryBuild();
 
-      ParseSelectClause( query.SelectClause );
-      ParseFromClause( query.FromClause );
+      ParseSelectClause(  query.SelectClause );
+      ParseFromClause(  query.FromClause );
       ParseWhereClause( query.WhereClause );
       ParseOrderByClause( query.OrderByClause );
 
-      return Builder.BuildQuery( new DbQueryConfigures() );
+      return builder.BuildQuery( new DbQueryConfigures() );
     }
 
     public virtual ParameterizedQuery ParseInsertQuery( InsertQuery query )
     {
-      Builder = Builder ?? Db.ServiceProvider.GetService<IParameterizedQueryBuilder>();
+      builder = QueryService.CreateQueryBuild();
 
       ParseInsertIntoClause( query.Into );
       ParseInsertColumnsClause( query.Columns );
       ParseInsertValues( query.Values );
 
-      return Builder.BuildQuery( new DbQueryConfigures() );
+      return builder.BuildQuery( new DbQueryConfigures() );
     }
 
 
     protected virtual void ParseSelectClause( SelectClause clause )
     {
-      Builder.Append( "SELECT " );
+      builder.Append( "SELECT " );
       bool flag = false;
       foreach ( var element in clause.Elements )
       {
         if ( flag )
-          Builder.Append( ", " );
+          builder.Append( ", " );
         flag = true;
 
         ParseSelectElement( element );
@@ -74,25 +94,25 @@ namespace Ivony.Data.SqlQueries
     protected void ParseSelectElementExpression( SelectElementExpression element )
     {
       ParseExpression( element.Expression, 0 );
-      Builder.Append( " AS " );
-      Builder.AppendName( element.Alias );
+      builder.Append( " AS " );
+      builder.AppendName( element.Alias );
     }
 
     protected void ParseSelectElementStar( SelectElementStar element )
     {
       if ( element.TableAlias != null )
       {
-        Builder.AppendName( element.TableAlias );
-        Builder.Append( '.' );
+        builder.AppendName( element.TableAlias );
+        builder.Append( '.' );
       }
 
-      Builder.Append( "*" );
+      builder.Append( "*" );
     }
 
     protected virtual void ParseFromClause( FromClause clause )
     {
       AppendNewLine();
-      Builder.Append( "FROM " );
+      builder.Append( "FROM " );
       ParseFromSource( clause.Source );
     }
 
@@ -108,8 +128,8 @@ namespace Ivony.Data.SqlQueries
 
     protected void AppendNewLine()
     {
-      Builder.Append( '\n' );
-      Builder.Append( new string( ' ', PaddingSize ) );
+      builder.Append( '\n' );
+      builder.Append( new string( ' ', PaddingSize ) );
     }
 
     protected virtual void ParseFromSource( FromSource source )
@@ -133,7 +153,7 @@ namespace Ivony.Data.SqlQueries
         return;
 
       AppendNewLine();
-      Builder.Append( "WHERE " );
+      builder.Append( "WHERE " );
       ParseExpression( clause.Condition, 0 );
     }
 
@@ -144,13 +164,13 @@ namespace Ivony.Data.SqlQueries
         return;
 
       AppendNewLine();
-      Builder.Append( "ORDER BY " );
+      builder.Append( "ORDER BY " );
 
       bool flag = false;
       foreach ( var item in clause.OrderByItems )
       {
         if ( flag )
-          Builder.Append( ", " );
+          builder.Append( ", " );
 
         flag = true;
         ParseOrderByItem( item );
@@ -159,16 +179,16 @@ namespace Ivony.Data.SqlQueries
 
     protected void ParseOrderByItem( OrderByItem item )
     {
-      Builder.AppendName( item.FieldAlias );
+      builder.AppendName( item.FieldAlias );
       if ( item.Ordering == OrderingType.Descending )
-        Builder.Append( " DESC" );
+        builder.Append( " DESC" );
     }
 
     protected virtual void ParseTableSource( TableSource table )
     {
       ParseTableExpression( table.TableExpression );
-      Builder.Append( " AS " );
-      Builder.AppendName( table.Alias );
+      builder.Append( " AS " );
+      builder.AppendName( table.Alias );
     }
 
     protected virtual void ParseTableExpression( SqlTableExpression expression )
@@ -182,13 +202,13 @@ namespace Ivony.Data.SqlQueries
         case SelectQuery query:
 
           AppendNewLine();
-          Builder.Append( '(' );
+          builder.Append( '(' );
           PaddingSize += IndentSize;
           AppendNewLine();
           ParseSelectQuery( query );
           PaddingSize -= IndentSize;
           AppendNewLine();
-          Builder.Append( ')' );
+          builder.Append( ')' );
           return;
 
       }
@@ -196,15 +216,15 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseTable( TableReference table )
     {
-      Builder.AppendName( table.TableName );
+      builder.AppendName( table.TableName );
     }
 
     protected virtual void ParseJoinedTables( JoinedTables tables )
     {
       ParseFromSource( tables.Left );
-      Builder.Append( ' ' );
-      Builder.Append( GetJoinOperator( tables.JoinType ) );
-      Builder.Append( ' ' );
+      builder.Append( ' ' );
+      builder.Append( GetJoinOperator( tables.JoinType ) );
+      builder.Append( ' ' );
       ParseFromSource( tables.Right );
 
       if ( tables.JoinType != TableJoinType.CrossJoin )
@@ -214,7 +234,7 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseOnClause( SqlBooleanExpression expression )
     {
-      Builder.Append( " ON " );
+      builder.Append( " ON " );
       ParseExpression( expression, true );
     }
 
@@ -224,25 +244,25 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseInsertIntoClause( InsertIntoClause into )
     {
-      Builder.Append( "INSERT INTO " );
+      builder.Append( "INSERT INTO " );
       ParseTable( into.Table );
     }
 
     protected virtual void ParseInsertColumnsClause( InsertColumns columns )
     {
 
-      Builder.Append( '(' );
+      builder.Append( '(' );
 
       bool flag = false;
       foreach ( var name in columns.Columns )
       {
         if ( flag )
-          Builder.Append( ", " );
+          builder.Append( ", " );
         flag = true;
-        Builder.AppendName( name );
+        builder.AppendName( name );
       }
 
-      Builder.Append( ')' );
+      builder.Append( ')' );
     }
 
     protected virtual void ParseInsertValues( InsertValuesSource list )
@@ -257,20 +277,20 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseValues( ValuesClause values )
     {
-      Builder.Append( "VALUES" );
+      builder.Append( "VALUES" );
 
       foreach ( var tuple in values.ValuesList )
       {
-        Builder.Append( '(' );
+        builder.Append( '(' );
 
         for ( int i = 0; i < tuple.Length; i++ )
         {
           if ( i > 0 )
-            Builder.Append( ", " );
+            builder.Append( ", " );
 
-          Builder.AppendParameter( tuple[i] );
+          builder.AppendParameter( tuple[i] );
         }
-        Builder.Append( ')' );
+        builder.Append( ')' );
       }
     }
 
@@ -287,7 +307,7 @@ namespace Ivony.Data.SqlQueries
     protected virtual void ParseExpression( SqlExpression expression, bool withParenthesis )
     {
       if ( withParenthesis )
-        Builder.Append( '(' );
+        builder.Append( '(' );
 
       switch ( expression )
       {
@@ -305,7 +325,7 @@ namespace Ivony.Data.SqlQueries
       }
 
       if ( withParenthesis )
-        Builder.Append( ')' );
+        builder.Append( ')' );
 
     }
 
@@ -334,21 +354,21 @@ namespace Ivony.Data.SqlQueries
     protected virtual void ParseArithmeticalExpression( SqlArithmeticalExpression expression )
     {
       ParseExpression( expression.Left, GetExpressionPriority( expression ) );
-      Builder.Append( GetOperator( expression.Operation ) );
+      builder.Append( GetOperator( expression.Operation ) );
       ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
 
 
     protected virtual void ParseField( FieldReference field )
     {
-      Builder.AppendName( field.TableName );
-      Builder.Append( '.' );
-      Builder.AppendName( field.FieldName );
+      builder.AppendName( field.TableName );
+      builder.Append( '.' );
+      builder.AppendName( field.FieldName );
     }
 
     protected virtual void ParseParameter( SqlConstantExpression constant )
     {
-      Builder.AppendParameter( constant.Value );
+      builder.AppendParameter( constant.Value );
     }
 
 
@@ -376,7 +396,7 @@ namespace Ivony.Data.SqlQueries
     protected virtual void ParseLikeExpression( SqlLikeExpression expression )
     {
       ParseExpression( expression.Left, GetExpressionPriority( expression ) );
-      Builder.Append( " LIKE " );
+      builder.Append( " LIKE " );
       ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
 
@@ -387,19 +407,19 @@ namespace Ivony.Data.SqlQueries
         if ( expression.Operation == ExpressionType.Equal )
         {
           ParseExpression( expression.Left, 0 );
-          Builder.Append( " IS NULL" );
+          builder.Append( " IS NULL" );
         }
         else if ( expression.Operation == ExpressionType.NotEqual )
         {
           ParseExpression( expression.Left, 0 );
-          Builder.Append( " IS NOT NULL" );
+          builder.Append( " IS NOT NULL" );
         }
       }
       else
       {
 
         ParseExpression( expression.Left, GetExpressionPriority( expression ) );
-        Builder.Append( GetOperator( expression.Operation ) );
+        builder.Append( GetOperator( expression.Operation ) );
         ParseExpression( expression.Right, GetExpressionPriority( expression ) );
       }
     }
@@ -407,7 +427,7 @@ namespace Ivony.Data.SqlQueries
     protected virtual void ParseLogicalExpression( SqlLogicalExpression expression )
     {
       ParseExpression( expression.Left, GetExpressionPriority( expression ) );
-      Builder.Append( " " + GetOperator( expression.Operation ) + " " );
+      builder.Append( " " + GetOperator( expression.Operation ) + " " );
       ParseExpression( expression.Right, GetExpressionPriority( expression ) );
     }
 
