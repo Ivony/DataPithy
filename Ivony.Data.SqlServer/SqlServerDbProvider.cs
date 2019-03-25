@@ -17,7 +17,15 @@ namespace Ivony.Data
     /// 创建 SqlServerDbProvider 对象
     /// </summary>
     /// <param name="connectionString">SQL Server 连接字符串</param>
-    public SqlServerDbProvider( string connectionString ) : this( new EmptyServiceProvider(), connectionString ) { }
+    public SqlServerDbProvider( string connectionString )
+      : this( new EmptyServiceProvider(), connectionString ) { }
+
+    /// <summary>
+    /// 创建 SqlServerDbProvider 对象
+    /// </summary>
+    /// <param name="connectionStringProvider">数据库连接字符串提供程序</param>
+    public SqlServerDbProvider( IDbConnectionStringProvider connectionStringProvider )
+      : this( connectionStringProvider.ServiceProvider, connectionStringProvider.GetConnectionString( typeof( SqlServerDbProvider ) ) ) { }
 
     /// <summary>
     /// 创建 SqlServerDbProvider 对象

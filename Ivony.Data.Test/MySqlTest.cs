@@ -18,7 +18,7 @@ namespace Ivony.Data.Test
     public void Enter()
     {
 
-      scope = Db.UseDatabase( MySqlDb.Connect( "192.168.10.163", "Test", "robot", "mvxy8Bsamc2MkdW" ) );
+      scope = Db.UseDatabase( MySqlDb.Connect( "10.168.95.112", "test_wangling", "wangling", "a135246A" ) );
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
       Db.T( $@"

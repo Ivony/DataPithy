@@ -114,8 +114,12 @@ namespace Ivony.Data
 
       public object GetService( Type serviceType )
       {
-        if ( serviceType == typeof( MySqlConfiguration ) )
+        if ( serviceType == typeof( MySqlDbConfiguration ) )
           return Configuration;
+
+        if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
+          return new MySqlParameterizedQueryParser();
+
 
         return null;
       }
