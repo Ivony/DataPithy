@@ -12,7 +12,6 @@ namespace Ivony.Data.Test
     [AssemblyInitialize]
     public static void AssemblyInitialize( TestContext context )
     {
-      Db.Initialize();
     }
 
 

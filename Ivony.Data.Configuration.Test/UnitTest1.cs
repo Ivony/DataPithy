@@ -9,7 +9,7 @@ namespace Ivony.Data.Configuration.Test
   {
 
     [AssemblyInitialize]
-    public void Initialize()
+    public void Initialize( TestContext context )
     {
       var services = new ServiceCollection();
 
