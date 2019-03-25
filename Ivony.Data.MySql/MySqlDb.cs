@@ -22,7 +22,7 @@ namespace Ivony.Data
     /// <returns>MySql 数据库访问器</returns>
     public static MySqlDbProvider Connect( string connectionString, MySqlDbConfiguration configuration = null )
     {
-      return new MySqlDbProvider( connectionString, configuration ?? DefaultConfiguration );
+      return MySqlDbProvider.Create( connectionString, configuration ?? DefaultConfiguration );
     }
 
 
@@ -36,6 +36,42 @@ namespace Ivony.Data
     public static MySqlDbProvider Connect( MySqlConnectionStringBuilder builder, MySqlDbConfiguration configuration = null )
     {
       return Connect( builder.GetConnectionString( true ), configuration );
+    }
+
+
+
+
+
+    /// <summary>
+    /// 使用 MySQL 数据库
+    /// </summary>
+    /// <param name="serviceProvider">系统服务提供程序</param>
+    /// <param name="connectionString">数据库连接字符串</param>
+    /// <returns>MySQL 数据库数据提供程序</returns>
+    public static IDbProvider UseMySql( this IServiceProvider serviceProvider, string connectionString )
+    {
+      return UseMySql( serviceProvider, null, connectionString );
+    }
+
+
+
+    /// <summary>
+    /// 使用 MySQL 数据库
+    /// </summary>
+    /// <param name="serviceProvider">系统服务提供程序</param>
+    /// <param name="databaseName">数据库名称</param>
+    /// <param name="connectionString">数据库连接字符串</param>
+    /// <returns>MySQL 数据库数据提供程序</returns>
+    public static IDbProvider UseMySql( this IServiceProvider serviceProvider, string databaseName, string connectionString )
+    {
+      var db = new MySqlDbProvider( serviceProvider, connectionString );
+      if ( databaseName != null )
+        Db.RegisterDatabase( databaseName, db, true );
+
+      else
+        Db.UseDatabase( db );
+
+      return db;
     }
 
 

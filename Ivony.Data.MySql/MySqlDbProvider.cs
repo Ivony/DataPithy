@@ -19,7 +19,20 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
     /// <param name="configuration">MySQL 数据库配置信息</param>
-    public MySqlDbProvider( string connectionString, MySqlDbConfiguration configuration ) : this( new MyServiceProvider( configuration ), connectionString ) { }
+    public static MySqlDbProvider Create( string connectionString, MySqlDbConfiguration configuration )
+    {
+      return new MySqlDbProvider( new MyServiceProvider( configuration ), connectionString );
+    }
+
+
+    /// <summary>
+    /// 创建 MySqlDbProvider 对象
+    /// </summary>
+    /// <param name="connectionStringProvider">连接字符串提供程序</param>
+    public MySqlDbProvider( IDbConnectionStringProvider connectionStringProvider )
+      : this( connectionStringProvider.ServiceProvider, connectionStringProvider.GetConnectionString( typeof( MySqlDbProvider ) ) )
+    {
+    }
 
 
     /// <summary>

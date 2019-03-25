@@ -21,16 +21,13 @@ namespace Ivony.Data
 
 
 
-
-    private static IDbProvider _default;
-
     private static AsyncLocal<IDbProvider> currentHost = new AsyncLocal<IDbProvider>();
 
 
     /// <summary>
     /// 默认的数据库访问提供程序
     /// </summary>
-    public static IDbProvider CurrentDatabase => currentHost.Value ?? _default;
+    public static IDbProvider CurrentDatabase => currentHost.Value;
 
 
 
@@ -100,13 +97,15 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="name">数据库名称</param>
     /// <param name="database">数据访问提供程序</param>
-    public static void RegisterDatabase( string name, IDbProvider database )
+    /// <param name="immediately">是否立即使用这个数据库</param>
+    public static void RegisterDatabase( string name, IDbProvider database, bool immediately = false )
     {
       lock ( sync )
       {
         _databases.Add( name, database );
-        if ( _default == null )
-          _default = database;
+
+        if ( immediately )
+          UseDatabase( name );
       }
     }
 

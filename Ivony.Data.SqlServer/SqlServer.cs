@@ -20,6 +20,44 @@ namespace Ivony.Data
   {
 
 
+
+
+    /// <summary>
+    /// 使用 MySQL 数据库
+    /// </summary>
+    /// <param name="serviceProvider">系统服务提供程序</param>
+    /// <param name="connectionString">数据库连接字符串</param>
+    /// <returns>MySQL 数据库数据提供程序</returns>
+    public static IDbProvider UseSqlServer( this IServiceProvider serviceProvider, string connectionString )
+    {
+      return UseSqlServer( serviceProvider, null, connectionString );
+    }
+
+
+
+    /// <summary>
+    /// 使用 MySQL 数据库
+    /// </summary>
+    /// <param name="serviceProvider">系统服务提供程序</param>
+    /// <param name="databaseName">数据库名称</param>
+    /// <param name="connectionString">数据库连接字符串</param>
+    /// <returns>MySQL 数据库数据提供程序</returns>
+    public static IDbProvider UseSqlServer( this IServiceProvider serviceProvider, string databaseName, string connectionString )
+    {
+      var db = new SqlServerDbProvider( serviceProvider, connectionString );
+
+      if ( databaseName != null )
+        Db.RegisterDatabase( databaseName, db, true );
+
+      else
+        Db.UseDatabase( db );
+
+      return db;
+    }
+
+
+
+
     /// <summary>
     /// 通过指定的连接字符串并创建 SQL Server 数据库访问器
     /// </summary>
