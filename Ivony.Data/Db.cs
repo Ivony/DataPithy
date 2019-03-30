@@ -54,15 +54,8 @@ namespace Ivony.Data
     public static IServiceProvider ServiceProvider => CurrentDatabase?.ServiceProvider ?? defaultServiceProvider;
 
 
-    private static IServiceProvider defaultServiceProvider = new EmptyServiceProvider();
+    private static IServiceProvider defaultServiceProvider = Ivony.Data.ServiceProvider.Empty;
 
-    private class EmptyServiceProvider : IServiceProvider
-    {
-      public object GetService( Type serviceType )
-      {
-        return null;
-      }
-    }
 
 
     /// <summary>

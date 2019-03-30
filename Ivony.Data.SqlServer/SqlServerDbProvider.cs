@@ -18,7 +18,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="connectionString">SQL Server 连接字符串</param>
     public SqlServerDbProvider( string connectionString )
-      : this( new EmptyServiceProvider(), connectionString ) { }
+      : this( Ivony.Data.ServiceProvider.Empty, connectionString ) { }
 
     /// <summary>
     /// 创建 SqlServerDbProvider 对象
@@ -39,13 +39,6 @@ namespace Ivony.Data
     }
 
 
-    private class EmptyServiceProvider : IServiceProvider
-    {
-      public object GetService( Type serviceType )
-      {
-        return null;
-      }
-    }
 
 
 

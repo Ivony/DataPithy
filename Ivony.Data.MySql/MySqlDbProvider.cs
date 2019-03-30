@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
 
@@ -21,7 +21,7 @@ namespace Ivony.Data
     /// <param name="configuration">MySQL 数据库配置信息</param>
     public static MySqlDbProvider Create( string connectionString, MySqlDbConfiguration configuration )
     {
-      return new MySqlDbProvider( new MyServiceProvider( configuration ), connectionString );
+      return new MySqlDbProvider( new ServiceProvider( builder => ConfigureServices( builder.AddService( configuration ) ) ), connectionString );
     }
 
 
@@ -30,7 +30,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="connectionStringProvider">连接字符串提供程序</param>
     public MySqlDbProvider( IDbConnectionStringProvider connectionStringProvider )
-      : this( connectionStringProvider.ServiceProvider, connectionStringProvider.GetConnectionString( typeof( MySqlDbProvider ) ) )
+      : this( connectionStringProvider.ServiceProvider.Expand( ConfigureServices ), connectionStringProvider.GetConnectionString( typeof( MySqlDbProvider ) ) )
     {
     }
 
@@ -86,43 +86,11 @@ namespace Ivony.Data
 
 
 
-    private static MySqlParameterizedQueryParser ParameterizedQueryParser { get; } = new MySqlParameterizedQueryParser();
-
-    /// <summary>
-    /// 获取服务对象
-    /// </summary>
-    /// <param name="serviceType">服务类型</param>
-    /// <returns></returns>
-    public object GetService( Type serviceType )
+    private static void ConfigureServices( ServiceProvider.ServiceRegistration registration )
     {
-      if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
-        return ParameterizedQueryParser;
-
-      return null;
+      registration.AddService<IParameterizedQueryParser<MySqlCommand>>( new MySqlParameterizedQueryParser() );
     }
 
-    private class MyServiceProvider : IServiceProvider
-    {
 
-
-      public MyServiceProvider( MySqlDbConfiguration configuration )
-      {
-        Configuration = configuration;
-      }
-
-      public MySqlDbConfiguration Configuration { get; }
-
-      public object GetService( Type serviceType )
-      {
-        if ( serviceType == typeof( MySqlDbConfiguration ) )
-          return Configuration;
-
-        if ( serviceType == typeof( IParameterizedQueryParser<MySqlCommand> ) )
-          return new MySqlParameterizedQueryParser();
-
-
-        return null;
-      }
-    }
   }
 }
