@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using Ivony.Data.Queries;
 
 namespace Ivony.Data
 {
@@ -20,12 +21,12 @@ namespace Ivony.Data
 
       internal ServiceRegistration()
       {
-
+        registration = new Dictionary<Type, Func<IServiceProvider, object>>();
       }
 
 
 
-      private Dictionary<Type, Func<IServiceProvider, object>> registration = new Dictionary<Type, Func<IServiceProvider, object>>();
+      private Dictionary<Type, Func<IServiceProvider, object>> registration;
 
 
       /// <summary>
@@ -36,7 +37,7 @@ namespace Ivony.Data
       /// <returns></returns>
       public ServiceRegistration AddService<TService>( TService instance )
       {
-        registration.Add( typeof( TService ), serviceProvider => instance );
+        registration[typeof( TService )] = serviceProvider => instance;
         return this;
       }
 
@@ -49,7 +50,7 @@ namespace Ivony.Data
       /// <returns></returns>
       public ServiceRegistration AddService<TService>( Func<TService> factory )
       {
-        registration.Add( typeof( TService ), serviceProvider => factory() );
+        registration[typeof( TService )] = serviceProvider => factory();
         return this;
       }
 
@@ -62,7 +63,7 @@ namespace Ivony.Data
       /// <returns></returns>
       public ServiceRegistration AddService<TService>( Func<IServiceProvider, TService> factory )
       {
-        registration.Add( typeof( TService ), serviceProvider => factory( serviceProvider ) );
+        registration[typeof( TService )] = serviceProvider => factory( serviceProvider );
         return this;
       }
 

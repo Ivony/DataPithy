@@ -18,7 +18,7 @@
     <Authors>Ivony</Authors>
     <Company />
     <Product />
-    <Version>4.5.0-alpha1</Version>
+    <Version>4.5.0-alpha1.1</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>

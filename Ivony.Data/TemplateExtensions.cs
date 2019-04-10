@@ -49,14 +49,14 @@ namespace Ivony.Data
       var builder = Db.ParameterizedQueryService.CreateQueryBuild();
       var configures = firstQuery.Configures;
 
-      builder.AppendParameter( firstQuery );
+      builder.AppendValue( firstQuery );
       foreach ( var query in otherQueries )
       {
         if ( query == null || string.IsNullOrEmpty( query.TextTemplate ) )
           continue;
 
         configures = DbQueryConfigures.Merge( configures, query.Configures );
-        builder.AppendParameter( query );
+        builder.AppendValue( query );
       }
 
       return builder.BuildQuery( configures );
@@ -64,24 +64,24 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 将数组转换为参数列表对象
+    /// 将数组转换为参数值列表对象
     /// </summary>
     /// <param name="array">要转换的数组对象</param>
     /// <returns>参数列表对象</returns>
-    public static ParameterList AsParameters( this Array array )
+    public static ValueList AsValueList( this Array array )
     {
-      return new ParameterList( array );
+      return new ValueList( array );
     }
 
     /// <summary>
-    /// 将数组转换为参数列表对象
+    /// 将数组转换为参数值列表对象
     /// </summary>
     /// <param name="array">要转换的数组对象</param>
     /// <param name="separator">参数列表分隔符</param>
     /// <returns>参数列表对象</returns>
-    public static ParameterList AsParameters( this Array array, string separator )
+    public static ValueList AsValueList( this Array array, string separator )
     {
-      return new ParameterList( array, separator );
+      return new ValueList( array, separator );
     }
 
 

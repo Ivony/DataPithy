@@ -101,7 +101,7 @@ namespace Ivony.Data.Queries
 
 
         var parameterIndex = int.Parse( match.Groups["index"].Value );
-        builder.AppendParameter( ParameterValues[parameterIndex] );
+        builder.AppendValue( ParameterValues[parameterIndex] );
 
         index = match.Index + match.Length;
       }

@@ -152,17 +152,17 @@ namespace Ivony.Data.Queries
 
       var array = value as Array;
       if ( array != null && !(array is byte[]) )
-        value = new ParameterList( array );
+        value = new ValueList( array );
 
       var tuple = value as ITuple;
       if ( tuple != null )
-        value = ParameterList.Create( tuple );
+        value = ValueList.Create( tuple );
 
       var template = value as FormattableString;
       if ( template != null )
         value = ParseTemplate( template );
 
-      builder.AppendParameter( value );
+      builder.AppendValue( value );
     }
   }
 

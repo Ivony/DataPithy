@@ -117,6 +117,7 @@ namespace Ivony.Data
     }
 
 
+
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
     /// </summary>
@@ -134,7 +135,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取参数化查询服务
     /// </summary>
-    public static IParameterizedQueryService ParameterizedQueryService => ServiceProvider.GetService<IParameterizedQueryService>() ?? Data.ParameterizedQueryService.Instance;
+    public static IParameterizedQueryService ParameterizedQueryService => ServiceProvider.GetService<IParameterizedQueryService>() ?? Queries.ParameterizedQueryService.Instance;
 
 
     /// <summary>

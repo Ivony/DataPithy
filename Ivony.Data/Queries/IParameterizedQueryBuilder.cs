@@ -34,10 +34,10 @@
 
 
     /// <summary>
-    /// 添加一个查询参数
+    /// 添加一个查询参数值
     /// </summary>
     /// <param name="value">参数值</param>
-    void AppendParameter( object value );
+    void AppendValue( object value );
 
 
     /// <summary>

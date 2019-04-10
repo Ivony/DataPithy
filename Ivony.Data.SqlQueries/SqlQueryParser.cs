@@ -288,7 +288,7 @@ namespace Ivony.Data.SqlQueries
           if ( i > 0 )
             builder.Append( ", " );
 
-          builder.AppendParameter( tuple[i] );
+          builder.AppendValue( tuple[i] );
         }
         builder.Append( ')' );
       }
@@ -368,7 +368,7 @@ namespace Ivony.Data.SqlQueries
 
     protected virtual void ParseParameter( SqlConstantExpression constant )
     {
-      builder.AppendParameter( constant.Value );
+      builder.AppendValue( constant.Value );
     }
 
 
