@@ -24,16 +24,26 @@ namespace Ivony.Data.Common
     public TCommand Parse( ParameterizedQuery query )
     {
 
-      var regex = ParameterizedQuery.ParameterPlaceholdRegex;
+      var regex = ParameterizedQuery.DbPartialPlaceholdRegex;
 
 
 
 
       var text = regex.Replace( query.TextTemplate, ( match ) =>
       {
-        var index = int.Parse( match.Groups["index"].Value );
 
-        return GetLiteralValue( DbValueConverter.ConvertTo( query.ParameterValues[index], null ) );
+        if ( match.Groups["index"].Success )
+        {
+          var index = int.Parse( match.Groups["index"].Value );
+          return GetLiteralValue( DbValueConverter.ConvertTo( query.ParameterValues[index], null ) );
+        }
+        else if ( match.Groups["name"].Success )
+        {
+          var name = match.Groups["name"].Value.Replace( "##", "#" );
+          return GetDbName( name );
+        }
+        else
+          throw new InvalidOperationException();
 
       } );
 
@@ -55,6 +65,13 @@ namespace Ivony.Data.Common
     /// <param name="value">参数值</param>
     /// <returns>该参数值在查询命令中的字面表达方式</returns>
     protected abstract string GetLiteralValue( object value );
+
+    /// <summary>
+    /// 获取指定对象名称在查询命令中的表达式
+    /// </summary>
+    /// <param name="name">数据对象名称</param>
+    /// <returns></returns>
+    protected abstract string GetDbName( string name );
 
   }
 }

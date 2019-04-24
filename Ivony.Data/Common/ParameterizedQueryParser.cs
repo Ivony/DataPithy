@@ -42,7 +42,7 @@ namespace Ivony.Data.Common
 
       lock ( SyncRoot )
       {
-        var regex = ParameterizedQuery.ParameterPlaceholdRegex;
+        var regex = ParameterizedQuery.DbPartialPlaceholdRegex;
 
         var text = regex.Replace( query.TextTemplate, ( match ) =>
         {
@@ -60,9 +60,9 @@ namespace Ivony.Data.Common
 
             return placeholder;
           }
-          else if ( match.Groups["dbName"].Success )
+          else if ( match.Groups["name"].Success )
           {
-            var name = match.Groups["dbName"].Value.Replace( "##", "#" );
+            var name = match.Groups["name"].Value.Replace( "##", "#" );
 
             return ParseDbName( name );
 

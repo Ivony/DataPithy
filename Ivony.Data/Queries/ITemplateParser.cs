@@ -152,7 +152,7 @@ namespace Ivony.Data.Queries
 
       var array = value as Array;
       if ( array != null && !(array is byte[]) )
-        value = new ValueList( array );
+        value = ValueList.Create( array );
 
       var tuple = value as ITuple;
       if ( tuple != null )

@@ -164,6 +164,13 @@ namespace Ivony.Data.Test
       Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = &#0#; DELETE Users; DELETE Users;", "连接空白字符开头查询失败" );
 
 
+      query = Db.T( $"SELECT * FROM {Db.Name( "Users" )} WHERE {Db.Name( "Users#ID" )} = {1};" );
+
+      Assert.AreEqual( (query + query + query).TextTemplate, "SELECT * FROM @#Users# WHERE @#Users##ID# = &#0#; SELECT * FROM @#Users# WHERE @#Users##ID# = &#1#; SELECT * FROM @#Users# WHERE @#Users##ID# = &#2#;", "多个带数据对象名和参数模板连接测试失败" );
+      Assert.AreEqual( query.ConcatQueries( query, query ).TextTemplate, "SELECT * FROM @#Users# WHERE @#Users##ID# = &#0#; SELECT * FROM @#Users# WHERE @#Users##ID# = &#1#; SELECT * FROM @#Users# WHERE @#Users##ID# = &#2#;", "多个带数据对象名和参数模板连接测试失败" );
+
+
+
     }
 
 

@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
 using Ivony.Data.Queries;
-using System.Text.RegularExpressions;
-using Ivony.Data.Common;
 
 namespace Ivony.Data
 {
@@ -70,7 +65,7 @@ namespace Ivony.Data
     /// <returns>参数列表对象</returns>
     public static ValueList AsValueList( this Array array )
     {
-      return new ValueList( array );
+      return ValueList.Create( array );
     }
 
     /// <summary>
@@ -81,9 +76,52 @@ namespace Ivony.Data
     /// <returns>参数列表对象</returns>
     public static ValueList AsValueList( this Array array, string separator )
     {
-      return new ValueList( array, separator );
+      return ValueList.Create( array, separator );
     }
 
+
+
+    /// <summary>
+    /// 将一个数组当作参数值列表添加到参数化查询构建器中
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="array">参数值列表</param>
+    public static void AppendValueList( this IParameterizedQueryBuilder builder, Array array )
+    {
+      builder.AppendValue( array.AsValueList() );
+    }
+
+    /// <summary>
+    /// 将一个数组当作参数值列表添加到参数化查询构建器中
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="array">参数值列表</param>
+    /// <param name="separator">分隔参数值的分隔符</param>
+    public static void AppendValueList( this IParameterizedQueryBuilder builder, Array array, string separator )
+    {
+      builder.AppendValue( array.AsValueList( separator ) );
+    }
+
+    /// <summary>
+    /// 将一个数组当作参数值列表添加到参数化查询构建器中
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="list">参数值列表</param>
+    public static void AppendValueList<T>( this IParameterizedQueryBuilder builder, IEnumerable<T> list )
+    {
+      builder.AppendValue( ValueList.Create( list ) );
+    }
+
+    /// <summary>
+    /// 将一个数组当作参数值列表添加到参数化查询构建器中
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="list">参数值列表</param>
+    /// <param name="separator">分隔参数值的分隔符</param>
+    public static void AppendValueList<T>( this IParameterizedQueryBuilder builder, IEnumerable<T> list, string separator )
+    {
+      builder.AppendValue( ValueList.Create( list, separator ) );
+    }
 
     /// <summary>
     /// 将一个字符串当作数据库对象名称添加到参数化查询构建器中
@@ -93,6 +131,17 @@ namespace Ivony.Data
     public static void AppendName( this IParameterizedQueryBuilder builder, string name )
     {
       builder.Append( new DbName( name ) );
+    }
+
+    /// <summary>
+    /// 添加一个参数化查询部分组件
+    /// </summary>
+    /// <param name="builder">参数化查询构建器</param>
+    /// <param name="partial">参数化查询部分组件</param>
+    /// <remarks>此扩展方法与直接调用 AppendValue 效果相同，但是具有强类型约束，建议使用此方法明确添加部分组件</remarks>
+    public static void AppendPartial( this IParameterizedQueryBuilder builder, IParameterizedQueryPartial partial )
+    {
+      builder.AppendValue( partial );
     }
 
   }

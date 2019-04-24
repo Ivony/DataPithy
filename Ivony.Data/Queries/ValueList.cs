@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -23,7 +24,7 @@ namespace Ivony.Data.Queries
     /// <summary>
     /// 从 Tuple 创建 ValueList 对象
     /// </summary>
-    /// <param name="tuple">Tuple 对象</param>
+    /// <param name="tuple">参数列表</param>
     /// <param name="separator">参数列表分隔符</param>
     /// <returns>参数列表对象</returns>
     public static ValueList Create( ITuple tuple, string separator = ", " )
@@ -33,7 +34,31 @@ namespace Ivony.Data.Queries
       for ( int i = 0; i < tuple.Length; i++ )
         array[i] = tuple[i];
 
-      return new ValueList( array );
+      return new ValueList( array, separator );
+    }
+
+
+    /// <summary>
+    /// 从数组创建 ValueList 对象
+    /// </summary>
+    /// <param name="array">参数列表</param>
+    /// <param name="separator">参数列表分隔符</param>
+    /// <returns>参数列表对象</returns>
+    public static ValueList Create( Array array, string separator = ", " )
+    {
+      return new ValueList( array, separator );
+    }
+
+
+    /// <summary>
+    /// 从可枚举集合创建 ValueList 对象
+    /// </summary>
+    /// <param name="list">参数列表</param>
+    /// <param name="separator">参数列表分隔符</param>
+    /// <returns>参数列表对象</returns>
+    public static ValueList Create<T>( IEnumerable<T> list, string separator = ", " )
+    {
+      return new ValueList( list.ToArray(), separator );
     }
 
 
@@ -42,7 +67,7 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="parameters">参数列表</param>
     /// <param name="separator">分隔符</param>
-    public ValueList( Array parameters, string separator = ", " )
+    private ValueList( Array parameters, string separator = ", " )
     {
       if ( parameters.Rank != 1 )
         throw new ArgumentException( "参数列表必须是一维数组", "parameters" );

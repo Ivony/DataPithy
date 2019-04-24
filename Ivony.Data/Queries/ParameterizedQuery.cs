@@ -19,10 +19,24 @@ namespace Ivony.Data.Queries
 
 
 
+    private const string _dbNameRegex = @"(@#(?<name>([^#]|##)+)#)";
+    private const string _dbValueRegex = @"(&#(?<index>[0-9]+)#)";
+
+
     /// <summary>
     /// 定义匹配占位符的正则表达式
     /// </summary>
-    public static readonly Regex ParameterPlaceholdRegex = new Regex( @"(&#(?<index>[0-9]+)#)|(@#(?<dbName>([^#]|##)+)#)", RegexOptions.Compiled );
+    public static readonly Regex DbPartialPlaceholdRegex = new Regex( _dbNameRegex + "|" + _dbValueRegex, RegexOptions.Compiled );
+
+    /// <summary>
+    /// 定义匹配占位符的正则表达式
+    /// </summary>
+    public static readonly Regex DbNamePlaceholdRegex = new Regex( _dbNameRegex, RegexOptions.Compiled );
+
+    /// <summary>
+    /// 定义匹配占位符的正则表达式
+    /// </summary>
+    public static readonly Regex DbValuePlaceholdRegex = new Regex( _dbValueRegex, RegexOptions.Compiled );
 
 
     /// <summary>
@@ -92,7 +106,7 @@ namespace Ivony.Data.Queries
 
       int index = 0;
 
-      foreach ( Match match in ParameterPlaceholdRegex.Matches( TextTemplate ) )
+      foreach ( Match match in DbPartialPlaceholdRegex.Matches( TextTemplate ) )
       {
 
         var length = match.Index - index;
@@ -100,8 +114,18 @@ namespace Ivony.Data.Queries
           builder.Append( TextTemplate.Substring( index, length ) );
 
 
-        var parameterIndex = int.Parse( match.Groups["index"].Value );
-        builder.AppendValue( ParameterValues[parameterIndex] );
+        if ( match.Groups["index"].Success )
+        {
+          var parameterIndex = int.Parse( match.Groups["index"].Value );
+          builder.AppendValue( ParameterValues[parameterIndex] );
+        }
+        else if ( match.Groups["name"].Success )
+        {
+          builder.AppendName( match.Groups["name"].Value.Replace( "##", "#" ) );
+        }
+        else
+          throw new InvalidOperationException();
+
 
         index = match.Index + match.Length;
       }

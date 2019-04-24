@@ -284,6 +284,16 @@ namespace Ivony.Data
       }
     }
 
+    /// <summary>
+    /// 创建一个 DbName 对象
+    /// </summary>
+    /// <param name="name">数据对象名</param>
+    /// <returns></returns>
+    public static DbName Name( string name )
+    {
+      return new DbName( name );
+    }
+
 
     /// <summary>
     /// 回滚事务
