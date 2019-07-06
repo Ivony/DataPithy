@@ -24,10 +24,30 @@ namespace Ivony.Data
     private static AsyncLocal<IDbProvider> currentHost = new AsyncLocal<IDbProvider>();
 
 
+    private static IDbProvider _default;
+
+
     /// <summary>
-    /// 默认的数据库访问提供程序
+    /// 当前的数据库访问提供程序
     /// </summary>
-    public static IDbProvider CurrentDatabase => currentHost.Value;
+    public static IDbProvider CurrentDatabase => currentHost.Value ?? _default;
+
+
+    /// <summary>
+    /// 设置默认数据库
+    /// </summary>
+    /// <param name="database">默认数据库</param>
+    /// <param name="force">即便已经有默认数据库仍然要覆盖已有的设置</param>
+    public static IDbProvider SetDefaultDatabase( IDbProvider database, bool force = false )
+    {
+      lock ( sync )
+      {
+        if ( force || _default == null )
+          _default = database;
+
+        return _default;
+      }
+    }
 
 
 
