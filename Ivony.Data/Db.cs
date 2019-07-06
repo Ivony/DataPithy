@@ -1,6 +1,7 @@
 ﻿using Ivony.Data.Queries;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -121,6 +122,43 @@ namespace Ivony.Data
           UseDatabase( name );
       }
     }
+
+
+    /// <summary>
+    /// 用指定的字符串连接多个部分查询对象
+    /// </summary>
+    /// <param name="separator">分隔符</param>
+    /// <param name="queries">要连接的部分查询对象列表</param>
+    /// <returns></returns>
+    /// <remarks>如果第一个对象是查询对象，则会从这个对象拷贝查询配置</remarks>
+    public static ParameterizedQuery Join( string separator, params IParameterizedQueryPartial[] queries )
+    {
+      if ( queries == null )
+        return null;
+
+      if ( queries.Length == 0 )
+        return Text( "" );
+
+
+      var configures = (queries[0] as DbQuery)?.Configures ?? new DbQueryConfigures();
+      return queries.AsValueList( separator ).AsQuery( configures.Clone() );
+
+    }
+
+
+    /// <summary>
+    /// 将 IParameterizedQueryPartial 对象转换为 ParameterizedQuery 对象
+    /// </summary>
+    /// <param name="partial">要转换的 IParameterizedQueryPartial 对象</param>
+    /// <param name="configures">要使用的查询配置对象</param>
+    /// <returns></returns>
+    public static ParameterizedQuery AsQuery( this IParameterizedQueryPartial partial, DbQueryConfigures configures = null )
+    {
+      var builder = ParameterizedQueryService.CreateQueryBuild();
+      builder.AppendPartial( partial );
+      return builder.BuildQuery( configures ?? new DbQueryConfigures() );
+    }
+
 
 
 
