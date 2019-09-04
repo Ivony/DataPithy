@@ -182,7 +182,7 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 创建 MySqlDbProvider 对象
+    /// 创建 <see cref="MySqlDb"/> 对象
     /// </summary>
     /// <param name="serviceProvider">系统服务提供程序</param>
     /// <param name="connectionString">连接字符串</param>

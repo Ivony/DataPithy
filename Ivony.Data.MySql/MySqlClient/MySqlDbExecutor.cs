@@ -37,7 +37,7 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutorWithTransaction( MySqlDatabaseTransaction transaction ) : base( transaction.Provider )
+    public MySqlDbExecutorWithTransaction( MySqlDatabaseTransaction transaction ) : base( transaction.Database )
     {
       Transaction = transaction;
     }
@@ -62,7 +62,7 @@ namespace Ivony.Data.MySqlClient
   /// </summary>
   internal abstract class MySqlDbExecutorBase : DbExecutorBase, IDbExecutor
   {
-    protected MySqlDbExecutorBase( IDatabase dbProvider ) : base( dbProvider )
+    protected MySqlDbExecutorBase( IDatabase database ) : base( database )
     {
     }
 

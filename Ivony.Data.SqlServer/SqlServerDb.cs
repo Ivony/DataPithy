@@ -21,7 +21,7 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 创建 SqlServerDbProvider 对象
+    /// 创建 <see cref="SqlServerDb"/> 对象
     /// </summary>
     /// <param name="connectionString">SQL Server 连接字符串</param>
     public SqlServerDb( string connectionString )

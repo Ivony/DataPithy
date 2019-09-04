@@ -16,7 +16,7 @@ namespace Ivony.Data.MySqlClient
 
     internal MySqlDatabaseTransaction( MySqlDb database ) : base( database )
     {
-      Provider = database ?? throw new ArgumentNullException( nameof( database ) );
+      Database = database ?? throw new ArgumentNullException( nameof( database ) );
       Connection = new MySqlConnection( database.ConnectionString );
     }
 
@@ -28,7 +28,7 @@ namespace Ivony.Data.MySqlClient
     /// <summary>
     /// 创建事务对象的数据提供程序
     /// </summary>
-    public MySqlDb Provider { get; }
+    public new MySqlDb Database { get; }
 
     protected override MySqlTransaction BeginTransactionCore()
     {

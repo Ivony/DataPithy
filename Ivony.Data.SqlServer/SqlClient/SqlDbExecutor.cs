@@ -28,12 +28,12 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 创建 SqlServer 数据库查询执行程序
     /// </summary>
-    /// <param name="dbProvider">数据库访问提供程序</param>
-    public SqlDbExecutor( SqlServerDb dbProvider ) : base( dbProvider )
+    /// <param name="database">数据库访问提供程序</param>
+    public SqlDbExecutor( SqlServerDb database ) : base( database )
     {
 
-      ConnectionString = dbProvider.ConnectionString;
-      Configuration = dbProvider.ServiceProvider.GetService<SqlServerConfiguration>();
+      ConnectionString = database.ConnectionString;
+      Configuration = database.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 
