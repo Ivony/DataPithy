@@ -10,9 +10,9 @@ namespace Ivony.Data
 
 
   /// <summary>
-  /// 定义数据库事务上下文
+  /// 定义数据库事务
   /// </summary>
-  public interface IDbTransactionContext : IDbProvider, IDisposableObjectContainer
+  public interface IDatabaseTransaction : IDatabase, IDisposableObjectContainer
   {
     /// <summary>
     /// 提交事务
@@ -41,7 +41,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取父级事务，如果有的话
     /// </summary>
-    IDbTransactionContext ParentTransaction { get; }
+    IDatabaseTransaction ParentTransaction { get; }
 
 
   }
@@ -50,7 +50,7 @@ namespace Ivony.Data
   /// <summary>
   /// 定义异步数据库事务上下文
   /// </summary>
-  public interface IAsyncDbTransactionContext : IDbTransactionContext
+  public interface IAsyncDbTransactionContext : IDatabaseTransaction
   {
 
 

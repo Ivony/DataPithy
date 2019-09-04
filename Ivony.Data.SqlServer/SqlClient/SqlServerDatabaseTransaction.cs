@@ -11,9 +11,9 @@ namespace Ivony.Data.SqlClient
   /// <summary>
   /// 实现 SQL Server 事务上下文
   /// </summary>
-  public class SqlServerTransactionContext : DbTransactionContextBase<SqlTransaction>
+  public class SqlServerDatabaseTransaction : DatabaseTransactionBase<SqlTransaction>
   {
-    internal SqlServerTransactionContext( SqlServerDbProvider dbProvider ) : base( dbProvider )
+    internal SqlServerDatabaseTransaction( SqlServerDb dbProvider ) : base( dbProvider )
     {
       Connection = new SqlConnection( dbProvider.ConnectionString );
     }

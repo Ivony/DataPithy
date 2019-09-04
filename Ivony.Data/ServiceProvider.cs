@@ -84,6 +84,11 @@ namespace Ivony.Data
     internal ServiceProvider( IServiceProvider serviceProvider, Action<ServiceRegistration> configure )
     {
       _serviceProvider = serviceProvider;
+
+      var registration = new ServiceRegistration();
+      configure( registration );
+      _registration = registration.Build();
+
     }
 
     /// <summary>

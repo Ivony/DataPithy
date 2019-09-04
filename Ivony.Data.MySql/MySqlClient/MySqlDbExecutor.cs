@@ -15,7 +15,7 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutor : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutor( MySqlDbProvider provider, string connectionString ) : base( provider )
+    public MySqlDbExecutor( MySqlDb provider, string connectionString ) : base( provider )
     {
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
     }
@@ -37,12 +37,12 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutorWithTransaction( MySqlDbTransactionContext transaction ) : base( transaction.Provider )
+    public MySqlDbExecutorWithTransaction( MySqlDatabaseTransaction transaction ) : base( transaction.Provider )
     {
       Transaction = transaction;
     }
 
-    public MySqlDbTransactionContext Transaction { get; }
+    public MySqlDatabaseTransaction Transaction { get; }
 
     protected override MySqlConnection CreateConnection()
     {
@@ -62,7 +62,7 @@ namespace Ivony.Data.MySqlClient
   /// </summary>
   internal abstract class MySqlDbExecutorBase : DbExecutorBase, IDbExecutor
   {
-    protected MySqlDbExecutorBase( IDbProvider dbProvider ) : base( dbProvider )
+    protected MySqlDbExecutorBase( IDatabase dbProvider ) : base( dbProvider )
     {
     }
 
@@ -70,7 +70,7 @@ namespace Ivony.Data.MySqlClient
     /// <summary>
     /// 获取当前配置
     /// </summary>
-    protected MySqlDbConfiguration Configuration => DbProvider.ServiceProvider.GetService<MySqlDbConfiguration>();
+    protected MySqlDbConfiguration Configuration => Database.ServiceProvider.GetService<MySqlDbConfiguration>();
 
 
     public IDbExecuteContext Execute( DbQuery query )
@@ -118,7 +118,7 @@ namespace Ivony.Data.MySqlClient
     private MySqlCommand CreateCommand( ParameterizedQuery query )
     {
 
-      return DbProvider.ServiceProvider.GetService<IParameterizedQueryParser<MySqlCommand>>().Parse( query );
+      return Database.ServiceProvider.GetService<IParameterizedQueryParser<MySqlCommand>>().Parse( query );
     }
   }
 }

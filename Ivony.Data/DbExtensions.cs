@@ -31,11 +31,11 @@ namespace Ivony.Data
     /// <summary>
     /// 获取异步数据库查询执行器
     /// </summary>
-    /// <param name="db">数据库提供程序</param>
+    /// <param name="database">数据库提供程序</param>
     /// <returns>异步数据库查询执行器</returns>
-    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDbProvider db )
+    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDatabase database )
     {
-      var executor = db?.GetDbExecutor();
+      var executor = database?.GetDbExecutor();
       if ( executor == null )
         return null;
 
@@ -47,14 +47,14 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// 使用指定的数据库访问提供程序执行一个方法
+    /// 使用指定的数据库执行一个方法
     /// </summary>
-    /// <param name="dbProvider">要使用的数据库访问提供程序</param>
+    /// <param name="database">要使用的数据库</param>
     /// <param name="action">要执行的方法</param>
     /// <returns></returns>
-    public static void Run( this IDbProvider dbProvider, Action action )
+    public static void Run( this IDatabase database, Action action )
     {
-      using ( Db.UseDatabase( dbProvider ) )
+      using ( Db.UseDatabase( database ) )
       {
         action();
       }
@@ -64,12 +64,12 @@ namespace Ivony.Data
     /// <summary>
     /// 使用指定的数据库访问提供程序执行一个方法
     /// </summary>
-    /// <param name="dbProvider">要使用的数据库访问提供程序</param>
+    /// <param name="database">要使用的数据库访问提供程序</param>
     /// <param name="action">要执行的方法</param>
     /// <returns></returns>
-    public static T Run<T>( this IDbProvider dbProvider, Func<T> action )
+    public static T Run<T>( this IDatabase database, Func<T> action )
     {
-      using ( Db.UseDatabase( dbProvider ) )
+      using ( Db.UseDatabase( database ) )
       {
         return action();
       }
@@ -78,12 +78,12 @@ namespace Ivony.Data
     /// <summary>
     /// 使用指定的数据库访问提供程序异步执行一个方法
     /// </summary>
-    /// <param name="dbProvider">要使用的数据库访问提供程序</param>
+    /// <param name="database">要使用的数据库访问提供程序</param>
     /// <param name="action">要执行的方法</param>
     /// <returns></returns>
-    public static async Task RunAsync( this IDbProvider dbProvider, Func<Task> action )
+    public static async Task RunAsync( this IDatabase database, Func<Task> action )
     {
-      using ( Db.UseDatabase( dbProvider ) )
+      using ( Db.UseDatabase( database ) )
       {
         await action();
       }
@@ -92,12 +92,12 @@ namespace Ivony.Data
     /// <summary>
     /// 使用指定的数据库访问提供程序异步执行一个方法
     /// </summary>
-    /// <param name="dbProvider">要使用的数据库访问提供程序</param>
+    /// <param name="database">要使用的数据库访问提供程序</param>
     /// <param name="action">要执行的方法</param>
     /// <returns></returns>
-    public static async Task<T> RunAsync<T>( this IDbProvider dbProvider, Func<Task<T>> action )
+    public static async Task<T> RunAsync<T>( this IDatabase database, Func<Task<T>> action )
     {
-      using ( Db.UseDatabase( dbProvider ) )
+      using ( Db.UseDatabase( database ) )
       {
         return await action();
       }

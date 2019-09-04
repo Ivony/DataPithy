@@ -16,45 +16,55 @@ namespace Ivony.Data
   /// <summary>
   /// 提供 SQL Server 数据库访问支持
   /// </summary>
-  public static class SqlServerDb
+  public class SqlServerDb : IDatabase
   {
 
 
-
+    /// <summary>
+    /// 创建 SqlServerDbProvider 对象
+    /// </summary>
+    /// <param name="connectionString">SQL Server 连接字符串</param>
+    public SqlServerDb( string connectionString )
+      : this( Ivony.Data.ServiceProvider.Empty, connectionString ) { }
 
     /// <summary>
-    /// 使用 MySQL 数据库
+    /// 创建 SqlServerDbProvider 对象
     /// </summary>
     /// <param name="serviceProvider">系统服务提供程序</param>
-    /// <param name="connectionString">数据库连接字符串</param>
-    /// <returns>MySQL 数据库数据提供程序</returns>
-    public static IDbProvider UseSqlServer( this IServiceProvider serviceProvider, string connectionString )
+    /// <param name="connectionString">SQL Server 连接字符串</param>
+    public SqlServerDb( IServiceProvider serviceProvider, string connectionString )
     {
-      return UseSqlServer( serviceProvider, null, connectionString );
+      ServiceProvider = serviceProvider;
+      ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
     }
-
-
 
     /// <summary>
-    /// 使用 MySQL 数据库
+    /// 获取服务提供程序
     /// </summary>
-    /// <param name="serviceProvider">系统服务提供程序</param>
-    /// <param name="databaseName">数据库名称</param>
-    /// <param name="connectionString">数据库连接字符串</param>
-    /// <returns>MySQL 数据库数据提供程序</returns>
-    public static IDbProvider UseSqlServer( this IServiceProvider serviceProvider, string databaseName, string connectionString )
+    public IServiceProvider ServiceProvider { get; }
+
+    /// <summary>
+    /// 连接字符串
+    /// </summary>
+    public string ConnectionString { get; private set; }
+
+    /// <summary>
+    /// 获取 SQL Server 查询执行器
+    /// </summary>
+    /// <returns></returns>
+    public IDbExecutor GetDbExecutor()
     {
-      var db = new SqlServerDbProvider( serviceProvider, connectionString );
-
-      if ( databaseName != null )
-        Db.RegisterDatabase( databaseName, db, true );
-
-      else
-        Db.UseDatabase( db );
-
-      return db;
+      return new SqlDbExecutor( this );
     }
 
+    /// <summary>
+    /// 创建数据库事务
+    /// </summary>
+    /// <returns></returns>
+    public IDatabaseTransaction CreateTransaction()
+    {
+      return new SqlServerDatabaseTransaction( this );
+    }
 
 
 
@@ -63,9 +73,9 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlServerDbProvider Connect( string connectionString )
+    public static SqlServerDb Connect( string connectionString )
     {
-      return new SqlServerDbProvider( connectionString );
+      return new SqlServerDb( connectionString );
     }
 
     /// <summary>
@@ -77,7 +87,7 @@ namespace Ivony.Data
     /// <param name="password">登录数据库的密码</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlServerDbProvider Connect( string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
+    public static SqlServerDb Connect( string dataSource, string initialCatalog, string userID, string password, bool pooling = true )
     {
       var builder = new SqlConnectionStringBuilder()
       {
@@ -93,7 +103,6 @@ namespace Ivony.Data
       return Connect( builder );
     }
 
-
     /// <summary>
     /// 通过集成身份验证登陆 SQL Server 数据库，以创建 SQL Server 数据库访问器
     /// </summary>
@@ -101,7 +110,7 @@ namespace Ivony.Data
     /// <param name="initialCatalog">数据库名称</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlServerDbProvider Connect( string dataSource, string initialCatalog, bool pooling = true )
+    public static SqlServerDb Connect( string dataSource, string initialCatalog, bool pooling = true )
     {
       var builder = new SqlConnectionStringBuilder()
       {
@@ -114,25 +123,22 @@ namespace Ivony.Data
       return Connect( builder );
     }
 
-
-
     /// <summary>
     /// 通过指定的连接字符串并创建 SQL Server 数据库访问器
     /// </summary>
     /// <param name="builder">数据库连接字符串构建器</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlServerDbProvider Connect( SqlConnectionStringBuilder builder )
+    public static SqlServerDb Connect( SqlConnectionStringBuilder builder )
     {
       return Connect( builder.ConnectionString );
     }
-
 
     /// <summary>
     /// 通过指定的连接字符串并创建 SQL Server 数据库访问器
     /// </summary>
     /// <param name="configure">配置数据库连接字符串的方法</param>
     /// <returns>SQL Server 数据库访问器</returns>
-    public static SqlServerDbProvider Connect( Action<SqlConnectionStringBuilder> configure )
+    public static SqlServerDb Connect( Action<SqlConnectionStringBuilder> configure )
     {
       var builder = new SqlConnectionStringBuilder();
       configure( builder );

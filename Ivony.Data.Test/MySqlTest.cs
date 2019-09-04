@@ -163,7 +163,7 @@ PRIMARY KEY (Id)
 
       {
         Exception exception = null;
-        var transaction = (MySqlDbTransactionContext) Db.EnterTransaction();
+        var transaction = (MySqlDatabaseTransaction) Db.EnterTransaction();
 
         try
         {
@@ -189,7 +189,7 @@ PRIMARY KEY (Id)
       var traceService = new TestTraceService();
       using ( Db.EnterTransaction() )
       {
-        Db.T( $"SELECT * FROM testTable" ).ExecuteDataTable();
+        Db.T( $"SELECT * FROM testTable" ).WithTraceService( traceService ).ExecuteDataTable();
 
         var tracing = traceService.Last();
 
@@ -203,7 +203,7 @@ PRIMARY KEY (Id)
 
         try
         {
-          Db.T( $"SELECT * FROM Nothing" ).ExecuteDynamics();
+          Db.T( $"SELECT * FROM Nothing" ).WithTraceService( traceService ).ExecuteDynamics();
         }
         catch
         {

@@ -19,17 +19,17 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 初始化 DbExecuterBase 类型
     /// </summary>
-    protected DbExecutorBase( IDbProvider dbProvider )
+    protected DbExecutorBase( IDatabase database )
     {
-      TraceService = dbProvider.ServiceProvider.GetService<IDbTraceService>();
-      DbProvider = dbProvider;
+      TraceService = database.ServiceProvider.GetService<IDbTraceService>();
+      Database = database;
     }
 
-    
+
     /// <summary>
     /// 数据库访问提供程序
     /// </summary>
-    public IDbProvider DbProvider { get; }
+    public IDatabase Database { get; }
 
 
     /// <summary>
@@ -52,20 +52,20 @@ namespace Ivony.Data.Common
     protected IDbTracing TryCreateTracing( IDbExecutor executor, DbQuery query )
     {
 
-      if ( TraceService == null )
+
+      var traceSerivce = query.Configures.GetService<IDbTraceService>() ?? TraceService;
+
+      if ( traceSerivce == null )
         return null;
 
-      IDbTracing tracing;
       try
       {
-        tracing = TraceService.CreateTracing( executor, query );
+        return traceSerivce.CreateTracing( executor, query );
       }
       catch
       {
         return null;
       }
-
-      return tracing;
     }
 
 

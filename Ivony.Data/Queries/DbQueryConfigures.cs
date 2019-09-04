@@ -77,7 +77,7 @@ namespace Ivony.Data.Queries
     /// <returns>合并后的查询配置对象</returns>
     public static DbQueryConfigures Merge( DbQueryConfigures configures, DbQueryConfigures another )
     {
-      return configures.Clone().MergeWith( configures );
+      return configures.Clone().MergeWith( another );
     }
 
 

@@ -68,12 +68,12 @@ namespace Ivony.Data.Common
 
   internal class AsyncDbTransactionContextWrapper : IAsyncDbTransactionContext, IServiceProvider
   {
-    public AsyncDbTransactionContextWrapper( IDbTransactionContext context )
+    public AsyncDbTransactionContextWrapper( IDatabaseTransaction context )
     {
       _context = context;
     }
 
-    private readonly IDbTransactionContext _context;
+    private readonly IDatabaseTransaction _context;
 
     public TransactionStatus Status => _context.Status;
 
@@ -81,7 +81,7 @@ namespace Ivony.Data.Common
 
     public IServiceProvider ServiceProvider => _context.ServiceProvider;
 
-    public IDbTransactionContext ParentTransaction => _context.ParentTransaction;
+    public IDatabaseTransaction ParentTransaction => _context.ParentTransaction;
 
 
     public Task BeginTransactionAsync()
@@ -101,7 +101,7 @@ namespace Ivony.Data.Common
       return Task.CompletedTask;
     }
 
-    public IDbTransactionContext CreateTransaction()
+    public IDatabaseTransaction CreateTransaction()
     {
       return _context.CreateTransaction();
     }

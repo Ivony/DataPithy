@@ -11,13 +11,13 @@ namespace Ivony.Data.MySqlClient
   /// <summary>
   /// 实现 MySQL 数据库事务支持
   /// </summary>
-  public class MySqlDbTransactionContext : DbTransactionContextBase<MySqlTransaction>
+  public class MySqlDatabaseTransaction : DatabaseTransactionBase<MySqlTransaction>
   {
 
-    internal MySqlDbTransactionContext( MySqlDbProvider provider ) : base( provider )
+    internal MySqlDatabaseTransaction( MySqlDb database ) : base( database )
     {
-      Provider = provider ?? throw new ArgumentNullException( nameof( provider ) );
-      Connection = new MySqlConnection( provider.ConnectionString );
+      Provider = database ?? throw new ArgumentNullException( nameof( database ) );
+      Connection = new MySqlConnection( database.ConnectionString );
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ namespace Ivony.Data.MySqlClient
     /// <summary>
     /// 创建事务对象的数据提供程序
     /// </summary>
-    public MySqlDbProvider Provider { get; }
+    public MySqlDb Provider { get; }
 
     protected override MySqlTransaction BeginTransactionCore()
     {

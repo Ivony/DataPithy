@@ -11,7 +11,7 @@ namespace Ivony.Data
 {
 
   /// <summary>
-  /// 查询执行上下文
+  /// 数据库查询执行上下文
   /// </summary>
   public interface IDbExecuteContext : IDisposableObjectContainer
   {

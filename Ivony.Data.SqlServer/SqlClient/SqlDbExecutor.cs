@@ -29,7 +29,7 @@ namespace Ivony.Data.SqlClient
     /// 创建 SqlServer 数据库查询执行程序
     /// </summary>
     /// <param name="dbProvider">数据库访问提供程序</param>
-    public SqlDbExecutor( SqlServerDbProvider dbProvider ) : base( dbProvider )
+    public SqlDbExecutor( SqlServerDb dbProvider ) : base( dbProvider )
     {
 
       ConnectionString = dbProvider.ConnectionString;
@@ -42,7 +42,7 @@ namespace Ivony.Data.SqlClient
     /// 创建在事务中执行的 SqlServer 数据库查询执行程序
     /// </summary>
     /// <param name="transaction">数据库事务上下文（如果在事务中执行的话）</param>
-    public SqlDbExecutor( SqlServerTransactionContext transaction ) : base( transaction )
+    public SqlDbExecutor( SqlServerDatabaseTransaction transaction ) : base( transaction )
     {
       Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
       ConnectionString = Transaction.Connection.ConnectionString;
@@ -61,7 +61,7 @@ namespace Ivony.Data.SqlClient
     /// <summary>
     /// 如果在事务中执行，获取事务上下文对象
     /// </summary>
-    protected SqlServerTransactionContext Transaction { get; }
+    protected SqlServerDatabaseTransaction Transaction { get; }
 
 
     /// <summary>

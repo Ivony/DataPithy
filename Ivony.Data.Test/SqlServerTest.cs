@@ -129,7 +129,7 @@ CREATE TABLE [dbo].[Test1]
 
       {
         Exception exception = null;
-        var transaction = (SqlServerTransactionContext) Db.EnterTransaction();
+        var transaction = (SqlServerDatabaseTransaction) Db.EnterTransaction();
 
         try
         {

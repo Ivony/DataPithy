@@ -58,7 +58,7 @@ namespace Ivony.Data.Queries
     public IDbExecuteContext Execute()
     {
       var executor = Configures?.GetService<IDbExecutor>()
-        ?? (Configures?.GetService<IDbProvider>() ?? Db.CurrentDatabase)?.GetDbExecutor()
+        ?? (Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase)?.GetDbExecutor()
         ?? throw new NotInitializedException();
 
       return executor?.Execute( this ) ?? throw NotSupported(); ;
@@ -74,7 +74,7 @@ namespace Ivony.Data.Queries
     {
 
       var executor = Configures.GetService<IAsyncDbExecutor>() 
-        ?? (Configures?.GetService<IDbProvider>() ?? Db.CurrentDatabase)?.GetAsyncDbExecutor();
+        ?? (Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase)?.GetAsyncDbExecutor();
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
     }

@@ -20,7 +20,7 @@ namespace Ivony.Data
     private static class ConfigureKeys
     {
       public const string Executor = ".DbQuery.Executor";
-      public const string DbProvider = ".DbQuery.DbProvider";
+      public const string Database = ".DbQuery.Database";
     }
 
 
@@ -55,11 +55,24 @@ namespace Ivony.Data
     /// 指定查询所属的数据库连接
     /// </summary>
     /// <param name="query">数据库查询</param>
-    /// <param name="dbProvider">数据库提供程序</param>
+    /// <param name="database">数据库提供程序</param>
     /// <returns></returns>
-    public static T WithDatabase<T>( this T query, IDbProvider dbProvider ) where T : DbQuery
+    public static T WithDatabase<T>( this T query, IDatabase database ) where T : DbQuery
     {
-      query.Configures.SetService<IDbProvider>( dbProvider );
+      query.Configures.SetService<IDatabase>( database );
+      return query;
+    }
+
+
+    /// <summary>
+    /// 使用指定的追踪服务
+    /// </summary>
+    /// <typeparam name="T">数据库查询类型</typeparam>
+    /// <param name="query">数据库查询</param>
+    /// <param name="traceService">要使用的追踪服务</param>
+    public static T WithTraceService<T>( this T query, IDbTraceService traceService ) where T : DbQuery
+    {
+      query.Configures.SetService<IDbTraceService>( traceService );
       return query;
     }
 

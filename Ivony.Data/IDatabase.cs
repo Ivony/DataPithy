@@ -9,7 +9,7 @@ namespace Ivony.Data
   /// <summary>
   /// 数据库访问提供程序，代表一个数据库
   /// </summary>
-  public interface IDbProvider
+  public interface IDatabase
   {
 
     /// <summary>
@@ -23,7 +23,7 @@ namespace Ivony.Data
     /// 创建事务上下文
     /// </summary>
     /// <returns></returns>
-    IDbTransactionContext CreateTransaction();
+    IDatabaseTransaction CreateTransaction();
 
 
 

@@ -10,17 +10,17 @@ namespace Ivony.Data.Common
   /// 辅助实现 IDbTransactionContext 接口
   /// </summary>
   /// <typeparam name="T">数据库事务对象类型</typeparam>
-  public abstract class DbTransactionContextBase<T> : IDbTransactionContext where T : IDbTransaction
+  public abstract class DatabaseTransactionBase<T> : IDatabaseTransaction where T : IDbTransaction
   {
 
 
     /// <summary>
     /// 创建和初始化 DbTransactionContextBase 对象
     /// </summary>
-    /// <param name="dbProvider">数据库访问提供程序</param>
-    protected DbTransactionContextBase( IDbProvider dbProvider )
+    /// <param name="database">数据库访问提供程序</param>
+    protected DatabaseTransactionBase( IDatabase database )
     {
-      DbProvider = dbProvider;
+      Database = database;
     }
 
 
@@ -45,19 +45,19 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 数据库访问提供程序
     /// </summary>
-    public IDbProvider DbProvider { get; }
+    public IDatabase Database { get; }
 
 
 
     /// <summary>
     /// 服务提供程序，从数据访问提供程序继承
     /// </summary>
-    public IServiceProvider ServiceProvider => DbProvider.ServiceProvider;
+    public IServiceProvider ServiceProvider => Database.ServiceProvider;
 
     /// <summary>
     /// 获取父级事务，如果有的话
     /// </summary>
-    public IDbTransactionContext ParentTransaction => DbProvider as IDbTransactionContext;
+    public IDatabaseTransaction ParentTransaction => Database as IDatabaseTransaction;
 
 
 
@@ -187,7 +187,7 @@ namespace Ivony.Data.Common
     /// 创建内嵌事务
     /// </summary>
     /// <returns></returns>
-    public virtual IDbTransactionContext CreateTransaction()
+    public virtual IDatabaseTransaction CreateTransaction()
     {
       throw new NotSupportedException( "Database is not supported nested Transaction." );
     }

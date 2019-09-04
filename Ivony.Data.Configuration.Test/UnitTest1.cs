@@ -25,7 +25,7 @@ namespace Ivony.Data.Configuration.Test
       services.AddSingleton( (IConfiguration) builder.Build() );
 
       services.AddConnectionStrings();
-      services.AddSingleton<IDbProvider, MySqlDbProvider>();
+      services.AddSingleton<IDatabase, MySqlDb>();
 
 
 
@@ -36,7 +36,7 @@ namespace Ivony.Data.Configuration.Test
     [TestMethod]
     public void TestMethod1()
     {
-      ServiceProvider.GetService<IDbProvider>();
+      ServiceProvider.GetService<IDatabase>();
 
     }
   }
