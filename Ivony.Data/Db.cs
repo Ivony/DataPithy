@@ -41,7 +41,7 @@ namespace Ivony.Data
 
       foreach ( var factory in providers )
       {
-        var database = factory.CreateDatabase( name );
+        var database = factory.GetDatabase( name );
 
         if ( database != null )
           return database;

@@ -16,7 +16,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="databaseName">数据库名称</param>
     /// <returns>对应数据库的 <see cref="IDatabase"/> 对象</returns>
-    IDatabase CreateDatabase( string databaseName );
+    IDatabase GetDatabase( string databaseName );
 
   }
 }

@@ -1,6 +1,7 @@
 ﻿using Ivony.Data.Queries;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,6 +56,7 @@ namespace Ivony.Data.Queries
     /// 同步执行查询
     /// </summary>
     /// <returns></returns>
+    [EditorBrowsable( EditorBrowsableState.Never )]
     public IDbExecuteContext Execute()
     {
       var executor = Configures?.GetService<IDbExecutor>()
@@ -70,7 +72,8 @@ namespace Ivony.Data.Queries
     /// </summary>
     /// <param name="token">取消查询标识</param>
     /// <returns></returns>
-    public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default( CancellationToken ) )
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default )
     {
 
       var executor = Configures.GetService<IAsyncDbExecutor>() 
