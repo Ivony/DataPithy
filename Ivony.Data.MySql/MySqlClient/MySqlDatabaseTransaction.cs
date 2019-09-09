@@ -30,17 +30,30 @@ namespace Ivony.Data.MySqlClient
     /// </summary>
     public new MySqlDb Database { get; }
 
+    /// <summary>
+    /// 实现此方法以开始事务
+    /// </summary>
+    /// <returns></returns>
     protected override MySqlTransaction BeginTransactionCore()
     {
       Connection.Open();
       return Connection.BeginTransaction();
     }
 
+    /// <summary>
+    /// 实现此方法以获取查询执行器
+    /// </summary>
+    /// <returns></returns>
     protected override IDbExecutor GetDbExecutorCore()
     {
       return new MySqlDbExecutorWithTransaction( this );
     }
 
+
+    /// <summary>
+    /// 实现此方法执行事务销毁工作
+    /// </summary>
+    /// <param name="transaction">要销毁的事务对象</param>
     protected override void DisposeTransaction( MySqlTransaction transaction )
     {
       base.DisposeTransaction( transaction );

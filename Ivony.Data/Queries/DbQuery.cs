@@ -61,7 +61,7 @@ namespace Ivony.Data.Queries
     {
       var executor = Configures?.GetService<IDbExecutor>()
         ?? (Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase)?.GetDbExecutor()
-        ?? throw new NotInitializedException();
+        ?? throw new InvalidOperationException( "no specified database in current context. is not initialize database? invoke UseDatabase or WithDatabase method to specify a database" );
 
       return executor?.Execute( this ) ?? throw NotSupported(); ;
     }

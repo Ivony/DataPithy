@@ -65,6 +65,19 @@ namespace Ivony.Data
 
 
     /// <summary>
+    /// 指定查询所属的数据库连接
+    /// </summary>
+    /// <param name="query">数据库查询</param>
+    /// <param name="database">数据库名称</param>
+    /// <returns></returns>
+    public static T WithDatabase<T>( this T query, string database ) where T : DbQuery
+    {
+      query.Configures.SetService<IDatabase>( Db.Database( database ) );
+      return query;
+    }
+
+
+    /// <summary>
     /// 使用指定的追踪服务
     /// </summary>
     /// <typeparam name="T">数据库查询类型</typeparam>

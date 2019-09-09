@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ivony.Data.Queries;
 
 namespace Ivony.Data
@@ -61,22 +62,22 @@ namespace Ivony.Data
     /// <summary>
     /// 将数组转换为参数值列表对象
     /// </summary>
-    /// <param name="array">要转换的数组对象</param>
+    /// <param name="list">要转换的值列表</param>
     /// <returns>参数列表对象</returns>
-    public static ValueList AsValueList( this Array array )
+    public static ValueList AsValueList<T>( this IEnumerable<T> list )
     {
-      return ValueList.Create( array );
+      return ValueList.Create( list );
     }
 
     /// <summary>
     /// 将数组转换为参数值列表对象
     /// </summary>
-    /// <param name="array">要转换的数组对象</param>
+    /// <param name="list">要转换的值列表</param>
     /// <param name="separator">参数列表分隔符</param>
     /// <returns>参数列表对象</returns>
-    public static ValueList AsValueList( this Array array, string separator )
+    public static ValueList AsValueList<T>( this IEnumerable<T> list, string separator )
     {
-      return ValueList.Create( array, separator );
+      return ValueList.Create( list, separator );
     }
 
 
@@ -88,7 +89,7 @@ namespace Ivony.Data
     /// <param name="array">参数值列表</param>
     public static void AppendValueList( this IParameterizedQueryBuilder builder, Array array )
     {
-      builder.AppendValue( array.AsValueList() );
+      builder.AppendValue( ValueList.Create( array ) );
     }
 
     /// <summary>
@@ -99,7 +100,7 @@ namespace Ivony.Data
     /// <param name="separator">分隔参数值的分隔符</param>
     public static void AppendValueList( this IParameterizedQueryBuilder builder, Array array, string separator )
     {
-      builder.AppendValue( array.AsValueList( separator ) );
+      builder.AppendValue( ValueList.Create( array, separator ) );
     }
 
     /// <summary>

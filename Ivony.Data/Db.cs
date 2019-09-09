@@ -284,10 +284,24 @@ namespace Ivony.Data
         }
         catch ( Exception e )
         {
-          if ( transaction.Status == TransactionStatus.Running )
-            transaction.Rollback();
+          try
+          {
+            if ( transaction.Status == TransactionStatus.Running )
+              transaction.Rollback();
+          }
+          catch ( Exception ex )
+          {
 
-          if ( e is RollbackException == false )
+            var exception = new TransactionCompleteException( "exception in auto rollback database transaction.", ex );
+
+            if ( e is RollbackImmediatelyException )
+              throw exception;
+
+            else
+              throw new AggregateException( exception, e );
+          }
+
+          if ( e is RollbackImmediatelyException == false )
             throw;
         }
         finally
@@ -297,6 +311,7 @@ namespace Ivony.Data
         }
       }
     }
+
 
     /// <summary>
     /// 创建一个事务并执行
@@ -312,14 +327,30 @@ namespace Ivony.Data
         }
         catch ( Exception e )
         {
-          if ( transaction.Status == TransactionStatus.Running )
-            transaction.Rollback();
+          try
+          {
+            if ( transaction.Status == TransactionStatus.Running )
+              transaction.Rollback();
+          }
+          catch ( Exception ex )
+          {
 
-          if ( e is RollbackException == false )
+            var exception = new TransactionCompleteException( "exception in auto rollback database transaction.", ex );
+
+            if ( e is RollbackImmediatelyException )
+              throw exception;
+
+            else
+              throw new AggregateException( exception, e );
+          }
+
+
+
+          if ( e is RollbackImmediatelyException == false )
             throw;
 
           else
-            return default( T );
+            return default;
         }
         finally
         {
@@ -348,7 +379,7 @@ namespace Ivony.Data
       if ( Db.CurrentDatabase is IDatabaseTransaction == false )
         throw new InvalidOperationException( "Rollback method must invoked in transaction context" );
 
-      throw new RollbackException();
+      throw new RollbackImmediatelyException();
     }
 
   }
