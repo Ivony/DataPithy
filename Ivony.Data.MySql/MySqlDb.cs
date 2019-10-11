@@ -20,11 +20,11 @@ namespace Ivony.Data
     /// 通过指定的连接字符串并创建 MySql 数据库访问器
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
-    /// <param name="configuration">MySql 配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string connectionString, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( string connectionString, IServiceProvider serviceProvider = null )
     {
-      return new MySqlDb( new ServiceProvider( builder => ConfigureServices( builder.AddService( configuration ?? new MySqlDbConfiguration() ) ) ), connectionString );
+      return new MySqlDb( Data.ServiceProvider.Create( BuildServices, serviceProvider ), connectionString );
     }
 
 
@@ -32,11 +32,11 @@ namespace Ivony.Data
     /// 通过指定的连接字符串构建器创建 MySql 数据库访问器
     /// </summary>
     /// <param name="builder">连接字符串构建器</param>
-    /// <param name="configuration">MySql 配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( MySqlConnectionStringBuilder builder, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( MySqlConnectionStringBuilder builder, IServiceProvider serviceProvider = null )
     {
-      return Connect( builder.GetConnectionString( true ), configuration );
+      return Connect( builder.GetConnectionString( true ), serviceProvider );
     }
 
 
@@ -44,13 +44,13 @@ namespace Ivony.Data
     /// 通过指定的连接字符串构建器创建 MySql 数据库访问器
     /// </summary>
     /// <param name="action">创建连接字符串的方法</param>
-    /// <param name="configuration">MySql 配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( Action<MySqlConnectionStringBuilder> action, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( Action<MySqlConnectionStringBuilder> action, IServiceProvider serviceProvider = null )
     {
       var builder = new MySqlConnectionStringBuilder();
       action( builder );
-      return Connect( builder.GetConnectionString( true ), configuration );
+      return Connect( builder.GetConnectionString( true ), serviceProvider );
     }
 
 
@@ -62,9 +62,9 @@ namespace Ivony.Data
     /// <param name="userID">登录数据库的用户名</param>
     /// <param name="password">登录数据库的密码</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
-    /// <param name="configuration">MySql 数据库配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string server, string database, string userID, string password, bool pooling = true, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( string server, string database, string userID, string password, bool pooling = true, IServiceProvider serviceProvider = null )
     {
       var builder = new MySqlConnectionStringBuilder()
       {
@@ -75,7 +75,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( builder, configuration );
+      return Connect( builder, serviceProvider );
     }
 
 
@@ -88,20 +88,21 @@ namespace Ivony.Data
     /// <param name="userID">登录数据库的用户名</param>
     /// <param name="password">登录数据库的密码</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
-    /// <param name="configuration">MySql 数据库配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string server, uint port, string database, string userID, string password, bool pooling = true, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( string server, uint port, string database, string userID, string password, bool pooling = true, IServiceProvider serviceProvider = null )
     {
       var builder = new MySqlConnectionStringBuilder()
       {
         Server = server,
+        Port = port,
         Database = database,
         UserID = userID,
         Password = password,
         Pooling = pooling
       };
 
-      return Connect( builder, configuration );
+      return Connect( builder, serviceProvider );
     }
 
 
@@ -111,9 +112,9 @@ namespace Ivony.Data
     /// <param name="server">数据库服务器地址</param>
     /// <param name="database">数据库名称</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
-    /// <param name="configuration">MySql 数据库配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string server, string database, bool pooling = true, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( string server, string database, bool pooling = true, IServiceProvider serviceProvider = null )
     {
 
       var builder = new MySqlConnectionStringBuilder()
@@ -123,7 +124,7 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( builder, configuration );
+      return Connect( builder, serviceProvider );
     }
 
 
@@ -134,9 +135,9 @@ namespace Ivony.Data
     /// <param name="port">数据库服务器端口</param>
     /// <param name="database">数据库名称</param>
     /// <param name="pooling">是否启用连接池（默认启用）</param>
-    /// <param name="configuration">MySql 数据库配置</param>
+    /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string server, uint port, string database, bool pooling = true, MySqlDbConfiguration configuration = null )
+    public static MySqlDb Connect( string server, uint port, string database, bool pooling = true, IServiceProvider serviceProvider = null )
     {
 
       var builder = new MySqlConnectionStringBuilder()
@@ -147,37 +148,12 @@ namespace Ivony.Data
         Pooling = pooling
       };
 
-      return Connect( builder, configuration );
+      return Connect( builder, serviceProvider );
     }
 
 
     #endregion Connect
 
-
-
-    static MySqlDb()
-    {
-      DefaultConfiguration = new MySqlDbConfiguration();
-    }
-
-
-    /// <summary>
-    /// 获取或设置默认配置
-    /// </summary>
-    public static MySqlDbConfiguration DefaultConfiguration
-    {
-      get;
-      set;
-    }
-
-
-    /// <summary>
-    /// 获取或设置 MySql 全局设置
-    /// </summary>
-    public static MySqlConfiguration MySqlGlobalSettings
-    {
-      get { return MySqlConfiguration.Settings; }
-    }
 
 
 
@@ -186,7 +162,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="serviceProvider">系统服务提供程序</param>
     /// <param name="connectionString">连接字符串</param>
-    public MySqlDb( IServiceProvider serviceProvider, string connectionString )
+    private MySqlDb( IServiceProvider serviceProvider, string connectionString )
     {
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
       ServiceProvider = serviceProvider;
@@ -206,18 +182,12 @@ namespace Ivony.Data
 
 
     /// <summary>
-    /// MySQL 数据库配置信息
-    /// </summary>
-    public MySqlDbConfiguration Configuration => ServiceProvider.GetService<MySqlDbConfiguration>();
-
-
-    /// <summary>
     /// 创建事务
     /// </summary>
     /// <returns>事务上下文</returns>
     public IDatabaseTransaction CreateTransaction()
     {
-      return new MySqlDatabaseTransaction( this );
+      return new MySqlDbTransaction( this );
     }
 
     /// <summary>
@@ -229,13 +199,9 @@ namespace Ivony.Data
       return new MySqlDbExecutor( this, ConnectionString );
     }
 
-    private static void ConfigureServices( ServiceProvider.ServiceRegistration registration )
+    private static void BuildServices( ServiceProvider.ServiceRegistration registration )
     {
       registration.AddService<IParameterizedQueryParser<MySqlCommand>>( new MySqlParameterizedQueryParser() );
     }
-
-
   }
-
-
 }

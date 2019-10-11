@@ -81,15 +81,6 @@ namespace Ivony.Data
     private IServiceProvider _serviceProvider;
 
 
-    internal ServiceProvider( IServiceProvider serviceProvider, Action<ServiceRegistration> configure )
-    {
-      _serviceProvider = serviceProvider;
-
-      var registration = new ServiceRegistration();
-      configure( registration );
-      _registration = registration.Build();
-
-    }
 
     /// <summary>
     /// 与另外一个 ServiceProvider 合并创建新的 ServiceProvider 对象
@@ -109,9 +100,10 @@ namespace Ivony.Data
     }
 
 
-    private ServiceProvider( IReadOnlyDictionary<Type, Func<IServiceProvider, object>> registration )
+    private ServiceProvider( IReadOnlyDictionary<Type, Func<IServiceProvider, object>> registration, IServiceProvider fallback = null )
     {
       _registration = registration;
+      _serviceProvider = fallback;
     }
 
 
@@ -119,12 +111,19 @@ namespace Ivony.Data
     /// 创建 ServiceProvider 对象
     /// </summary>
     /// <param name="configure">服务注册配置</param>
-    public ServiceProvider( Action<ServiceRegistration> configure )
+    /// <param name="fallback">回退服务提供程序，若获取不到指定类型的服务，则回退到这个服务提供程序获取</param>
+    public static ServiceProvider Create( Action<ServiceRegistration> configure, IServiceProvider fallback = null )
     {
+
+      if ( fallback is ServiceProvider instance )
+        return instance.Merge( Create( configure ) );
+
+
       var registration = new ServiceRegistration();
       configure( registration );
 
-      _registration = registration.Build();
+      return new ServiceProvider( registration.Build(), fallback );
+
     }
 
 
@@ -153,7 +152,7 @@ namespace Ivony.Data
     /// <summary>
     /// 提供一个空白的服务容器
     /// </summary>
-    public static IServiceProvider Empty { get; } = new ServiceProvider( builder => { } );
+    public static IServiceProvider Empty { get; } = new ServiceProvider( new Dictionary<Type, Func<IServiceProvider, object>>() );
 
   }
 }

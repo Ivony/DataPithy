@@ -11,10 +11,10 @@ namespace Ivony.Data.MySqlClient
   /// <summary>
   /// 实现 MySQL 数据库事务支持
   /// </summary>
-  public class MySqlDatabaseTransaction : DatabaseTransactionBase<MySqlTransaction>
+  public class MySqlDbTransaction : DatabaseTransactionBase<MySqlTransaction>
   {
 
-    internal MySqlDatabaseTransaction( MySqlDb database ) : base( database )
+    internal MySqlDbTransaction( MySqlDb database ) : base( database )
     {
       Database = database ?? throw new ArgumentNullException( nameof( database ) );
       Connection = new MySqlConnection( database.ConnectionString );

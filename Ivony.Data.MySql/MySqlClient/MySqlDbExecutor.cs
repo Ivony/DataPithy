@@ -37,12 +37,12 @@ namespace Ivony.Data.MySqlClient
   internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   {
 
-    public MySqlDbExecutorWithTransaction( MySqlDatabaseTransaction transaction ) : base( transaction.Database )
+    public MySqlDbExecutorWithTransaction( MySqlDbTransaction transaction ) : base( transaction.Database )
     {
       Transaction = transaction;
     }
 
-    public MySqlDatabaseTransaction Transaction { get; }
+    public MySqlDbTransaction Transaction { get; }
 
     protected override MySqlConnection CreateConnection()
     {
@@ -67,12 +67,6 @@ namespace Ivony.Data.MySqlClient
     }
 
 
-    /// <summary>
-    /// 获取当前配置
-    /// </summary>
-    protected MySqlDbConfiguration Configuration => Database.ServiceProvider.GetService<MySqlDbConfiguration>();
-
-
     public IDbExecuteContext Execute( DbQuery query )
     {
 
@@ -95,8 +89,6 @@ namespace Ivony.Data.MySqlClient
         var connection = CreateConnection();
 
         command.Connection = connection;
-        if ( Configuration.QueryExecutingTimeout.HasValue )
-          command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
 
         var context = CreateExecuteContext( connection, command.ExecuteReader(), tracing );
 

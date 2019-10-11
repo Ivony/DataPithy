@@ -163,7 +163,7 @@ PRIMARY KEY (Id)
 
       {
         Exception exception = null;
-        var transaction = (MySqlDatabaseTransaction) Db.EnterTransaction();
+        var transaction = (MySqlDbTransaction) Db.EnterTransaction();
 
         try
         {

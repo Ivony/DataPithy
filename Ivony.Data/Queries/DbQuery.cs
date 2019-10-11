@@ -59,10 +59,7 @@ namespace Ivony.Data.Queries
     [EditorBrowsable( EditorBrowsableState.Never )]
     public IDbExecuteContext Execute()
     {
-      var executor = Configures?.GetService<IDbExecutor>()
-        ?? (Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase)?.GetDbExecutor()
-        ?? throw new InvalidOperationException( "no specified database in current context. is not initialize database? invoke UseDatabase or WithDatabase method to specify a database" );
-
+      var executor = Configures?.GetService<IDbExecutor>() ?? GetDatabase().GetDbExecutor();
       return executor?.Execute( this ) ?? throw NotSupported(); ;
     }
 
@@ -76,10 +73,25 @@ namespace Ivony.Data.Queries
     public Task<IAsyncDbExecuteContext> ExecuteAsync( CancellationToken token = default )
     {
 
-      var executor = Configures.GetService<IAsyncDbExecutor>() 
-        ?? (Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase)?.GetAsyncDbExecutor();
+      var executor = Configures.GetService<IAsyncDbExecutor>() ?? GetDatabase().GetAsyncDbExecutor();
       return executor?.ExecuteAsync( this, token ) ?? throw NotSupportedAsync(); ;
 
+    }
+
+
+    /// <summary>
+    /// 获取当前查询关联的 IDatabase 对象
+    /// </summary>
+    /// <returns>关联的 IDatabase 对象，若找不到关联的 IDatabase 对象则抛出异常</returns>
+    protected IDatabase GetDatabase()
+    {
+      return Configures?.GetService<IDatabase>() ?? Db.CurrentDatabase
+        ?? throw NoSpecifiedDatabase();
+    }
+
+    private static Exception NoSpecifiedDatabase()
+    {
+      return new InvalidOperationException( "no specified database in current context. is not initialize database? invoke UseDatabase or WithDatabase method to specify a database" );
     }
 
 

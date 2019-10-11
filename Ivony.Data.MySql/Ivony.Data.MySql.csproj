@@ -20,7 +20,7 @@
     <RootNamespace>Ivony.Data</RootNamespace>
     <Product />
     <Authors>Ivony</Authors>
-    <Version>4.5.0-alpha3.0.1</Version>
+    <Version>4.5.0-alpha3.1</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
     <Company />
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.15" />
+    <PackageReference Include="MySql.Data" Version="[6.8.0,)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -18,11 +18,7 @@ namespace Ivony.Data
     /// <returns>扩展后的 IServiceProvider 对象</returns>
     public static IServiceProvider Expand( this IServiceProvider serviceProvider, Action<ServiceProvider.ServiceRegistration> configure )
     {
-      if ( serviceProvider is ServiceProvider instance )
-        return instance.Merge( new ServiceProvider( configure ) );
-
-
-      return new ServiceProvider( serviceProvider, configure );
+      return ServiceProvider.Create( configure, serviceProvider );
     }
   }
 }
