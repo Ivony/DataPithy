@@ -22,10 +22,10 @@ namespace Ivony.Data.MySqlClient
     /// <param name="dataReader">MySql 数据读取器</param>
     /// <param name="tracing">用于当前查询的追踪器</param>
     public MySqlExecuteContext( MySqlConnection connection, MySqlDataReader dataReader, IDbTracing tracing )
-      : base( dataReader, tracing, connection )
+      : base( dataReader, tracing )
     {
       MySqlDataReader = dataReader;
-      
+
       RegisterDispose( connection );
     }
 
