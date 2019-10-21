@@ -284,22 +284,7 @@ namespace Ivony.Data
         }
         catch ( Exception e )
         {
-          try
-          {
-            if ( transaction.Status == TransactionStatus.Running )
-              transaction.Rollback();
-          }
-          catch ( Exception ex )
-          {
-
-            var exception = new TransactionCompleteException( "exception in auto rollback database transaction.", ex );
-
-            if ( e is RollbackImmediatelyException )
-              throw exception;
-
-            else
-              throw new AggregateException( exception, e );
-          }
+          OnTransactionException( transaction, e );
 
           if ( e is RollbackImmediatelyException == false )
             throw;
@@ -317,7 +302,8 @@ namespace Ivony.Data
     /// 创建一个事务并执行
     /// </summary>
     /// <param name="actions"></param>
-    public static T Transaction<T>( Func<T> actions )
+    /// <param name="resultOnRollback">如果执行回滚，则应当返回的值</param>
+    public static T Transaction<T>( Func<T> actions, T resultOnRollback = default )
     {
       using ( var transaction = EnterTransaction() )
       {
@@ -327,36 +313,39 @@ namespace Ivony.Data
         }
         catch ( Exception e )
         {
-          try
-          {
-            if ( transaction.Status == TransactionStatus.Running )
-              transaction.Rollback();
-          }
-          catch ( Exception ex )
-          {
-
-            var exception = new TransactionCompleteException( "exception in auto rollback database transaction.", ex );
-
-            if ( e is RollbackImmediatelyException )
-              throw exception;
-
-            else
-              throw new AggregateException( exception, e );
-          }
-
-
+          OnTransactionException( transaction, e );
 
           if ( e is RollbackImmediatelyException == false )
-            throw;
+            return resultOnRollback;
 
           else
-            return default;
+            throw;
         }
         finally
         {
           if ( transaction.Status == TransactionStatus.Running )
             transaction.Commit();
         }
+      }
+    }
+
+    private static void OnTransactionException( IDatabaseTransaction transaction, Exception e )
+    {
+      try
+      {
+        if ( transaction.Status == TransactionStatus.Running )
+          transaction.Rollback();
+      }
+      catch ( Exception ex )
+      {
+
+        var exception = new TransactionCompleteException( "exception in auto rollback database transaction.", ex );
+
+        if ( e is RollbackImmediatelyException )
+          throw exception;
+
+        else
+          throw new AggregateException( exception, e );
       }
     }
 

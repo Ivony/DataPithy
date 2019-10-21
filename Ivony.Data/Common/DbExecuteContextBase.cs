@@ -213,6 +213,10 @@ namespace Ivony.Data.Common
 
           else
             Tracing.OnComplete();
+
+          if ( Tracing is IDisposable disposable )
+            disposable.Dispose();
+
         }
       }
       catch { }
