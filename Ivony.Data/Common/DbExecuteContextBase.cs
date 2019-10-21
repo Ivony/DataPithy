@@ -234,9 +234,8 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="dataReader">用于读取数据的 IDataReader 对象</param>
     /// <param name="tracing">用于追踪此次查询过程的追踪器</param>
-    /// <param name="disposeMethod">当上下文销毁时要执行的方法</param>
     /// <param name="sync">用于同步的对象</param>
-    protected AsyncDbExecuteContextBase( DbDataReader dataReader, IDbTracing tracing = null, Action disposeMethod = null, object sync = null )
+    protected AsyncDbExecuteContextBase( DbDataReader dataReader, IDbTracing tracing = null, object sync = null )
       : base( dataReader, tracing, sync )
     {
 
