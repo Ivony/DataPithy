@@ -22,6 +22,7 @@ namespace Ivony.Data.Common
     protected DbExecutorBase( IDatabase database )
     {
       TraceService = database.ServiceProvider.GetService<IDbTraceService>();
+      ExceptionFilter = database.ServiceProvider.GetService<IDbExceptionFilter>();
       Database = database;
     }
 
@@ -40,6 +41,14 @@ namespace Ivony.Data.Common
       get;
       private set;
     }
+
+    /// <summary>
+    /// 获取异常筛选器
+    /// </summary>
+    protected IDbExceptionFilter ExceptionFilter { get; }
+
+
+
 
 
 

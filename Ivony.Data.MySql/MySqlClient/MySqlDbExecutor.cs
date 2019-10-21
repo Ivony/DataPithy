@@ -72,10 +72,30 @@ namespace Ivony.Data.MySqlClient
 
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )
-        return null;
+        throw new NotSupportedException( $"unsupport db query type: {query.GetType().FullName}" );
 
-      return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+      try
+      {
+        return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+      }
+      catch ( Exception e )
+      {
 
+        if ( ExceptionFilter != null )
+        {
+          try
+          {
+            ExceptionFilter.OnQueryException( e, query );
+          }
+          catch ( Exception exception )
+          {
+            throw new AggregateException( e, exception );
+          }
+        }
+
+        throw new DbQueryExecutionException( query, e );
+
+      }
     }
 
     protected virtual IDbExecuteContext Execute( MySqlCommand command, IDbTracing tracing )
