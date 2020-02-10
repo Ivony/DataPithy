@@ -14,8 +14,8 @@ namespace Ivony.Data.Queries
   public class StoredProcedureQuery : DbQuery
   {
 
-    private string _name;
-    private IDictionary<string, object> _parameters;
+    private readonly string _name;
+    private readonly IDictionary<string, object> _parameters;
 
     /// <summary>
     /// 创建 StoredProcedureExpression 对象

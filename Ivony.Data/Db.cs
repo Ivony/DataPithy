@@ -17,7 +17,6 @@ namespace Ivony.Data
   {
 
 
-    private static readonly object sync = new object();
     private static readonly AsyncLocal<IDatabase> databaseHost = new AsyncLocal<IDatabase>();
     private static readonly IList<IDatabaseProvider> providers = new List<IDatabaseProvider>();
 
@@ -59,7 +58,7 @@ namespace Ivony.Data
     public static IServiceProvider ServiceProvider => CurrentDatabase?.ServiceProvider ?? defaultServiceProvider;
 
 
-    private static IServiceProvider defaultServiceProvider = Ivony.Data.ServiceProvider.Empty;
+    private static readonly IServiceProvider defaultServiceProvider = Ivony.Data.ServiceProvider.Empty;
 
 
 
@@ -215,7 +214,17 @@ namespace Ivony.Data
     /// <returns></returns>
     public static IDatabaseTransaction EnterTransaction()
     {
-      var transaction = CurrentDatabase.CreateTransaction() ?? throw new NotSupportedException();
+      return EnterTransaction( CurrentDatabase );
+    }
+
+    /// <summary>
+    /// 开启并进入一个事务上下文
+    /// </summary>
+    /// <param name="database">要开启事务的数据库</param>
+    /// <returns></returns>
+    public static IDatabaseTransaction EnterTransaction( this IDatabase database )
+    {
+      var transaction = database.CreateTransaction() ?? throw new NotSupportedException();
       return EnterTransaction( transaction );
     }
 
@@ -273,10 +282,21 @@ namespace Ivony.Data
     /// <summary>
     /// 创建一个事务并执行
     /// </summary>
-    /// <param name="actions"></param>
+    /// <param name="actions">要在事务中执行的操作</param>
     public static void Transaction( Action actions )
     {
-      using ( var transaction = EnterTransaction() )
+      CurrentDatabase.Transaction( actions );
+    }
+
+
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="database">创建事务的数据库</param>
+    /// <param name="actions">要在事务中执行的操作</param>
+    public static void Transaction( this IDatabase database, Action actions )
+    {
+      using ( var transaction = database.EnterTransaction() )
       {
         try
         {
@@ -301,11 +321,22 @@ namespace Ivony.Data
     /// <summary>
     /// 创建一个事务并执行
     /// </summary>
-    /// <param name="actions"></param>
+    /// <param name="actions">要在事务中执行的操作</param>
     /// <param name="resultOnRollback">如果执行回滚，则应当返回的值</param>
     public static T Transaction<T>( Func<T> actions, T resultOnRollback = default )
     {
-      using ( var transaction = EnterTransaction() )
+      return Transaction( CurrentDatabase, actions, resultOnRollback );
+    }
+
+    /// <summary>
+    /// 创建一个事务并执行
+    /// </summary>
+    /// <param name="database">创建事务的数据库</param>
+    /// <param name="actions">要在事务中执行的操作</param>
+    /// <param name="resultOnRollback">如果执行回滚，则应当返回的值</param>
+    public static T Transaction<T>( IDatabase database, Func<T> actions, T resultOnRollback = default )
+    {
+      using ( var transaction = database.EnterTransaction() )
       {
         try
         {

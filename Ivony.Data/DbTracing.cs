@@ -1,6 +1,7 @@
 ﻿using Ivony.Data.Queries;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -45,8 +46,8 @@ namespace Ivony.Data
 
 
 
-    private Stopwatch executionStopwatch = new Stopwatch();
-    private Stopwatch queryStopwatch = new Stopwatch();
+    private readonly Stopwatch executionStopwatch = new Stopwatch();
+    private readonly Stopwatch queryStopwatch = new Stopwatch();
 
 
 
@@ -101,19 +102,16 @@ namespace Ivony.Data
 
 
 
-    private List<TraceEventDescriptor> events = new List<TraceEventDescriptor>();
+    private readonly List<TraceEventDescriptor> events = new List<TraceEventDescriptor>();
 
 
     /// <summary>
     /// 获取查询过程中所出现的事件列表
     /// </summary>
-    public TraceEventDescriptor[] TraceEvents
-    {
-      get { return events.ToArray(); }
-    }
+    public IReadOnlyList<TraceEventDescriptor> TraceEvents => events;
 
 
-    private Action<DbTracing> callback;
+    private readonly Action<DbTracing> callback;
 
 
     void IDbTracing.OnExecuting( object commandObject )
@@ -166,34 +164,30 @@ namespace Ivony.Data
     }
 
 
+  }
 
 
+  /// <summary>
+  /// 定义 DbTracing 在追踪过程中发生的事件的描述
+  /// </summary>
+  public struct TraceEventDescriptor
+  {
 
+    internal TraceEventDescriptor( string name, DateTime time )
+    {
+      UtcTime = time;
+      EventName = name;
+    }
+    /// <summary>
+    /// 事件名称
+    /// </summary>
+    public string EventName { get; }
 
     /// <summary>
-    /// 定义 DbTracing 在追踪过程中发生的事件的描述
+    /// 事件发生时间
     /// </summary>
-    public struct TraceEventDescriptor
-    {
-
-      internal TraceEventDescriptor( string name, DateTime time )
-      {
-        _time = time;
-        EventName = name;
-      }
-      /// <summary>
-      /// 事件名称
-      /// </summary>
-      public string EventName { get; }
-
-
-      private DateTime _time;
-      /// <summary>
-      /// 事件发生时间
-      /// </summary>
-      public DateTime UtcTime { get { return _time; } }
-
-    }
+    public DateTime UtcTime { get; private set; }
 
   }
+
 }
