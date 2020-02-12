@@ -48,6 +48,34 @@ namespace Ivony.Data.Common
     protected IDbExceptionFilter ExceptionFilter { get; }
 
 
+    /// <summary>
+    /// 当执行查询时发生异常调用此方法处理
+    /// </summary>
+    /// <param name="e">异常信息</param>
+    /// <param name="query">数据库查询信息</param>
+    protected Exception ExecuteError( Exception e, DbQuery query )
+    {
+
+      var exception = new DbQueryExecutionException( query, e );
+
+
+
+      if ( ExceptionFilter != null )
+      {
+        try
+        {
+          ExceptionFilter.OnQueryException( e, query );
+        }
+        catch ( Exception filterException )
+        {
+          return new AggregateException( exception, filterException );
+        }
+      }
+
+      return exception;
+
+    }
+
 
 
 

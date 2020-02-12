@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ivony.Data.MySqlClient
@@ -34,6 +35,9 @@ namespace Ivony.Data.MySqlClient
       return new MySqlExecuteContext( connection, reader, tracing );
     }
   }
+
+
+
   internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   {
 
@@ -51,16 +55,17 @@ namespace Ivony.Data.MySqlClient
 
     protected override MySqlExecuteContext CreateExecuteContext( MySqlConnection connection, MySqlDataReader reader, IDbTracing tracing )
     {
-
       return new MySqlExecuteContext( Transaction, reader, tracing );
     }
 
   }
 
+
+
   /// <summary>
   /// 用于操作 MySQL 的数据库访问工具
   /// </summary>
-  internal abstract class MySqlDbExecutorBase : DbExecutorBase, IDbExecutor
+  internal abstract class MySqlDbExecutorBase : DbExecutorBase, IDbExecutor, IAsyncDbExecutor
   {
     protected MySqlDbExecutorBase( IDatabase database ) : base( database )
     {
@@ -69,10 +74,7 @@ namespace Ivony.Data.MySqlClient
 
     public IDbExecuteContext Execute( DbQuery query )
     {
-
-      var parameterizedQuery = query as ParameterizedQuery;
-      if ( parameterizedQuery == null )
-        throw new NotSupportedException( $"unsupport db query type: {query.GetType().FullName}" );
+      var parameterizedQuery = AsParameterizedQuery( query );
 
       try
       {
@@ -80,22 +82,17 @@ namespace Ivony.Data.MySqlClient
       }
       catch ( Exception e )
       {
-
-        if ( ExceptionFilter != null )
-        {
-          try
-          {
-            ExceptionFilter.OnQueryException( e, query );
-          }
-          catch ( Exception exception )
-          {
-            throw new AggregateException( e, exception );
-          }
-        }
-
-        throw new DbQueryExecutionException( query, e );
-
+        throw ExecuteError( e, query );
       }
+    }
+
+    private static ParameterizedQuery AsParameterizedQuery( DbQuery query )
+    {
+      var parameterizedQuery = query as ParameterizedQuery;
+
+      if ( parameterizedQuery == null )
+        throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
+      return parameterizedQuery;
     }
 
     protected virtual IDbExecuteContext Execute( MySqlCommand command, IDbTracing tracing )
@@ -123,6 +120,8 @@ namespace Ivony.Data.MySqlClient
       }
     }
 
+
+
     protected abstract MySqlExecuteContext CreateExecuteContext( MySqlConnection connection, MySqlDataReader reader, IDbTracing tracing );
 
     protected abstract MySqlConnection CreateConnection();
@@ -135,6 +134,11 @@ namespace Ivony.Data.MySqlClient
         throw new InvalidOperationException( "service of type \"IParameterizedQueryParser<MySqlCommand>\" is not registered." );
 
       return parser.Parse( query );
+    }
+
+    public Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token )
+    {
+      throw new NotImplementedException();
     }
   }
 }

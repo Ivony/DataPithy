@@ -168,18 +168,32 @@ namespace Ivony.Data.SqlClient
     {
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )
-        return null;
+        throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
 
-      return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+      try
+      {
+        return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+      }
+      catch ( Exception e )
+      {
+        throw ExecuteError( e, query );
+      }
     }
 
     Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( DbQuery query, CancellationToken token )
     {
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )
-        return null;
+        throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
 
-      return ExecuteAsync( CreateCommand( parameterizedQuery ), token, TryCreateTracing( this, query ) );
+      try
+      {
+        return ExecuteAsync( CreateCommand( parameterizedQuery ), token, TryCreateTracing( this, query ) );
+      }
+      catch ( Exception e )
+      {
+        throw ExecuteError( e, query );
+      }
     }
 
     /// <summary>
