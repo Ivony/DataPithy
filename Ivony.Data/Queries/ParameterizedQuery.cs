@@ -130,7 +130,7 @@ namespace Ivony.Data.Queries
         index = match.Index + match.Length;
       }
 
-      builder.Append( TextTemplate.Substring( index, TextTemplate.Length - index ) );
+      builder.Append( TextTemplate.Substring( index ) );
     }
 
 
@@ -198,6 +198,12 @@ namespace Ivony.Data.Queries
     public static ParameterizedQuery operator +( FormattableString query1, ParameterizedQuery query2 )
     {
       return Db.Template( query1 ).Concat( query2 );
+    }
+
+
+    public static implicit operator ParameterizedQuery( string text )
+    {
+      return Db.Text( text );
     }
 
 
