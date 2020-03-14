@@ -280,6 +280,56 @@ namespace Ivony.Data
 
 
     /// <summary>
+    /// 创建一个事务并异步执行
+    /// </summary>
+    /// <param name="actions">要执行的操作</param>
+    /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
+    public static Task AsyncTrasaction( Func<Task> actions )
+    {
+      return CurrentDatabase.AsyncTransaction( actions );
+    }
+
+
+    /// <summary>
+    /// 创建一个事务并异步执行
+    /// </summary>
+    /// <param name="database">要开启事务的 <see cref="IDatabase"/> 对象</param>
+    /// <param name="actions">要执行的操作</param>
+    /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
+    public static async Task AsyncTransaction( this IDatabase database, Func<Task> actions )
+    {
+      using ( var transaction = database.EnterTransaction() )
+      {
+
+        var asyncTransaction = transaction as IAsyncDatabaseTransaction;
+
+        try
+        {
+          await actions();
+        }
+        catch ( Exception e )
+        {
+          OnTransactionException( transaction, e );
+
+          if ( e is RollbackImmediatelyException == false )
+            throw;
+        }
+        finally
+        {
+          if ( transaction.Status == TransactionStatus.Running )
+          {
+            if ( asyncTransaction != null )
+              await asyncTransaction.CommitAsync();
+
+            else
+              transaction.Commit();
+          }
+        }
+      }
+    }
+
+
+    /// <summary>
     /// 创建一个事务并执行
     /// </summary>
     /// <param name="actions">要在事务中执行的操作</param>

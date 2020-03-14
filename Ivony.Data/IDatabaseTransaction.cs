@@ -50,7 +50,7 @@ namespace Ivony.Data
   /// <summary>
   /// 定义异步数据库事务上下文
   /// </summary>
-  public interface IAsyncDbTransactionContext : IDatabaseTransaction
+  public interface IAsyncDatabaseTransaction : IDatabaseTransaction
   {
 
 

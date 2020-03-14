@@ -66,7 +66,7 @@ namespace Ivony.Data.Common
   }
 
 
-  internal class AsyncDbTransactionContextWrapper : IAsyncDbTransactionContext, IServiceProvider
+  internal class AsyncDbTransactionContextWrapper : IAsyncDatabaseTransaction, IServiceProvider
   {
     public AsyncDbTransactionContextWrapper( IDatabaseTransaction context )
     {
