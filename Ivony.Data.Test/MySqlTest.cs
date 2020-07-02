@@ -194,7 +194,7 @@ PRIMARY KEY (Id)
         var tracing = traceService.Last();
 
         var logs = tracing.TraceEvents;
-        Assert.AreEqual( logs.Length, 3 );
+        Assert.AreEqual( logs.Count, 3 );
 
         Assert.AreEqual( logs[0].EventName, "OnExecuting" );
         Assert.AreEqual( logs[1].EventName, "OnLoadingData" );
@@ -213,7 +213,7 @@ PRIMARY KEY (Id)
         tracing = traceService.Last();
 
         logs = tracing.TraceEvents;
-        Assert.AreEqual( logs.Length, 2 );
+        Assert.AreEqual( logs.Count, 2 );
 
         Assert.AreEqual( logs[0].EventName, "OnExecuting" );
         Assert.AreEqual( logs[1].EventName, "OnException" );

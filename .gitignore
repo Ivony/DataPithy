@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/Ivony.Data/.vshistory/Db.cs
+/Ivony.Data/Common/.vshistory/DatabaseTransactionBase.cs
+/Ivony.Data.Test/.vshistory

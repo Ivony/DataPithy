@@ -72,7 +72,7 @@ namespace Ivony.Data
     /// <returns></returns>
     public static T WithDatabase<T>( this T query, string database ) where T : DbQuery
     {
-      query.Configures.SetService<IDatabase>( Db.Database( database ) );
+      query.Configures.SetService<IDatabase>( Db.Database( database ) ?? throw new InvalidOperationException( $"database \"{database}\" is not registered." ) );
       return query;
     }
 
