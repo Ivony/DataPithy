@@ -133,7 +133,7 @@ namespace Ivony.Data.Test
 
 
 
-      var query = Db.T( $"SELECT * FROM Users;" );
+      var query = Db.T( "SELECT * FROM Users;" );
 
       Assert.AreEqual( (query + query).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
       Assert.AreEqual( query.Concat( query ).TextTemplate, "SELECT * FROM Users; SELECT * FROM Users;", "两个纯文本模板连接测试失败" );
@@ -154,7 +154,7 @@ namespace Ivony.Data.Test
       Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = &#0#;", "参数化查询对象连接一个 null 值失败" );
 
 
-      query += $"";
+      query += "";
       Assert.AreEqual( query.TextTemplate, "SELECT * FROM Users WHERE UserID = &#0#;", "参数化查询对象连接一个空字符串失败" );
 
       query += "DELETE Users;".AsTextQuery();

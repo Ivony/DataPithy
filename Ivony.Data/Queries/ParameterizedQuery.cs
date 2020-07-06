@@ -201,9 +201,22 @@ namespace Ivony.Data.Queries
     }
 
 
+    /// <summary>
+    /// 从字符串转换为参数化查询对象
+    /// </summary>
+    /// <param name="text"></param>
     public static implicit operator ParameterizedQuery( string text )
     {
       return Db.Text( text );
+    }
+
+    /// <summary>
+    /// 从插值字符串转换为参数化查询对象
+    /// </summary>
+    /// <param name="template"></param>
+    public static implicit operator ParameterizedQuery( FormattableString template )
+    {
+      return Db.Template( template );
     }
 
 

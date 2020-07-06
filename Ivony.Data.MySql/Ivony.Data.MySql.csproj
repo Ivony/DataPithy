@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="[0.69.0,)" />
+    <PackageReference Include="MySqlConnector" Version="0.69.5" />
   </ItemGroup>
 
   <ItemGroup>

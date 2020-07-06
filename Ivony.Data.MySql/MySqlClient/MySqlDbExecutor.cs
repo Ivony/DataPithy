@@ -136,9 +136,45 @@ namespace Ivony.Data.MySqlClient
       return parser.Parse( query );
     }
 
-    public Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token )
+    public async Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token )
     {
-      throw new NotImplementedException();
+      var parameterizedQuery = AsParameterizedQuery( query );
+
+      try
+      {
+        return await ExecuteAsync( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+      }
+      catch ( Exception e )
+      {
+        throw ExecuteError( e, query );
+      }
+    }
+
+    protected virtual async Task<IAsyncDbExecuteContext> ExecuteAsync( MySqlCommand command, IDbTracing tracing )
+    {
+
+      if ( command == null )
+        throw new ArgumentNullException( nameof( command ) );
+
+      try
+      {
+        TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
+        var connection = CreateConnection();
+
+        command.Connection = connection;
+
+        var context = CreateExecuteContext( connection, await command.ExecuteReaderAsync(), tracing );
+
+        TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
+
+        return context;
+      }
+      catch ( DbException exception )
+      {
+        TryExecuteTracing( tracing, t => t.OnException( exception ) );
+        throw;
+      }
+
     }
   }
 }
