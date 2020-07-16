@@ -1,0 +1,23 @@
+<Project>
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net46;netcoreapp3.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <IncludeSource>true</IncludeSource>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedAllSources>true</EmbedAllSources>
+
+    
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Authors>Ivony</Authors>
+    <Product />
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
+    <Company />
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+  </PropertyGroup>
+</Project>

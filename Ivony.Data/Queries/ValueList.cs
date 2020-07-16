@@ -19,6 +19,7 @@ namespace Ivony.Data.Queries
     private Array _parameters;
     private string _separator;
 
+#if NETCOREAPP
 
 
     /// <summary>
@@ -36,6 +37,7 @@ namespace Ivony.Data.Queries
 
       return new ValueList( array, separator );
     }
+#endif
 
 
     /// <summary>

@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+
+  <Import Project="..\Project.props" />
+
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2</TargetFrameworks>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <Authors>Ivony</Authors>
-    <Product />
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
-    <Company />
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>4.4</Version>
+    <Version>4.5.0.1</Version>
     <Description>DataPithy for SQL Server</Description>
   </PropertyGroup>
 

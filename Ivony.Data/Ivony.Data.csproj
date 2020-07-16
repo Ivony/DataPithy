@@ -1,37 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netstandard2.1</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <IncludeSource>true</IncludeSource>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
+  <Import Project="..\Project.props" />
 
 
   <PropertyGroup>
-    <Authors>Ivony</Authors>
-    <Company />
-    <Product />
-    <Version>4.5.0</Version>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
+    <Version>4.5.0.1</Version>
     <Description>DataPithy is a light database accesser</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\Ivony.Data.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Ivony.Data.xml</DocumentationFile>
-  </PropertyGroup>
-
 </Project>

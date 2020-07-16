@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Ivony.Data.Queries;
 
@@ -90,7 +91,11 @@ namespace Ivony.Data
     public ServiceProvider Merge( ServiceProvider serviceProvider )
     {
 
+#if NETCOREAPP
       var registration = new Dictionary<Type, Func<IServiceProvider, object>>( _registration );
+#else
+      var registration = new Dictionary<Type, Func<IServiceProvider, object>>( _registration.ToDictionary( item => item.Key, item => item.Value ) );
+#endif
 
       foreach ( var pair in serviceProvider._registration )
         registration[pair.Key] = pair.Value;

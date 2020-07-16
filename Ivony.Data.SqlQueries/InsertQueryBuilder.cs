@@ -28,6 +28,8 @@ namespace Ivony.Data.SqlQueries
       return this;
 
     }
+
+#if NETCOREAPP
     public InsertQueryBuilder InsertInto( TableReference table, ITuple columns = null )
     {
       Into = new InsertIntoClause( table );
@@ -37,11 +39,15 @@ namespace Ivony.Data.SqlQueries
 
       return this;
     }
+#endif
 
     private void AddColumns( string[] array )
     {
       Columns = new InsertColumns( array );
     }
+
+
+#if NETCOREAPP
 
     private void AddColumns( ITuple tuple )
     {
@@ -51,6 +57,8 @@ namespace Ivony.Data.SqlQueries
 
       AddColumns( array );
     }
+
+#endif
 
     public InsertQueryBuilder WithValues( ValuesClause values )
     {

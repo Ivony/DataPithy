@@ -1,31 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netstandard2.1</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <IncludeSource>true</IncludeSource>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
+  <Import Project="..\Project.props" />
 
 
 
 
   <PropertyGroup>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <Product />
-    <Authors>Ivony</Authors>
-    <Version>4.5.0-MySqlConnector</Version>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
-    <Company />
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>4.5.0.1-MySqlConnector</Version>
     <Description>DataPithy for MySQL</Description>
   </PropertyGroup>
 
