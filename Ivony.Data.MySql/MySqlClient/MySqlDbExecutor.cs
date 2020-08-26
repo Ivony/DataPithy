@@ -23,7 +23,17 @@ namespace Ivony.Data.MySqlClient
 
     protected string ConnectionString { get; }
 
-    protected override MySqlConnection CreateConnection()
+
+    protected override MySqlCommand ApplyConnection( MySqlCommand command )
+    {
+      if ( command is null )
+        throw new ArgumentNullException( nameof( command ) );
+
+      command.Connection = CreateConnection();
+      return command;
+    }
+
+    protected MySqlConnection CreateConnection()
     {
       var connection = new MySqlConnection( ConnectionString );
       connection.Open();
@@ -48,10 +58,15 @@ namespace Ivony.Data.MySqlClient
 
     public MySqlDbTransaction Transaction { get; }
 
-    protected override MySqlConnection CreateConnection()
+
+    protected override MySqlCommand ApplyConnection( MySqlCommand command )
     {
-      return Transaction.Connection;
+      command.Connection = Transaction.Connection;
+      command.Transaction = Transaction.Transaction;
+
+      return command;
     }
+
 
     protected override MySqlExecuteContext CreateExecuteContext( MySqlConnection connection, MySqlDataReader reader, IDbTracing tracing )
     {
@@ -103,11 +118,10 @@ namespace Ivony.Data.MySqlClient
       try
       {
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
-        var connection = CreateConnection();
 
-        command.Connection = connection;
+        command = ApplyConnection( command );
 
-        var context = CreateExecuteContext( connection, command.ExecuteReader(), tracing );
+        var context = CreateExecuteContext( command.Connection, command.ExecuteReader(), tracing );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
@@ -124,7 +138,7 @@ namespace Ivony.Data.MySqlClient
 
     protected abstract MySqlExecuteContext CreateExecuteContext( MySqlConnection connection, MySqlDataReader reader, IDbTracing tracing );
 
-    protected abstract MySqlConnection CreateConnection();
+    protected abstract MySqlCommand ApplyConnection( MySqlCommand command );
 
     private MySqlCommand CreateCommand( ParameterizedQuery query )
     {
@@ -159,11 +173,9 @@ namespace Ivony.Data.MySqlClient
       try
       {
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
-        var connection = CreateConnection();
+        command = ApplyConnection( command );
 
-        command.Connection = connection;
-
-        var context = CreateExecuteContext( connection, await command.ExecuteReaderAsync(), tracing );
+        var context = CreateExecuteContext( command.Connection, await command.ExecuteReaderAsync(), tracing );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
