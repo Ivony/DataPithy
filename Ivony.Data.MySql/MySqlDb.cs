@@ -1,7 +1,7 @@
 ﻿using System;
 using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Ivony.Data
 {

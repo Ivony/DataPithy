@@ -1,13 +1,10 @@
-﻿using Ivony.Data.Common;
-using Ivony.Data.Queries;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ivony.Data.Common;
+using Ivony.Data.Queries;
+using MySqlConnector;
 
 namespace Ivony.Data.MySqlClient
 {

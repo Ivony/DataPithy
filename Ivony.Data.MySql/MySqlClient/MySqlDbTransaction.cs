@@ -1,9 +1,6 @@
-﻿using Ivony.Data.Common;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
+﻿using System;
+using Ivony.Data.Common;
+using MySqlConnector;
 
 namespace Ivony.Data.MySqlClient
 {

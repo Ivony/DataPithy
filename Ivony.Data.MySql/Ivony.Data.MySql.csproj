@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <Version>4.5.0.2-MySqlConnector</Version>
+    <Version>4.5.0.2-MySqlConnector-1.0.1</Version>
     <Description>DataPithy for MySQL</Description>
   </PropertyGroup>
 
@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="0.69.5" />
+    <PackageReference Include="MySqlConnector" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
