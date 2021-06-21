@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Queries;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -251,7 +252,8 @@ namespace Ivony.Data
         throw new ArgumentNullException( nameof( transaction ) );
 
 
-      transaction.RegisterDispose( DbContext.EnterContext( transaction ) );
+      var context = DbContext.EnterContext( transaction );
+      transaction.RegisterDispose( context );
       transaction.BeginTransaction();
 
       return transaction;

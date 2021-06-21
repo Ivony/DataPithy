@@ -1,5 +1,9 @@
 ﻿using Ivony.Data.Common;
+#if MySqlConnector
 using MySqlConnector;
+#else
+using MySql.Data.MySqlClient;
+#endif
 
 namespace Ivony.Data.MySqlClient
 {

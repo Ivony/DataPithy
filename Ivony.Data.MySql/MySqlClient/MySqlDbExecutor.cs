@@ -4,7 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ivony.Data.Common;
 using Ivony.Data.Queries;
+
+#if MySqlConnector
 using MySqlConnector;
+#else
+using MySql.Data.MySqlClient;
+#endif
+
 
 namespace Ivony.Data.MySqlClient
 {
@@ -172,7 +178,7 @@ namespace Ivony.Data.MySqlClient
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
         command = ApplyConnection( command );
 
-        var context = CreateExecuteContext( command.Connection, await command.ExecuteReaderAsync(), tracing );
+        var context = CreateExecuteContext( command.Connection, (MySqlDataReader) await command.ExecuteReaderAsync(), tracing );
 
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
