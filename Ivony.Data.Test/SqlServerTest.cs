@@ -178,7 +178,7 @@ CREATE TABLE [dbo].[Test1]
       var tracing = traceService.Last();
 
       var events = tracing.TraceEvents;
-      Assert.AreEqual( events.Length, 3 );
+      Assert.AreEqual( events.Count, 3 );
 
       Assert.IsTrue( tracing.QueryTime >= tracing.ExecutionTime );
 
@@ -199,7 +199,7 @@ CREATE TABLE [dbo].[Test1]
       tracing = traceService.Last();
 
       events = tracing.TraceEvents;
-      Assert.AreEqual( events.Length, 2 );
+      Assert.AreEqual( events.Count, 2 );
 
       Assert.AreEqual( events[0].EventName, "OnExecuting" );
       Assert.AreEqual( events[1].EventName, "OnException" );

@@ -1,22 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netstandard2.1</TargetFrameworks>
-    <RootNamespace>Ivony.Data.SqlQueries</RootNamespace>
-    <Version>4.3.0</Version>
-    <AssemblyName>Ivony.Data.SqlQueries</AssemblyName>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/Ivony/DataPithy</PackageProjectUrl>
-    <Authors>Ivony</Authors>
-    <Description>build standard SQL queries</Description>
-  </PropertyGroup>
+  <Import Project="..\Project.props" />
 
-  <ItemGroup>
-    <None Remove="SqlInsertQueryBuilder.cs~RFf876cad.TMP" />
-    <None Remove="SqlQueryParser.cs~RF1038ddaa.TMP" />
-  </ItemGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;netcoreapp3.0</TargetFrameworks>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />

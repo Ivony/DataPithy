@@ -1,11 +1,9 @@
 ﻿using Ivony.Data.Common;
-using Ivony.Data.Queries;
+#if MySqlConnector
+using MySqlConnector;
+#else
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+#endif
 
 namespace Ivony.Data.MySqlClient
 {

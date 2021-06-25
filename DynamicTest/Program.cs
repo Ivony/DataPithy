@@ -69,9 +69,7 @@ namespace DynamicTest
       var serviceProvider = services.BuildServiceProvider();
       ActivatorUtilities.CreateInstance<TestClass>( serviceProvider );
 
-      Console.ReadKey();
-      return;
-
+      
 
       var select = new SelectQueryBuilder()
         .Select( Tables.U.ID, Tables.U.Username, Tables.P.Email )

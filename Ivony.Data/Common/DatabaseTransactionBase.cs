@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
 
 namespace Ivony.Data.Common
@@ -137,13 +138,35 @@ namespace Ivony.Data.Common
     {
       lock ( SyncRoot )
       {
-        if ( Status == TransactionStatus.Running )
-          Transaction.Rollback();
+
+        var exceptions = new List<Exception>();
+
+        try
+        {
+          if ( Status == TransactionStatus.Running )
+            Transaction.Rollback();
+        }
+        catch ( Exception e )
+        {
+          exceptions.Add( e );
+        }
 
         Status = TransactionStatus.Completed;
         DisposeTransaction( Transaction );
         foreach ( var item in _disposables )
-          item.Dispose();
+        {
+          try
+          {
+            item.Dispose();
+          }
+          catch( Exception e )
+          {
+            exceptions.Add( e );
+          }
+        }
+
+        if ( exceptions.Any() )
+          throw new AggregateException( exceptions );
       }
     }
 

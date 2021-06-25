@@ -23,14 +23,17 @@ namespace Ivony.Data.SqlQueries
     }
     public SelectQueryBuilder Select( object obj )
     {
-      if ( obj is ITuple tuple )
-      {
-        AddElements( tuple );
-      }
-      else if ( obj is Array list )
+      if ( obj is Array list )
       {
         AddElements( list );
       }
+#if NETCOREAPP
+      else if ( obj is ITuple tuple )
+      {
+        AddElements( tuple );
+      }
+#endif
+
       else
       {
         foreach ( var property in obj.GetType().GetProperties() )
@@ -53,6 +56,8 @@ namespace Ivony.Data.SqlQueries
       return this;
     }
 
+#if NETCOREAPP
+
     public SelectQueryBuilder AddElements( ITuple tuple )
     {
       for ( int i = 0; i < tuple.Length; i++ )
@@ -60,6 +65,8 @@ namespace Ivony.Data.SqlQueries
 
       return this;
     }
+
+#endif
 
     public SelectQueryBuilder AddElement( object value )
     {

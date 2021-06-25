@@ -1,7 +1,11 @@
 ﻿using System;
 using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
+#if MySqlConnector
+using MySqlConnector;
+#else
 using MySql.Data.MySqlClient;
+#endif
 
 namespace Ivony.Data
 {
@@ -36,7 +40,7 @@ namespace Ivony.Data
     /// <returns>MySql 数据库访问器</returns>
     public static MySqlDb Connect( MySqlConnectionStringBuilder builder, IServiceProvider serviceProvider = null )
     {
-      return Connect( builder.GetConnectionString( true ), serviceProvider );
+      return Connect( builder.ConnectionString, serviceProvider );
     }
 
 
@@ -50,7 +54,7 @@ namespace Ivony.Data
     {
       var builder = new MySqlConnectionStringBuilder();
       action( builder );
-      return Connect( builder.GetConnectionString( true ), serviceProvider );
+      return Connect( builder.ConnectionString, serviceProvider );
     }
 
 

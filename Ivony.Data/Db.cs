@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Queries;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -153,12 +154,23 @@ namespace Ivony.Data
     /// <summary>
     /// 解析模板表达式，创建参数化查询对象
     /// </summary>
-    /// <param name="template">参数化模板</param>
+    /// <param name="query">参数化模板</param>
+    /// <returns>参数化查询</returns>
+    public static ParameterizedQuery T( ParameterizedQuery query )
+    {
+      return query;
+    }
+
+    /// <summary>
+    /// 解析模板表达式，创建参数化查询对象
+    /// </summary>
+    /// <param name="template">参数查询对象</param>
     /// <returns>参数化查询</returns>
     public static ParameterizedQuery T( FormattableString template )
     {
       return Template( template );
     }
+
 
 
 
@@ -240,7 +252,8 @@ namespace Ivony.Data
         throw new ArgumentNullException( nameof( transaction ) );
 
 
-      transaction.RegisterDispose( DbContext.EnterContext( transaction ) );
+      var context = DbContext.EnterContext( transaction );
+      transaction.RegisterDispose( context );
       transaction.BeginTransaction();
 
       return transaction;
