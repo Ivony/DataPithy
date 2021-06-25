@@ -261,6 +261,46 @@ namespace Ivony.Data
 
 
 
+    /// <summary>
+    /// 开启并进入一个事务上下文
+    /// </summary>
+    /// <param name="database">要开启事务的数据库，若事务是异步事务，则会异步开启，否则将同步开启</param>
+    /// <returns></returns>
+    public static async ValueTask<IDatabaseTransaction> EnterTransactionAsync( this IDatabase database )
+    {
+      var transaction = database.CreateTransaction() ?? throw new NotSupportedException();
+      return await EnterTransactionAsync( transaction );
+    }
+
+
+
+    /// <summary>
+    /// 异步进入一个事务上下文
+    /// </summary>
+    /// <param name="transaction">要进入的事务，若事务是异步事务，则会异步开启，否则将同步开启</param>
+    /// <returns>事务上下文</returns>
+    public static async ValueTask<IDatabaseTransaction> EnterTransactionAsync( IDatabaseTransaction transaction )
+    {
+      if ( transaction == null )
+        throw new ArgumentNullException( nameof( transaction ) );
+
+
+      var context = DbContext.EnterContext( transaction );
+      transaction.RegisterDispose( context );
+
+      if ( transaction is IAsyncDatabaseTransaction async )
+        await async.BeginTransactionAsync();
+
+      else
+        transaction.BeginTransaction();
+
+      return transaction;
+    }
+
+
+
+
+
 
     private class DbContext : IDisposable
     {
@@ -311,9 +351,8 @@ namespace Ivony.Data
     /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
     public static async Task AsyncTransaction( this IDatabase database, Func<Task> actions )
     {
-      using ( var transaction = database.EnterTransaction() )
+      using ( var transaction = await database.EnterTransactionAsync() ?? throw new NotSupportedException() )
       {
-
         var asyncTransaction = transaction as IAsyncDatabaseTransaction;
 
         try
