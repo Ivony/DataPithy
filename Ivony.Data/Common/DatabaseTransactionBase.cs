@@ -10,6 +10,7 @@ namespace Ivony.Data.Common
   /// 辅助实现 IDbTransactionContext 接口
   /// </summary>
   /// <typeparam name="T">数据库事务对象类型</typeparam>
+  [System.Diagnostics.CodeAnalysis.SuppressMessage( "Design", "CA1063:Implement IDisposable Correctly", Justification = "<挂起>" )]
   public abstract class DatabaseTransactionBase<T> : IDatabaseTransaction where T : IDbTransaction
   {
 
@@ -39,7 +40,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 用于同步的对象
     /// </summary>
-    public object Sync { get; } = new object();
+    public object SyncRoot { get; } = new object();
 
 
     /// <summary>
@@ -69,7 +70,7 @@ namespace Ivony.Data.Common
     /// </summary>
     public virtual void BeginTransaction()
     {
-      lock ( Sync )
+      lock ( SyncRoot )
       {
         if ( Status == TransactionStatus.Running )
           return;
@@ -96,7 +97,7 @@ namespace Ivony.Data.Common
     /// </summary>
     public virtual void Commit()
     {
-      lock ( Sync )
+      lock ( SyncRoot )
       {
         if ( Status == TransactionStatus.NotBeginning )
           throw new InvalidOperationException();
@@ -115,7 +116,7 @@ namespace Ivony.Data.Common
     /// </summary>
     public virtual void Rollback()
     {
-      lock ( Sync )
+      lock ( SyncRoot )
       {
         if ( Status == TransactionStatus.NotBeginning )
           throw new InvalidOperationException();
@@ -134,7 +135,7 @@ namespace Ivony.Data.Common
     /// </summary>
     public virtual void Dispose()
     {
-      lock ( Sync )
+      lock ( SyncRoot )
       {
         if ( Status == TransactionStatus.Running )
           Transaction.Rollback();
@@ -164,7 +165,7 @@ namespace Ivony.Data.Common
     /// <returns></returns>
     public virtual IDbExecutor GetDbExecutor()
     {
-      lock ( Sync )
+      lock ( SyncRoot )
       {
         if ( Status == TransactionStatus.NotBeginning )
           BeginTransaction();

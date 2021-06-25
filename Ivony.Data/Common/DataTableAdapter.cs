@@ -61,8 +61,24 @@ namespace Ivony.Data.Common
 
       while ( await dataReader.ReadAsync() )
       {
+
+        if ( startRecord > 0 )
+        {
+          startRecord--;
+          continue;
+        }
+
+        else if ( maxRecords > 0 )
+          maxRecords--;
+
+        else
+          break;
+
+
+
         dataReader.GetValues( array );
         dataTable.LoadDataRow( array, true );
+
       }
 
       return dataTable;

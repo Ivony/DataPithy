@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+
 namespace Ivony.Data.Common
 {
 
@@ -28,15 +30,9 @@ namespace Ivony.Data.Common
     /// 
     protected DbExecuteContextBase( IDataReader dataReader, IDbTracing tracing = null, object sync = null )
     {
-
-      if ( dataReader == null )
-        throw new ArgumentNullException( "dataReader" );
-
+      DataReader = dataReader ?? throw new ArgumentNullException( nameof( dataReader ) );
 
       SyncRoot = sync;
-
-
-      DataReader = dataReader;
       Tracing = tracing;
 
       DataTableAdapter = new DataTableAdapter();
@@ -267,32 +263,16 @@ namespace Ivony.Data.Common
     /// <param name="maxRecords">最多填充的记录条数</param>
     /// <param name="token">取消指示</param>
     /// <returns>填充好的 DataTable</returns>
-    public Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default( CancellationToken ) )
+    public async Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default )
     {
-      var builder = new TaskCompletionSource<DataTable>();
-
-      if ( token.IsCancellationRequested )
-      {
-        builder.SetCanceled();
-        return builder.Task;
-      }
-
-
       try
       {
-
-        var result = LoadDataTable( startRecord, maxRecords );
-        builder.SetResult( result );
-        return builder.Task;
-
+        return await DataTableAdapter.FillDataTableAsync( DataReader, startRecord, maxRecords );
       }
       catch ( Exception exception )
       {
         OnException( exception );
-
-
-        builder.SetException( exception );
-        return builder.Task;
+        throw;
       }
     }
 
@@ -319,28 +299,21 @@ namespace Ivony.Data.Common
     /// 异步读取一条记录，并将读取指针推移到下一个位置。
     /// </summary>
     /// <returns>若当前位置存在记录，则返回该记录，否则返回 null</returns>
-    public Task<IDataRecord> ReadRecordAsync()
+    public async Task<IDataRecord> ReadRecordAsync()
     {
+      try
+      {
+        if ( await DataReader.ReadAsync() )
+          return DataReader;
 
-      return DataReader.ReadAsync().ContinueWith( task =>
-        {
-
-          if ( task.Exception != null )
-          {
-            OnException( task.Exception );
-
-            throw new AggregateException( task.Exception );
-          }
-          if ( task.Result )
-            return (IDataRecord) DataReader;
-
-          else
-            return null;
-
-        } );
-
+        else
+          return null;
+      }
+      catch ( Exception exception )
+      {
+        OnException( exception );
+        throw;
+      }
     }
   }
-
-
 }
