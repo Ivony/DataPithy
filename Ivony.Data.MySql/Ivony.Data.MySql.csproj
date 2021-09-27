@@ -8,16 +8,22 @@
 
   <PropertyGroup>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <Version>4.5.0.2</Version>
+    <VersionPrefix>4.5.0.3</VersionPrefix>
     <Description>DataPithy for MySQL</Description>
+    <Connector>MySQL.Connector</Connector>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Ivony.Data.MySql.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Connector)'=='MySQL.Connector'">
+    <DefineConstants>MySqlConnector</DefineConstants>
+    <VersionSuffix>MySQLConnector</VersionSuffix>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Connector)'=='MySQL.Data'">
     <PackageReference Include="MySql.Data" Version="8.0.22" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Connector)'=='MySQL.Connector'">
+    <PackageReference Include="MySqlConnector" Version="1.3.12" />
   </ItemGroup>
 
   <ItemGroup>
