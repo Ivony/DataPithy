@@ -58,6 +58,7 @@ namespace Ivony.Data.Common
       base.FillSchema( dataTable, SchemaType.Source, dataReader );
 
       var array = new object[dataReader.FieldCount];
+      var count = 0;
 
       while ( await dataReader.ReadAsync() )
       {
@@ -68,13 +69,12 @@ namespace Ivony.Data.Common
           continue;
         }
 
-        else if ( maxRecords > 0 )
-          maxRecords--;
-
-        else
-          break;
-
-
+        if ( maxRecords > 0 )
+        {
+          count++;
+          if ( count > maxRecords )
+            break;
+        }
 
         dataReader.GetValues( array );
         dataTable.LoadDataRow( array, true );
