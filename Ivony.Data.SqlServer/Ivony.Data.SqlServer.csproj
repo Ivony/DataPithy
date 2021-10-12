@@ -5,7 +5,7 @@
 
   <PropertyGroup>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <Version>4.5.0.3</Version>
+    <Version>4.5.0.4</Version>
     <Description>DataPithy for SQL Server</Description>
   </PropertyGroup>
 
