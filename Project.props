@@ -1,7 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;netstandard2.1</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1;net6</TargetFrameworks>
 
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeSource>true</IncludeSource>
