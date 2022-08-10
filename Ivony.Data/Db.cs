@@ -337,7 +337,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="actions">要执行的操作</param>
     /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
-    public static Task AsyncTrasaction( Func<Task> actions )
+    public static Task AsyncTransaction( Func<Task> actions )
     {
       return CurrentDatabase.AsyncTransaction( actions );
     }
