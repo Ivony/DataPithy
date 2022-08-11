@@ -154,12 +154,9 @@ namespace Ivony.Data.Queries
       if ( array != null && !(array is byte[]) )
         value = ValueList.Create( array );
 
-#if NETCOREAPP
-
       var tuple = value as ITuple;
       if ( tuple != null )
         value = ValueList.Create( tuple );
-#endif
 
       var template = value as FormattableString;
       if ( template != null )

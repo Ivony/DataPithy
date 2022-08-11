@@ -4,6 +4,7 @@ using System.Linq;
 using Ivony.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ivony.Data.Queries;
+using System.Threading.Tasks;
 
 namespace Ivony.Data.Test
 {
@@ -112,6 +113,9 @@ PRIMARY KEY (Id)
 
 
 
+
+
+
       using ( var transaction = Db.EnterTransaction() )
       {
         Exception exception = null;
@@ -182,6 +186,102 @@ PRIMARY KEY (Id)
         Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed, "退出事务自动关闭连接" );
       }
     }
+
+
+    [TestMethod]
+    public async Task AsyncTransactionTest()
+    {
+
+      await Db.AsyncTransaction( async () =>
+      {
+        Assert.AreEqual( await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
+        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1, "插入数据后查询" );
+
+        Db.Rollback();
+      } );
+
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务" );
+
+
+
+      await Db.AsyncTransaction( async () =>
+      {
+        Assert.AreEqual( await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
+        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1, "插入数据后查询" );
+      } );
+
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "自动提交事务" );
+
+      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+
+
+
+
+
+
+      using ( var transaction = Db.EnterTransaction() )
+      {
+        Exception exception = null;
+        try
+        {
+          await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync();
+          transaction.Commit();
+          await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync();
+
+        }
+        catch ( Exception e )
+        {
+          exception = e;
+        }
+
+        Assert.IsNotNull( exception, "提交事务后再执行操作引发异常" );
+      }
+
+
+
+      Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
+
+      await Db.AsyncTransaction( async () =>
+      {
+        await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync();
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "直接运行事务" );
+
+        Db.Rollback();
+      } );
+
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
+
+
+      await Db.AsyncTransaction( async () =>
+      {
+        Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
+      } );
+
+
+
+
+      {
+        Exception exception = null;
+        var transaction = (MySqlDbTransaction) Db.EnterTransaction();
+
+        try
+        {
+          using ( transaction )
+          {
+            Db.T( $"SELECT * FROM Nothing" ).ExecuteNonQuery();
+            transaction.Commit();
+          }
+        }
+        catch ( Exception e )
+        {
+          exception = e;
+        }
+
+        Assert.IsNotNull( exception, "事务中出现异常测试" );
+        Assert.AreEqual( transaction.Connection.State, ConnectionState.Closed, "退出事务自动关闭连接" );
+      }
+    }
+
 
     [TestMethod]
     public void TraceTest()
