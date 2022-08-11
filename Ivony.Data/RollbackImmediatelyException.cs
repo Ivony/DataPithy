@@ -13,8 +13,20 @@ namespace Ivony.Data
     /// <summary>
     /// 创建 <see cref="RollbackImmediatelyException"/> 对象
     /// </summary>
-    public RollbackImmediatelyException() : base( "Transaction will be rollback, don't catch this exception." )
+    public RollbackImmediatelyException() : this( null ) { }
+
+    /// <summary>
+    /// 创建 <see cref="RollbackImmediatelyException"/> 对象
+    /// </summary>
+    public RollbackImmediatelyException( object result ) : base( "Transaction will be rollback, don't catch this exception." )
     {
+      Result = result;
     }
+
+
+    /// <summary>
+    /// 结果，当使用带返回值的 <see cref="Db.Transaction{T}( Func{T} )"/> 或 <see cref="Db.AsyncTransaction{T}( Func{ System.Threading.Tasks.Task {T} })"/> 方法
+    /// </summary>
+    public object Result { get; }
   }
 }

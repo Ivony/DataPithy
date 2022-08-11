@@ -301,6 +301,20 @@ namespace Ivony.Data
     /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
     public static Task AsyncTransaction( Func<Task> actions )
     {
+      return CurrentDatabase.AsyncTransaction( async () =>
+      {
+        await actions();
+        return (object) null;
+      } );
+    }
+
+    /// <summary>
+    /// 创建一个事务并异步执行
+    /// </summary>
+    /// <param name="actions">要执行的操作</param>
+    /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
+    public static Task<T> AsyncTransaction<T>( Func<Task<T>> actions )
+    {
       return CurrentDatabase.AsyncTransaction( actions );
     }
 
@@ -311,21 +325,34 @@ namespace Ivony.Data
     /// <param name="database">要开启事务的 <see cref="IDatabase"/> 对象</param>
     /// <param name="actions">要执行的操作</param>
     /// <returns>用于等待操作完成的 <see cref="Task"/> 对象</returns>
-    public static async Task AsyncTransaction( this IDatabase database, Func<Task> actions )
+    public static async Task<T> AsyncTransaction<T>( this IDatabase database, Func<Task<T>> actions )
     {
-      using ( var transaction = database.EnterTransaction() ?? throw new NotSupportedException() )
+      using ( var transaction = database.CreateTransaction() ?? throw new NotSupportedException() )
       {
+
         var asyncTransaction = transaction as IAsyncDatabaseTransaction;
+
+        if ( asyncTransaction != null )
+          await asyncTransaction.BeginTransactionAsync();
+
+        else
+          transaction.BeginTransaction();
+
+
+        EnterTransaction( transaction );
 
         try
         {
-          await actions();
+          return await actions();
         }
         catch ( Exception e )
         {
-          OnTransactionException( transaction, e );
+          RollbackWhenError( transaction, e );
 
-          if ( e is RollbackImmediatelyException == false )
+          if ( e is RollbackImmediatelyException rollback )
+            return (T) rollback.Result;
+
+          else
             throw;
         }
         finally
@@ -349,36 +376,11 @@ namespace Ivony.Data
     /// <param name="actions">要在事务中执行的操作</param>
     public static void Transaction( Action actions )
     {
-      CurrentDatabase.Transaction( actions );
-    }
-
-
-    /// <summary>
-    /// 创建一个事务并执行
-    /// </summary>
-    /// <param name="database">创建事务的数据库</param>
-    /// <param name="actions">要在事务中执行的操作</param>
-    public static void Transaction( this IDatabase database, Action actions )
-    {
-      using ( var transaction = database.EnterTransaction() )
+      CurrentDatabase.Transaction( () =>
       {
-        try
-        {
-          actions();
-        }
-        catch ( Exception e )
-        {
-          OnTransactionException( transaction, e );
-
-          if ( e is RollbackImmediatelyException == false )
-            throw;
-        }
-        finally
-        {
-          if ( transaction.Status == TransactionStatus.Running )
-            transaction.Commit();
-        }
-      }
+        actions();
+        return (object) null;
+      } );
     }
 
 
@@ -386,10 +388,9 @@ namespace Ivony.Data
     /// 创建一个事务并执行
     /// </summary>
     /// <param name="actions">要在事务中执行的操作</param>
-    /// <param name="resultOnRollback">如果执行回滚，则应当返回的值</param>
-    public static T Transaction<T>( Func<T> actions, T resultOnRollback = default )
+    public static T Transaction<T>( Func<T> actions )
     {
-      return Transaction( CurrentDatabase, actions, resultOnRollback );
+      return Transaction( CurrentDatabase, actions );
     }
 
     /// <summary>
@@ -397,8 +398,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="database">创建事务的数据库</param>
     /// <param name="actions">要在事务中执行的操作</param>
-    /// <param name="resultOnRollback">如果执行回滚，则应当返回的值</param>
-    public static T Transaction<T>( IDatabase database, Func<T> actions, T resultOnRollback = default )
+    public static T Transaction<T>( this IDatabase database, Func<T> actions )
     {
       using ( var transaction = database.EnterTransaction() )
       {
@@ -408,10 +408,10 @@ namespace Ivony.Data
         }
         catch ( Exception e )
         {
-          OnTransactionException( transaction, e );
+          RollbackWhenError( transaction, e );
 
-          if ( e is RollbackImmediatelyException == false )
-            return resultOnRollback;
+          if ( e is RollbackImmediatelyException rollback )
+            return (T) rollback.Result;
 
           else
             throw;
@@ -424,7 +424,7 @@ namespace Ivony.Data
       }
     }
 
-    private static void OnTransactionException( IDatabaseTransaction transaction, Exception e )
+    private static void RollbackWhenError( IDatabaseTransaction transaction, Exception e )
     {
       try
       {
@@ -460,10 +460,19 @@ namespace Ivony.Data
     /// </summary>
     public static void Rollback()
     {
+      Rollback( null );
+    }
+
+    /// <summary>
+    /// 回滚事务
+    /// </summary>
+    /// <param name="result">回滚后要返回的值</param>
+    public static void Rollback( object result )
+    {
       if ( Db.CurrentDatabase is IDatabaseTransaction == false )
         throw new InvalidOperationException( "Rollback method must invoked in transaction context" );
 
-      throw new RollbackImmediatelyException();
+      throw new RollbackImmediatelyException( result );
     }
 
   }

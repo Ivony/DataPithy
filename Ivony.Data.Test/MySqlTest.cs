@@ -241,14 +241,17 @@ PRIMARY KEY (Id)
 
       Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
 
-      await Db.AsyncTransaction( async () =>
+      var result = await Db.AsyncTransaction( async () =>
       {
         await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync();
         Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "直接运行事务" );
 
-        Db.Rollback();
+        Db.Rollback( 1 );
+
+        return 0;
       } );
 
+      Assert.AreEqual( result, 1, "事务回滚返回值" );
       Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
 
 
