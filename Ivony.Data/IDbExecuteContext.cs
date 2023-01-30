@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -68,19 +69,21 @@ namespace Ivony.Data
     /// <param name="maxRecords">最大要填充的记录条数</param>
     /// <param name="token">取消指示</param>
     /// <returns>填充了数据的 DataTable</returns>
-    Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default( CancellationToken ) );
+    Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default );
 
     /// <summary>
     /// 尝试异步读取下一个结果集
     /// </summary>
+    /// <param name="cancellationToken">取消标识</param>
     /// <returns>若存在下一个结果集，则返回 true ，否则返回 false</returns>
-    Task<bool> NextResultAsync();
+    Task<bool> NextResultAsync( CancellationToken cancellationToken = default );
 
 
     /// <summary>
     /// 异步读取一条记录，并将读取指针推移到下一个位置。
     /// </summary>
+    /// <param name="cancellationToken">取消标识</param>
     /// <returns>若当前位置存在记录，则返回该记录，否则返回 null</returns>
-    Task<IDataRecord> ReadRecordAsync();
+    Task<IDataRecord> ReadRecordAsync( CancellationToken cancellationToken = default );
   }
 }

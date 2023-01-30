@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ivony.Data.Common
@@ -30,18 +31,6 @@ namespace Ivony.Data.Common
       return dataTable;
     }
 
-    /// <summary>
-    /// 从 DataReader 中读取所有数据并填充一个 DataSet 返回。
-    /// </summary>
-    /// <param name="dataReader">用来读取数据的 DataReader</param>
-    /// <returns>填充好的 DataTable</returns>
-    public DataSet FillDataSet( IDataReader dataReader )
-    {
-      var dataSet = new DataSet();
-      base.Fill( dataSet, "Result", dataReader, 0, 0 );
-      return dataSet;
-    }
-
 
     /// <summary>
     /// 使用指定范围内的行异步填充 DataTable 并返回。
@@ -50,7 +39,7 @@ namespace Ivony.Data.Common
     /// <param name="startRecord">要填充的起始记录位置</param>
     /// <param name="maxRecords">最多填充的记录条数</param>
     /// <returns>填充好的 DataTable</returns>
-    public async Task<DataTable> FillDataTableAsync( DbDataReader dataReader, int startRecord, int maxRecords )
+    public async Task<DataTable> FillDataTableAsync( DbDataReader dataReader, int startRecord, int maxRecords, CancellationToken cancellationToken )
     {
 
       var dataTable = new DataTable();
@@ -60,7 +49,7 @@ namespace Ivony.Data.Common
       var array = new object[dataReader.FieldCount];
       var count = 0;
 
-      while ( await dataReader.ReadAsync() )
+      while ( await dataReader.ReadAsync( cancellationToken ) )
       {
 
         if ( startRecord > 0 )

@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Queries;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -56,13 +57,24 @@ namespace Ivony.Data.Common
     public void Dispose() => Context.Dispose();
 
 
-    public Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default( CancellationToken ) )
-      => Task.FromResult( LoadDataTable( startRecord, maxRecords ) );
+    public async Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken cancellationToken = default )
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      return LoadDataTable( startRecord, maxRecords );
+    }
 
 
-    public Task<bool> NextResultAsync() => Task.FromResult( NextResult() );
+    public async Task<bool> NextResultAsync( CancellationToken cancellationToken )
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      return NextResult();
+    }
 
-    public Task<IDataRecord> ReadRecordAsync() => Task.FromResult( ReadRecord() );
+    public async Task<IDataRecord> ReadRecordAsync( CancellationToken cancellationToken )
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      return ReadRecord();
+    }
   }
 
 

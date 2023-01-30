@@ -261,13 +261,13 @@ namespace Ivony.Data.Common
     /// </summary>
     /// <param name="startRecord">要填充的起始记录位置</param>
     /// <param name="maxRecords">最多填充的记录条数</param>
-    /// <param name="token">取消指示</param>
+    /// <param name="cancellationToken">取消指示</param>
     /// <returns>填充好的 DataTable</returns>
-    public async Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken token = default )
+    public async Task<DataTable> LoadDataTableAsync( int startRecord, int maxRecords, CancellationToken cancellationToken = default )
     {
       try
       {
-        return await DataTableAdapter.FillDataTableAsync( DataReader, startRecord, maxRecords );
+        return await DataTableAdapter.FillDataTableAsync( DataReader, startRecord, maxRecords, cancellationToken );
       }
       catch ( Exception exception )
       {
@@ -281,11 +281,11 @@ namespace Ivony.Data.Common
     /// 尝试异步读取下一个结果集
     /// </summary>
     /// <returns>若存在下一个结果集，则返回 true ，否则返回 false</returns>
-    public Task<bool> NextResultAsync()
+    public Task<bool> NextResultAsync( CancellationToken cancellationToken )
     {
       try
       {
-        return DataReader.NextResultAsync();
+        return DataReader.NextResultAsync( cancellationToken );
       }
       catch ( Exception exception )
       {
@@ -298,12 +298,13 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 异步读取一条记录，并将读取指针推移到下一个位置。
     /// </summary>
+    /// <param name="cancellationToken">取消标识</param>
     /// <returns>若当前位置存在记录，则返回该记录，否则返回 null</returns>
-    public async Task<IDataRecord> ReadRecordAsync()
+    public async Task<IDataRecord> ReadRecordAsync( CancellationToken cancellationToken )
     {
       try
       {
-        if ( await DataReader.ReadAsync() )
+        if ( await DataReader.ReadAsync( cancellationToken ) )
           return DataReader;
 
         else
