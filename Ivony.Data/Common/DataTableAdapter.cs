@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -49,6 +50,9 @@ namespace Ivony.Data.Common
       var array = new object[dataReader.FieldCount];
       var count = 0;
 
+
+      var watch = new Stopwatch();
+
       while ( await dataReader.ReadAsync( cancellationToken ) )
       {
 
@@ -65,10 +69,16 @@ namespace Ivony.Data.Common
             break;
         }
 
+
+        watch.Start();
+
         dataReader.GetValues( array );
-        dataTable.LoadDataRow( array, true );
+        dataTable.Rows.Add( array );
+        watch.Stop();
 
       }
+
+      Console.WriteLine( $"load:{watch.ElapsedMilliseconds}ms" );
 
       return dataTable;
     }
