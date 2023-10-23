@@ -73,6 +73,7 @@ namespace Ivony.Data.Common
 
       }
 
+      dataTable.AcceptChanges();
       return dataTable;
     }
 
