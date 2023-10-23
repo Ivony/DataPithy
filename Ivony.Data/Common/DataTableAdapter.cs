@@ -45,7 +45,7 @@ namespace Ivony.Data.Common
 
       var dataTable = new DataTable();
 
-      base.FillSchema( dataTable, SchemaType.Source, dataReader );
+      base.FillSchema( dataTable, SchemaType.Mapped, dataReader );
 
       var array = new object[dataReader.FieldCount];
       var count = 0;
