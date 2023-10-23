@@ -51,8 +51,6 @@ namespace Ivony.Data.Common
       var count = 0;
 
 
-      var watch = new Stopwatch();
-
       while ( await dataReader.ReadAsync( cancellationToken ) )
       {
 
@@ -70,15 +68,10 @@ namespace Ivony.Data.Common
         }
 
 
-        watch.Start();
-
         dataReader.GetValues( array );
         dataTable.Rows.Add( array );
-        watch.Stop();
 
       }
-
-      Console.WriteLine( $"load:{watch.ElapsedMilliseconds}ms" );
 
       return dataTable;
     }
