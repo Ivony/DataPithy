@@ -83,7 +83,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="dataItem">数据行</param>
     /// <returns>转换的实体对象</returns>
-    T Convert( DataRow dataItem );
+    T Convert( IDataRecord dataItem );
 
     /// <summary>
     /// 是否可重用

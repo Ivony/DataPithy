@@ -65,13 +65,13 @@ namespace Ivony.Data
 
 
 
-    private static Action<DataRow, T> fillMethod;
+    private static Action<IDataRecord, T> fillMethod;
 
     /// <summary>
     /// 获取实体填充方法
     /// </summary>
     /// <returns>针对指定实体的转换方法</returns>
-    internal static Action<DataRow, T> GetFillMethod()
+    internal static Action<IDataRecord, T> GetFillMethod()
     {
 
       lock ( sync )
@@ -81,7 +81,7 @@ namespace Ivony.Data
 
     }
 
-    private static Action<DataRow, T> CreateFillMethod()
+    private static Action<IDataRecord, T> CreateFillMethod()
     {
       var type = typeof( T );
 
@@ -138,14 +138,14 @@ namespace Ivony.Data
         il.Emit( OpCodes.Ldarg_1 );
         il.Emit( OpCodes.Ldarg_0 );
         il.Emit( OpCodes.Ldstr, name );
-        il.Emit( OpCodes.Call, typeof( EntityExtensions ).GetMethod( "FieldValue", new[] { typeof( DataRow ), typeof( string ) } ).MakeGenericMethod( p.PropertyType ) );
+        il.Emit( OpCodes.Call, typeof( EntityExtensions ).GetMethod( "FieldValue", new[] { typeof( IDataRecord ), typeof( string ) } ).MakeGenericMethod( p.PropertyType ) );
         il.Emit( OpCodes.Callvirt, setMethod );
         il.MarkLabel( label );
       }
 
       il.Emit( OpCodes.Ret );
 
-      return (Action<DataRow, T>) dynamicMethod.CreateDelegate( typeof( Action<DataRow, T> ) );
+      return (Action<IDataRecord, T>) dynamicMethod.CreateDelegate( typeof( Action<IDataRecord, T> ) );
     }
 
 
@@ -153,12 +153,12 @@ namespace Ivony.Data
     /// <summary>
     /// 用指定的数据对象填充实体对象
     /// </summary>
-    /// <param name="dataItem">数据对象</param>
+    /// <param name="dataRecord">数据记录</param>
     /// <param name="entity">要填充的实体对象</param>
     /// <returns>填充好的实体对象</returns>
-    public static T FillEntity( DataRow dataItem, T entity )
+    public static T FillEntity( IDataRecord dataRecord, T entity )
     {
-      GetFillMethod()( dataItem, entity );
+      GetFillMethod()( dataRecord, entity );
       return entity;
     }
 
@@ -260,26 +260,26 @@ namespace Ivony.Data
 
     private static IEntityConverter<T> CreateConverter( MethodInfo method )
     {
-      return new EntityConverter( (Func<DataRow, T>) Delegate.CreateDelegate( typeof( Func<DataRow, T> ), method ) );
+      return new EntityConverter( (Func<IDataRecord, T>) Delegate.CreateDelegate( typeof( Func<IDataRecord, T> ), method ) );
 
     }
 
 
 
-    private static IEntityConverter<T> CreateConverter( ConstructorInfo constructorInfo, bool withDataRow )
+    private static IEntityConverter<T> CreateConverter( ConstructorInfo constructorInfo, bool withDataRecord )
     {
 
       Expression body;
       var parameter = Expression.Parameter( typeof( DataRow ), "dataItem" );
 
-      if ( withDataRow )
+      if ( withDataRecord )
         body = Expression.New( constructorInfo, parameter );
 
       else
         body = Expression.Call( thisFillMethod, parameter, Expression.New( constructorInfo ) );
 
 
-      var func = Expression.Lambda<Func<DataRow, T>>( body, parameter );
+      var func = Expression.Lambda<Func<IDataRecord, T>>( body, parameter );
       return new EntityConverter( func.Compile() );
     }
 
@@ -288,15 +288,15 @@ namespace Ivony.Data
     private class EntityConverter : IEntityConverter<T>
     {
 
-      private Func<DataRow, T> _method;
+      private Func<IDataRecord, T> _method;
 
-      public EntityConverter( Func<DataRow, T> method )
+      public EntityConverter( Func<IDataRecord, T> method )
       {
         _method = method;
       }
 
 
-      public T Convert( DataRow dataItem )
+      public T Convert( IDataRecord dataItem )
       {
         return _method( dataItem );
       }
@@ -315,9 +315,8 @@ namespace Ivony.Data
     /// </summary>
     private class DefaultEntityConverter : IEntityConverter<T>
     {
-      public T Convert( DataRow dataItem )
+      public T Convert( IDataRecord dataItem )
       {
-
         throw new NotImplementedException();
       }
 

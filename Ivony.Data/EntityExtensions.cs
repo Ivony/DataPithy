@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,7 +15,7 @@ namespace Ivony.Data
   /// <summary>
   /// 提供面向 Entity 的扩展方法
   /// </summary>
-  public static class EntityExtensions
+  public static partial class EntityExtensions
   {
 
 
@@ -27,7 +28,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public static T[] ExecuteEntities<T>( this IDbExecutable query )
     {
-      var data = query.ExecuteDataTable();
+      var data = Data.DataTableExecuteExtensions.ExecuteDataTable( query );
       return data.GetRows().Select( dataItem => dataItem.ToEntity<T>() ).ToArray();
     }
 
@@ -41,7 +42,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public async static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
-      var data = await query.ExecuteDataTableAsync( token );
+      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
       return data.GetRows().Select( dataItem => dataItem.ToEntity<T>() ).ToArray();
     }
 
@@ -55,7 +56,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public static T[] ExecuteEntities<T>( this IDbExecutable query, IEntityConverter<T> converter )
     {
-      var data = query.ExecuteDataTable();
+      var data = Data.DataTableExecuteExtensions.ExecuteDataTable( query );
       return data.GetRows().Select( dataItem => dataItem.ToEntity( converter ) ).ToArray();
     }
 
@@ -70,7 +71,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public async static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, IEntityConverter<T> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var data = await query.ExecuteDataTableAsync( token );
+      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
       return data.GetRows().Select( dataItem => dataItem.ToEntity<T>( converter ) ).ToArray();
     }
 
@@ -84,7 +85,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public static T[] ExecuteEntities<T>( this IDbExecutable query, Func<DataRow, T> converter )
     {
-      var data = query.ExecuteDataTable();
+      var data = Data.DataTableExecuteExtensions.ExecuteDataTable( query );
       return data.GetRows().Select( dataItem => converter( dataItem ) ).ToArray();
     }
 
@@ -99,7 +100,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public async static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, Func<DataRow, T> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var data = await query.ExecuteDataTableAsync( token );
+      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
       return data.GetRows().Select( dataItem => converter( dataItem ) ).ToArray();
     }
 
@@ -114,7 +115,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public async static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, Func<DataRow, CancellationToken, Task<T>> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var data = await query.ExecuteDataTableAsync( token );
+      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
       List<T> result = new List<T>();
 
       foreach ( var dataItem in data.GetRows() )
@@ -136,7 +137,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public static T ExecuteEntity<T>( this IDbExecutable query )
     {
-      var dataItem = query.ExecuteFirstRow();
+      var dataItem = Data.DataTableExecuteExtensions.ExecuteFirstRow( query );
       return dataItem.ToEntity<T>();
 
     }
@@ -150,7 +151,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
-      var dataItem = await query.ExecuteFirstRowAsync( token );
+      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query, token );
       return dataItem.ToEntity<T>();
 
     }
@@ -165,7 +166,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public static T ExecuteEntity<T>( this IDbExecutable query, IEntityConverter<T> converter )
     {
-      var dataItem = query.ExecuteFirstRow();
+      var dataItem = Data.DataTableExecuteExtensions.ExecuteFirstRow( query );
       return dataItem.ToEntity<T>( converter );
 
     }
@@ -181,7 +182,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, IEntityConverter<T> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var dataItem = await query.ExecuteFirstRowAsync( token );
+      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query, token );
       return dataItem.ToEntity<T>( converter );
 
     }
@@ -195,7 +196,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public static T ExecuteEntity<T>( this IDbExecutable query, Func<DataRow, T> converter )
     {
-      var dataItem = query.ExecuteFirstRow();
+      var dataItem = Data.DataTableExecuteExtensions.ExecuteFirstRow( query );
       return converter( dataItem );
     }
 
@@ -209,7 +210,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, Func<DataRow, T> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var dataItem = await query.ExecuteFirstRowAsync( token );
+      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query, token );
       return converter( dataItem );
     }
 
@@ -224,7 +225,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, Func<DataRow, CancellationToken, Task<T>> converter, CancellationToken token = default( CancellationToken ) )
     {
-      var dataItem = await query.ExecuteFirstRowAsync( token );
+      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query, token );
       return await converter( dataItem, token );
     }
 
@@ -239,7 +240,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public static T ToEntity<T>( this DataRow dataItem )
     {
-      return ToEntity<T>( dataItem, null );
+      return ToEntity<T>( dataItem.AsDataRecord(), null );
     }
 
     /// <summary>
@@ -251,7 +252,32 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public static T ToEntity<T>( this DataRow dataItem, IEntityConverter<T> converter )
     {
-      if ( dataItem == null )
+      var entityConverter = converter ?? EntityConvert<T>.GetConverter();
+      return entityConverter.Convert( dataItem.AsDataRecord() );
+    }
+
+
+    /// <summary>
+    /// 将 DataRow 转换为实体
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
+    /// <param name="dataItem">包含数据的 DataRow</param>
+    /// <returns>实体</returns>
+    public static T ToEntity<T>( this IDataRecord dataItem )
+    {
+      return ToEntity<T>( dataItem, null );
+    }
+
+    /// <summary>
+    /// 将 DataRow 转换为实体
+    /// </summary>
+    /// <typeparam name="T">实体类型</typeparam>
+    /// <param name="dataItem">包含数据的 DataRow</param>
+    /// <param name="converter">实体转换器</param>
+    /// <returns>实体</returns>
+    public static T ToEntity<T>( this IDataRecord record, IEntityConverter<T> converter )
+    {
+      if ( record == null )
       {
 
         if ( typeof( T ).IsValueType )
@@ -261,9 +287,9 @@ namespace Ivony.Data
           return default( T );//等同于return null
       }
 
-      if ( dataItem.Table.Columns.Count == 1 )
+      if ( record.FieldCount == 1 )
       {
-        var value = dataItem[0];
+        var value = record[0];
 
         if ( value is T )
           return (T) value;
@@ -271,22 +297,24 @@ namespace Ivony.Data
 
 
       var entityConverter = converter ?? EntityConvert<T>.GetConverter();
-      return entityConverter.Convert( dataItem );
+      return entityConverter.Convert( record );
     }
 
 
 
+
+
     private static object sync = new object();
-    private static Dictionary<Type, Func<DataRow, object>> entityConverterDictionary = new Dictionary<Type, Func<DataRow, object>>();
+    private static Dictionary<Type, Func<IDataRecord, object>> entityConverterDictionary = new Dictionary<Type, Func<IDataRecord, object>>();
 
 
-    internal static object ToEntity( this DataRow dataItem, Type entityType )
+    internal static object ToEntity( this IDataRecord dataItem, Type entityType )
     {
       return GetToEntityMethod( entityType )( dataItem );
     }
 
 
-    private static Func<DataRow, object> GetToEntityMethod( Type entityType )
+    private static Func<IDataRecord, object> GetToEntityMethod( Type entityType )
     {
       lock ( sync )
       {
@@ -295,10 +323,10 @@ namespace Ivony.Data
 
 
         var method = typeof( EntityExtensions )
-          .GetMethod( "ToEntity", new[] { typeof( DataRow ) } )
+          .GetMethod( "ToEntity", new[] { typeof( IDataRecord ) } )
           .MakeGenericMethod( entityType );
 
-        return entityConverterDictionary[entityType] = (Func<DataRow, object>) Delegate.CreateDelegate( typeof( Func<DataRow, object> ), method );
+        return entityConverterDictionary[entityType] = (Func<IDataRecord, object>) Delegate.CreateDelegate( typeof( Func<IDataRecord, object> ), method );
       }
     }
 
@@ -307,16 +335,16 @@ namespace Ivony.Data
 
 
 
-    private static Dictionary<Type, Func<DataRow, DataColumn, object>> dbValueConverterDictionary = new Dictionary<Type, Func<DataRow, DataColumn, object>>();
+    private static Dictionary<Type, Func<IDataRecord, DataColumn, object>> dbValueConverterDictionary = new Dictionary<Type, Func<IDataRecord, DataColumn, object>>();
 
 
-    internal static object FieldValue( this DataRow dataItem, DataColumn column, Type valueType )
+    internal static object FieldValue( this IDataRecord dataItem, DataColumn column, Type valueType )
     {
       return GetFieldValueMethod( valueType )( dataItem, column );
     }
 
 
-    private static Func<DataRow, DataColumn, object> GetFieldValueMethod( Type valueType )
+    private static Func<IDataRecord, DataColumn, object> GetFieldValueMethod( Type valueType )
     {
       lock ( sync )
       {
@@ -326,25 +354,12 @@ namespace Ivony.Data
 
         var method = fieldValueMethod.MakeGenericMethod( valueType );
 
-        return dbValueConverterDictionary[valueType] = (Func<DataRow, DataColumn, object>) Delegate.CreateDelegate( typeof( Func<DataRow, DataColumn, object> ), method );
+        return dbValueConverterDictionary[valueType] = (Func<IDataRecord, DataColumn, object>) Delegate.CreateDelegate( typeof( Func<IDataRecord, DataColumn, object> ), method );
       }
     }
 
 
 
-
-    /// <summary>
-    /// 获取指定字段的值
-    /// </summary>
-    /// <typeparam name="T">值类型</typeparam>
-    /// <param name="dataRow">数据行</param>
-    /// <param name="columnIndex">要返回的列的序号</param>
-    /// <returns>强类型的值</returns>
-    public static T FieldValue<T>( this DataRow dataRow, int columnIndex )
-    {
-
-      return FieldValue<T>( dataRow, dataRow.Table.Columns[columnIndex] );
-    }
 
     /// <summary>
     /// 获取指定字段的值
@@ -384,6 +399,5 @@ namespace Ivony.Data
         throw;
       }
     }
-
   }
 }

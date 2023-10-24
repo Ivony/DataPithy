@@ -126,7 +126,7 @@ namespace Ivony.Data
     /// <returns>第一列的数据</returns>
     public static T[] ExecuteFirstColumn<T>( this IDbExecutable query )
     {
-      return query.ExecuteDataTable().Column<T>();
+      return Data.DataTableExecuteExtensions.ExecuteDataTable( query ).Column<T>();
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ namespace Ivony.Data
     /// <returns>第一列的数据</returns>
     public async static Task<T[]> ExecuteFirstColumnAsync<T>( this IDbExecutable query )
     {
-      return (await query.ExecuteDataTableAsync()).Column<T>();
+      return (await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query )).Column<T>();
     }
 
 
@@ -148,7 +148,7 @@ namespace Ivony.Data
     /// <returns>转换为 DataRowView 的数据集合</returns>
     public static IEnumerable<DataRowView> ExecuteDataRowViews( this IDbExecutable query )
     {
-      return query.ExecuteDataTable().GetRowViews();
+      return Data.DataTableExecuteExtensions.ExecuteDataTable( query ).GetRowViews();
     }
 
 
@@ -159,7 +159,7 @@ namespace Ivony.Data
     /// <returns>转换为 DataRowView 的数据集合</returns>
     public async static Task<IEnumerable<DataRowView>> ExecuteDataRowViewsAsync( this IDbExecutable query )
     {
-      return (await query.ExecuteDataTableAsync()).GetRowViews();
+      return (await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query )).GetRowViews();
     }
 
 
@@ -170,7 +170,7 @@ namespace Ivony.Data
     /// <returns>转换为 DataRowView 的数据集合</returns>
     public static DataRowView ExecuteFirstDataRowView( this IDbExecutable query )
     {
-      return query.ExecuteDataTable().GetRowViews().FirstOrDefault();
+      return Data.DataTableExecuteExtensions.ExecuteDataTable( query ).GetRowViews().FirstOrDefault();
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ namespace Ivony.Data
     /// <returns>转换为 DataRowView 的数据集合</returns>
     public async static Task<DataRowView> ExecuteFirstDataRowViewAsync( this IDbExecutable query )
     {
-      return (await query.ExecuteDataTableAsync()).GetRowViews().FirstOrDefault();
+      return (await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query )).GetRowViews().FirstOrDefault();
     }
 
   }

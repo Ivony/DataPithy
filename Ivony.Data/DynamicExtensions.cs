@@ -51,7 +51,7 @@ namespace Ivony.Data
     /// <returns>查询结果</returns>
     public static dynamic[] ExecuteDynamics( this IDbExecutable query )
     {
-      var data = query.ExecuteDataTable();
+      var data = Data.DataTableExecuteExtensions.ExecuteDataTable( query );
       return ToDynamics( data );
     }
 
@@ -63,7 +63,7 @@ namespace Ivony.Data
     /// <returns>查询结果</returns>
     public static async Task<dynamic[]> ExecuteDynamicsAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
     {
-      var data = await query.ExecuteDataTableAsync( token );
+      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
       return ToDynamics( data );
     }
 
@@ -76,7 +76,7 @@ namespace Ivony.Data
     /// <returns>查询结果</returns>
     public static dynamic ExecuteDynamicObject( this IDbExecutable query )
     {
-      var dataItem = query.ExecuteFirstRow();
+      var dataItem = Data.DataTableExecuteExtensions.ExecuteFirstRow( query );
       return ToDynamic( dataItem );
     }
 
@@ -88,7 +88,7 @@ namespace Ivony.Data
     /// <returns>查询结果</returns>
     public static async Task<dynamic> ExecuteDynamicObjectAsync( this IDbExecutable query )
     {
-      var dataItem = await query.ExecuteFirstRowAsync();
+      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query );
       return ToDynamic( dataItem );
     }
 
