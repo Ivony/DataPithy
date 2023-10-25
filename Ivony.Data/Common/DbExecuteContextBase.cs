@@ -35,7 +35,6 @@ namespace Ivony.Data.Common
       SyncRoot = sync;
       Tracing = tracing;
 
-      DataTableAdapter = new DataTableAdapter();
 
 
 
@@ -75,14 +74,13 @@ namespace Ivony.Data.Common
     }
 
 
+
+    private Lazy<IDataTableAdapter> _adapterLoader = new Lazy<IDataTableAdapter>( () => new DataTableAdapter() );
+
     /// <summary>
     /// 用于填充数据到 DataTable 的 DataTableAdapter 对象
     /// </summary>
-    protected DataTableAdapter DataTableAdapter
-    {
-      get;
-      private set;
-    }
+    protected virtual IDataTableAdapter DataTableAdapter => _adapterLoader.Value;
 
     /// <summary>
     /// 加载数据到 DataTable
