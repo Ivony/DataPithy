@@ -54,11 +54,29 @@ namespace Ivony.Data.MySqlClient
 
     protected override MySqlExecuteContext CreateExecuteContext( MySqlCommand command, IDbTracing tracing )
     {
-      return new MySqlExecuteContext( command.Connection, command.ExecuteReader(), tracing );
+      if ( command is null ) throw new ArgumentNullException( nameof( command ) );
+      try
+      {
+        return new MySqlExecuteContext( command.Connection, command.ExecuteReader(), tracing );
+      }
+      catch
+      {
+        command.Connection.Dispose();
+        throw;
+      }
     }
     protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( MySqlCommand command, IDbTracing tracing )
     {
-      return new MySqlExecuteContext( command.Connection, await command.ExecuteReaderAsync(), tracing );
+      if ( command is null ) throw new ArgumentNullException( nameof( command ) );
+      try
+      {
+        return new MySqlExecuteContext( command.Connection, await command.ExecuteReaderAsync(), tracing );
+      }
+      catch
+      {
+        command.Connection.Dispose();
+        throw;
+      }
     }
   }
 
@@ -86,11 +104,15 @@ namespace Ivony.Data.MySqlClient
 
     protected override MySqlExecuteContext CreateExecuteContext( MySqlCommand command, IDbTracing tracing )
     {
+      if ( command is null ) throw new ArgumentNullException( nameof( command ) );
+
       return new MySqlExecuteContext( Transaction, command.ExecuteReader(), tracing );
     }
 
     protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( MySqlCommand command, IDbTracing tracing )
     {
+      if ( command is null ) throw new ArgumentNullException( nameof( command ) );
+
       return new MySqlExecuteContext( Transaction, await command.ExecuteReaderAsync(), tracing );
     }
 
@@ -110,25 +132,14 @@ namespace Ivony.Data.MySqlClient
 
     public IDbExecuteContext Execute( DbQuery query )
     {
-      var command = CreateCommand( query );
       try
       {
-        return Execute( command, TryCreateTracing( this, query ) );
+        return Execute( CreateCommand( query ), TryCreateTracing( this, query ) );
       }
       catch ( Exception e )
       {
-        command.Dispose();
         throw ExecuteError( e, query );
       }
-    }
-
-    private static ParameterizedQuery AsParameterizedQuery( DbQuery query )
-    {
-      var parameterizedQuery = query as ParameterizedQuery;
-
-      if ( parameterizedQuery == null )
-        throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
-      return parameterizedQuery;
     }
 
     protected virtual IDbExecuteContext Execute( MySqlCommand command, IDbTracing tracing )
@@ -140,13 +151,12 @@ namespace Ivony.Data.MySqlClient
       {
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        command = ApplyConnection( command );
-
+        var flag = ApplyConnection( command );
         var context = CreateExecuteContext( command, tracing );
-
         TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
         return context;
+
       }
       catch ( DbException exception )
       {
@@ -164,6 +174,17 @@ namespace Ivony.Data.MySqlClient
 
 
     protected abstract MySqlCommand ApplyConnection( MySqlCommand command );
+
+
+    private static ParameterizedQuery AsParameterizedQuery( DbQuery query )
+    {
+      var parameterizedQuery = query as ParameterizedQuery;
+
+      if ( parameterizedQuery == null )
+        throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
+      return parameterizedQuery;
+    }
+
 
     private MySqlCommand CreateCommand( DbQuery query )
     {
