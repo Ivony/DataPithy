@@ -33,7 +33,7 @@ namespace Ivony.Data.SqlClient
     {
 
       ConnectionString = database.ConnectionString;
-      Configuration = database.ServiceProvider.GetService<SqlServerConfiguration>();
+      Configuration = database.Configuration;
 
     }
 

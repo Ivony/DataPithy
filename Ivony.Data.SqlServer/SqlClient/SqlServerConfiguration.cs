@@ -24,6 +24,9 @@ namespace Ivony.Data.SqlClient
     public SqlServerConfiguration( SqlServerConfiguration configuration ) { }
 
 
+    /// <summary>
+    /// 设置查询超时时间
+    /// </summary>
     public TimeSpan? QueryExecutingTimeout { get; set; }
   }
 }
