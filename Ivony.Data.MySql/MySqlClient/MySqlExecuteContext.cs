@@ -1,4 +1,7 @@
-﻿using Ivony.Data.Common;
+﻿using System;
+
+using Ivony.Data.Common;
+
 #if MySqlConnector
 using MySqlConnector;
 #else
@@ -42,6 +45,7 @@ namespace Ivony.Data.MySqlClient
     }
 
 
+
     /// <summary>
     /// 数据读取器
     /// </summary>
@@ -61,6 +65,9 @@ namespace Ivony.Data.MySqlClient
       private set;
     }
 
+
+    private Lazy<IDataTableAdapter> _adapter = new Lazy<IDataTableAdapter>( new MySqlTableDataAdapter() );
+    protected override IDataTableAdapter DataTableAdapter => _adapter.Value;
 
   }
 }
