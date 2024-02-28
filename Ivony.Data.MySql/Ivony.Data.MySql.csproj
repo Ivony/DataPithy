@@ -10,7 +10,8 @@
     <RootNamespace>Ivony.Data</RootNamespace>
     <VersionPrefix>4.5.5</VersionPrefix>
     <Description>DataPithy for MySQL</Description>
-    <Connector>MySQL.Connector</Connector>
+    <Connector>MySQL.Data</Connector>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Connector)'=='MySQL.Connector'">
@@ -18,8 +19,9 @@
     <VersionSuffix>MySQLConnector</VersionSuffix>
   </PropertyGroup>
 
+
   <ItemGroup Condition="'$(Connector)'=='MySQL.Data'">
-    <PackageReference Include="MySql.Data" Version="8.0.22" />
+    <PackageReference Include="MySql.Data" Version="8.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Connector)'=='MySQL.Connector'">
