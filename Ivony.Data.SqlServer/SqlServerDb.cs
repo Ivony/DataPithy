@@ -163,7 +163,7 @@ namespace Ivony.Data
 
 
 
-    private SqlServerConfiguration _configuration = new SqlServerConfiguration();;
+    private SqlServerConfiguration _configuration = new SqlServerConfiguration();
 
     /// <summary>
     /// 获取或设置 SQL Server 配置信息
