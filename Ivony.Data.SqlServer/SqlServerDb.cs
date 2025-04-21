@@ -163,15 +163,5 @@ namespace Ivony.Data
 
 
 
-    private SqlServerConfiguration _configuration = new SqlServerConfiguration();
-
-    /// <summary>
-    /// 获取或设置 SQL Server 配置信息
-    /// </summary>
-    public SqlServerConfiguration Configuration
-    {
-      get => _configuration;
-      set => value = _configuration ?? throw new ArgumentNullException( nameof( value ) );
-    }
   }
 }

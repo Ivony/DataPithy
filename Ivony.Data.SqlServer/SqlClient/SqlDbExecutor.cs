@@ -33,7 +33,6 @@ namespace Ivony.Data.SqlClient
     {
 
       ConnectionString = database.ConnectionString;
-      Configuration = database.Configuration;
 
     }
 
@@ -46,7 +45,6 @@ namespace Ivony.Data.SqlClient
     {
       Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
       ConnectionString = Transaction.Connection.ConnectionString;
-      Configuration = transaction.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 
@@ -63,11 +61,6 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     protected SqlServerDatabaseTransaction Transaction { get; }
 
-
-    /// <summary>
-    /// SqlServer 数据库访问配置信息
-    /// </summary>
-    protected SqlServerConfiguration Configuration { get; }
 
 
 
@@ -105,9 +98,6 @@ namespace Ivony.Data.SqlClient
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
 
-        if ( Configuration.QueryExecutingTimeout.HasValue )
-          command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
-
 
         var reader = command.ExecuteReader();
         var context = new SqlDbExecuteContext( reader, tracing );
@@ -142,8 +132,6 @@ namespace Ivony.Data.SqlClient
 
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        if ( Configuration.QueryExecutingTimeout.HasValue )
-          command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
 
 
         var reader = await command.ExecuteReaderAsync( token );
