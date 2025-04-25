@@ -142,7 +142,9 @@ namespace Ivony.Data.MySqlClient
     {
       try
       {
-        return Execute( CreateCommand( query ), TryCreateTracing( this, query ) );
+        var context = Execute( CreateCommand( query ), TryCreateTracing( this, query ) );
+        context.RegisterExceptionHandler( e => ExecuteError( e, query ) );
+        return context;
       }
       catch ( Exception e )
       {
@@ -210,7 +212,9 @@ namespace Ivony.Data.MySqlClient
       var command = CreateCommand( query );
       try
       {
-        return await ExecuteAsync( command, TryCreateTracing( this, query ) );
+        var context = await ExecuteAsync( command, TryCreateTracing( this, query ) );
+        context.RegisterExceptionHandler( e => ExecuteError( e, query ) );
+        return context;
       }
       catch ( Exception e )
       {
