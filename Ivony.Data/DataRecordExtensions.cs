@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Ivony.Data
 {
-  public static class DataRevordExtensions
+  public static class DataRecordExtensions
   {
 
     public static IDataRecord AsDataRecord( this DataRow dataRow )
