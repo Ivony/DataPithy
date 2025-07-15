@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -137,7 +138,13 @@ namespace Ivony.Data
     }
 
 
-    public static async Task<IReadOnlyList<IDataRecord>> ExecuteDataRecordsAsync( this IDbExecutable query, CancellationToken token = default )
+    /// <summary>
+    /// 异步查询结果集以IDataRecord的形式返回
+    /// </summary>
+    /// <param name="query">要执行的查询</param>
+    /// <param name="token">取消标志</param>
+    /// <returns>异步查询结果</returns>
+    public static async IAsyncEnumerable<IDataRecord> ExecuteDataRecordsAsync( this IDbExecutable query, [EnumeratorCancellation] CancellationToken token = default )
     {
 
       var result = new List<IDataRecord>();
@@ -146,16 +153,37 @@ namespace Ivony.Data
       {
         while ( true )
         {
-          var record = await context.ReadRecordAsync();
+          var record = await context.ReadRecordAsync( token );
           if ( record == null )
-            break;
-          
-          result.Add( record );
+            yield break;
+
+          yield return record;
         }
       }
-
-      return new ReadOnlyCollection<IDataRecord>( result );
     }
 
+
+    /// <summary>
+    /// 异步查询结果集以IDataRecord的形式返回
+    /// </summary>
+    /// <param name="query">要执行的查询</param>
+    /// <returns>异步查询结果</returns>
+    public static IEnumerable<IDataRecord> ExecuteDataRecords( this IDbExecutable query )
+    {
+
+      var result = new List<IDataRecord>();
+
+      using ( var context = query.Execute() )
+      {
+        while ( true )
+        {
+          var record = context.ReadRecord();
+          if ( record == null )
+            yield break;
+
+          yield return record;
+        }
+      }
+    }
   }
 }
