@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -155,6 +156,7 @@ namespace Ivony.Data.Common
 
 
     private Exception _exception;
+    private ConcurrentBag<Action<Exception>> _exceptionHandlers = new ConcurrentBag<Action<Exception>>();
 
     /// <summary>
     /// 当结果集执行过程中产生了异常，则调用此方法来记录。
@@ -163,7 +165,17 @@ namespace Ivony.Data.Common
     protected void OnException( Exception exception )
     {
       _exception = exception;
+
+      foreach ( var handler in _exceptionHandlers )
+      {
+        handler( exception );
+      }
+
     }
+
+
+    /// <inheritdoc />
+    public void RegisterExceptionHandler( Action<Exception> handler ) => _exceptionHandlers.Add( handler );
 
 
 

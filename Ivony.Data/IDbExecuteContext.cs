@@ -52,6 +52,14 @@ namespace Ivony.Data
     /// </summary>
     object SyncRoot { get; }
 
+
+
+    /// <summary>
+    /// 注册一个数据查询异常处理程序。
+    /// </summary>
+    /// <param name="exceptionHandler">一个处理异常的委托，当捕获到异常时会调用此委托。</param>
+    void RegisterExceptionHandler( Action<Exception> exceptionHandler );
+
   }
 
 

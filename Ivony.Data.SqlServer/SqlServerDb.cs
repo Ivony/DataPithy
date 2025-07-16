@@ -160,5 +160,8 @@ namespace Ivony.Data
     internal static string LocalDBInstanceName { get; set; }
 
     internal static string ExpressInstanceName { get; set; }
+
+
+
   }
 }

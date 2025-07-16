@@ -33,7 +33,6 @@ namespace Ivony.Data.SqlClient
     {
 
       ConnectionString = database.ConnectionString;
-      Configuration = database.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 
@@ -46,7 +45,6 @@ namespace Ivony.Data.SqlClient
     {
       Transaction = transaction ?? throw new ArgumentNullException( nameof( transaction ) );
       ConnectionString = Transaction.Connection.ConnectionString;
-      Configuration = transaction.ServiceProvider.GetService<SqlServerConfiguration>();
 
     }
 
@@ -63,11 +61,6 @@ namespace Ivony.Data.SqlClient
     /// </summary>
     protected SqlServerDatabaseTransaction Transaction { get; }
 
-
-    /// <summary>
-    /// SqlServer 数据库访问配置信息
-    /// </summary>
-    protected SqlServerConfiguration Configuration { get; }
 
 
 
@@ -105,9 +98,6 @@ namespace Ivony.Data.SqlClient
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
 
-        if ( Configuration.QueryExecutingTimeout.HasValue )
-          command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
-
 
         var reader = command.ExecuteReader();
         var context = new SqlDbExecuteContext( reader, tracing );
@@ -142,8 +132,6 @@ namespace Ivony.Data.SqlClient
 
         TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-        if ( Configuration.QueryExecutingTimeout.HasValue )
-          command.CommandTimeout = (int) Configuration.QueryExecutingTimeout.Value.TotalSeconds;
 
 
         var reader = await command.ExecuteReaderAsync( token );
@@ -170,9 +158,12 @@ namespace Ivony.Data.SqlClient
       if ( parameterizedQuery == null )
         throw new NotSupportedException( $"not support query of type \"{query.GetType().FullName}\"" );
 
+
       try
       {
-        return Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+        var context = Execute( CreateCommand( parameterizedQuery ), TryCreateTracing( this, query ) );
+        context.RegisterExceptionHandler( e => ExecuteError( e, query ) );
+        return context;
       }
       catch ( Exception e )
       {
@@ -180,7 +171,7 @@ namespace Ivony.Data.SqlClient
       }
     }
 
-    Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( DbQuery query, CancellationToken token )
+    async Task<IAsyncDbExecuteContext> IAsyncDbExecutor.ExecuteAsync( DbQuery query, CancellationToken token )
     {
       var parameterizedQuery = query as ParameterizedQuery;
       if ( parameterizedQuery == null )
@@ -188,7 +179,9 @@ namespace Ivony.Data.SqlClient
 
       try
       {
-        return ExecuteAsync( CreateCommand( parameterizedQuery ), token, TryCreateTracing( this, query ) );
+        var context = await ExecuteAsync( CreateCommand( parameterizedQuery ), token, TryCreateTracing( this, query ) );
+        context.RegisterExceptionHandler( e => ExecuteError( e, query ) );
+        return context;
       }
       catch ( Exception e )
       {

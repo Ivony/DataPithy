@@ -75,6 +75,8 @@ namespace Ivony.Data.Common
       cancellationToken.ThrowIfCancellationRequested();
       return ReadRecord();
     }
+
+    public void RegisterExceptionHandler( Action<Exception> exceptionHandler ) => Context.RegisterExceptionHandler( exceptionHandler );
   }
 
 
