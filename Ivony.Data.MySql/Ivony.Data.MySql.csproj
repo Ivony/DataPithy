@@ -10,7 +10,7 @@
     <RootNamespace>Ivony.Data</RootNamespace>
     <VersionPrefix>5.0.0-alpha-0716a</VersionPrefix>
     <Description>DataPithy for MySQL</Description>
-    <Connector>MySQL.Data</Connector>
+    <Connector>MySQL.Connector</Connector>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
