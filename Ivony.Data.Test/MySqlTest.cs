@@ -57,7 +57,7 @@ PRIMARY KEY (Id)
   }
 
   [TestMethod]
-  public void Entitytest()
+  public void EntityTest()
   {
     Assert.IsNull( Db.T( $"SELECT * FROM testTable" ).ExecuteEntity<TestEntity>(), "空数据表查询" );
 
@@ -65,6 +65,19 @@ PRIMARY KEY (Id)
     Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteEntities<TestEntity>().Length, 1L, "插入数据后查询" );
 
     var dataItem = Db.T( $"SELECT * FROM testTable" ).ExecuteEntity<TestEntity>();
+    Assert.AreEqual( dataItem.Name, "Ivony", "插入数据后查询" );
+    Assert.AreEqual( dataItem.Content, "Test", "插入数据后查询" );
+  }
+
+  [TestMethod]
+  public async Task AsyncEntityTest()
+  {
+    Assert.IsNull( await Db.T( $"SELECT * FROM testTable" ).ExecuteEntityAsync<TestEntity>(), "空数据表查询" );
+
+    Assert.AreEqual( await Db.T( $"INSERT INTO testTable ( Name, Content) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
+    Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteEntitiesAsync<TestEntity>()).Length, 1L, "插入数据后查询" );
+
+    var dataItem = await Db.T( $"SELECT * FROM testTable" ).ExecuteEntityAsync<TestEntity>();
     Assert.AreEqual( dataItem.Name, "Ivony", "插入数据后查询" );
     Assert.AreEqual( dataItem.Content, "Test", "插入数据后查询" );
   }

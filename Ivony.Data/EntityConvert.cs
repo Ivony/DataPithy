@@ -25,26 +25,6 @@ namespace Ivony.Data
     private static Dictionary<PropertyInfo, object[]> _propertyAttributesCache = new Dictionary<PropertyInfo, object[]>();
 
 
-    /// <summary>
-    /// 获取指定属性上的特性
-    /// </summary>
-    /// <param name="property">要获取特性的属性</param>
-    /// <returns>属性上所设置的特性</returns>
-    private static object[] GetAttributes( PropertyInfo property )
-    {
-      lock ( sync )
-      {
-
-        if ( _propertyAttributesCache.TryGetValue( property, out object[] attributes ) )
-          return attributes;
-
-        attributes = property.GetCustomAttributes( false );
-
-        _propertyAttributesCache[property] = attributes;
-
-        return attributes;
-      }
-    }
 
 
     /// <summary>
@@ -159,12 +139,6 @@ namespace Ivony.Data
 
         return converter ?? instance;
       }
-    }
-
-
-    private static bool CheckMethodSignature( MethodBase method, params Type[] types )
-    {
-      return new HashSet<Type>( method.GetParameters().Select( p => p.ParameterType ) ).SetEquals( new HashSet<Type>( types ) );
     }
 
 

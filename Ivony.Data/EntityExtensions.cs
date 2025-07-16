@@ -36,7 +36,7 @@ namespace Ivony.Data
     /// <param name="query">要执行的查询</param>
     /// <param name="token">取消指示</param>
     /// <returns>实体集</returns>
-    public static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, CancellationToken token ) => ExecuteEntitiesAsync( query, EntityConvert<T>.GetConverter() );
+    public static Task<T[]> ExecuteEntitiesAsync<T>( this IDbExecutable query, CancellationToken token = default ) => ExecuteEntitiesAsync( query, EntityConvert<T>.GetConverter() );
 
     /// <summary>
     /// 查询数据库并将第一个结果集填充实体类型
