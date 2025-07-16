@@ -4,7 +4,7 @@
 
 
   <PropertyGroup>
-    <Version>4.5.4</Version>
+    <Version>5.0.0-alpha-0716</Version>
     <Description>DataPithy is a light database accesser</Description>
   </PropertyGroup>
 </Project>
