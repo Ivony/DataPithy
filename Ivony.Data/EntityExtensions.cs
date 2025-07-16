@@ -47,7 +47,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public static T[] ExecuteEntities<T>( this IDbExecutable query, IEntityConverter<T> converter )
     {
-      var data = Data.DataTableExecuteExtensions.ExecuteDataRecords( query );
+      var data = DataRecordExtensions.EnumerateDataRecords( query );
       return data.Select( dataItem => dataItem.ToEntity( converter ) ).ToArray();
     }
 
@@ -64,7 +64,7 @@ namespace Ivony.Data
     {
       var result = new List<T>();
 
-      await foreach ( var item in DataTableExecuteExtensions.ExecuteDataRecordsAsync( query, token ) )
+      await foreach ( var item in DataRecordExtensions.EnumerateDataRecordsAsync( query, token ) )
         result.Add( item.ToEntity( converter ) );
 
       return result.ToArray();
@@ -99,7 +99,7 @@ namespace Ivony.Data
     /// <param name="converter">实体转换方法</param>
     /// <returns>实体</returns>
     public static T ExecuteEntity<T>( this IDbExecutable query, IEntityConverter<T> converter )
-      => DataTableExecuteExtensions.ExecuteDataRecords( query ).FirstOrDefault().ToEntity<T>();
+      => DataRecordExtensions.EnumerateDataRecords( query ).Select( item => item.ToEntity<T>() ).FirstOrDefault();
 
 
     /// <summary>
@@ -112,7 +112,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, IEntityConverter<T> converter, CancellationToken token = default )
     {
-      await foreach ( var item in DataTableExecuteExtensions.ExecuteDataRecordsAsync( query ) )
+      await foreach ( var item in DataRecordExtensions.EnumerateDataRecordsAsync( query ) )
       {
         return item.ToEntity( converter );
       }

@@ -136,54 +136,5 @@ namespace Ivony.Data
           return null;
       }
     }
-
-
-    /// <summary>
-    /// 异步查询结果集以IDataRecord的形式返回
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <param name="token">取消标志</param>
-    /// <returns>异步查询结果</returns>
-    public static async IAsyncEnumerable<IDataRecord> ExecuteDataRecordsAsync( this IDbExecutable query, [EnumeratorCancellation] CancellationToken token = default )
-    {
-
-      var result = new List<IDataRecord>();
-
-      using ( var context = await query.ExecuteAsync( token ) )
-      {
-        while ( true )
-        {
-          var record = await context.ReadRecordAsync( token );
-          if ( record == null )
-            yield break;
-
-          yield return record;
-        }
-      }
-    }
-
-
-    /// <summary>
-    /// 异步查询结果集以IDataRecord的形式返回
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <returns>异步查询结果</returns>
-    public static IEnumerable<IDataRecord> ExecuteDataRecords( this IDbExecutable query )
-    {
-
-      var result = new List<IDataRecord>();
-
-      using ( var context = query.Execute() )
-      {
-        while ( true )
-        {
-          var record = context.ReadRecord();
-          if ( record == null )
-            yield break;
-
-          yield return record;
-        }
-      }
-    }
   }
 }

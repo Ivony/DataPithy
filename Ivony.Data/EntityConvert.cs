@@ -81,7 +81,7 @@ namespace Ivony.Data
       var dataRecord = Expression.Parameter( typeof( IDataRecord ), "dataRecord" );
       var entity = Expression.Parameter( entityType, "entity" );
 
-      var valueMethod = typeof( DataRecordExtensions ).GetMethod( nameof( DataRecordExtensions.FieldValue ), 0, new[] { typeof( IDataRecord ), typeof( string ) } );
+      var valueMethod = typeof( DataRecordExtensions ).GetMethod( nameof( DataRecordExtensions.FieldValue ), 1, new[] { typeof( IDataRecord ), typeof( string ) } );
 
       var setters =
         from property in entityType.GetProperties()
@@ -89,7 +89,7 @@ namespace Ivony.Data
         where property.CanWrite
         let name = GetFieldname( property )
         let set = property.GetSetMethod()
-        let value = Expression.Call( valueMethod, dataRecord, Expression.Constant( name ) )
+        let value = Expression.Call( valueMethod.MakeGenericMethod( property.PropertyType ), dataRecord, Expression.Constant( name ) )
         select Expression.Call( entity, set, value );
 
       return Expression.Lambda<Action<IDataRecord, T>>( Expression.Block( setters.ToArray() ), dataRecord, entity ).Compile();
@@ -114,15 +114,15 @@ namespace Ivony.Data
 
     static EntityConvert()
     {
-      thisFillMethod = typeof( EntityConvert<T> ).GetMethod( "FillEntity" );
+      thisFillMethod = typeof( EntityConvert<T> ).GetMethod( nameof( FillEntity ) );
 
       var type = typeof( T );
       var attribute = type.GetCustomAttributes( typeof( EntityConvertAttribute ), false ).OfType<EntityConvertAttribute>().FirstOrDefault();
 
       if ( attribute != null )
-        converterActivator = () => attribute.CreateConverter<T>();   //缓存创建实例的方法
+        converterActivator = attribute.CreateConverter<T>;   //缓存创建实例的方法
       else
-        converterActivator = () => CreateConverter();
+        converterActivator = CreateConverter;
     }
 
 
@@ -176,33 +176,27 @@ namespace Ivony.Data
     {
 
       var type = typeof( T );
-      {
-        var methods = from i in type.GetMethods( BindingFlags.Static | BindingFlags.Public )
-                      where string.Equals( i.Name, "CreateInstance", StringComparison.OrdinalIgnoreCase )
-                      where CheckMethodSignature( i, typeof( IDataRecord ) )
-                      where i.ReturnType == typeof( T )
-                      select i;
-
-        if ( methods.Count() == 1 )
-          return CreateConverter( methods.First() );
-      }
 
 
-      {
+      var parameter = Expression.Parameter( typeof( IDataRecord ), "dataItem" );
 
+      var constructor = type.GetConstructor( new[] { typeof( IDataRecord ) } );
+      if ( constructor != null )
+        return CreateConverter( Expression.New( constructor, parameter ) );
 
-
-        var constructor = type.GetConstructor( new[] { typeof( IDataRecord ) } );
-        if ( constructor != null )
-          return CreateConverter( constructor, true );
-
-        constructor = type.GetConstructor( new Type[0] );
-        if ( constructor != null )
-          return CreateConverter( constructor, false );
-
-      }
+      constructor = type.GetConstructor( Array.Empty<Type>() );
+      if ( constructor != null )
+        return CreateConverter( Expression.Call( thisFillMethod, parameter, Expression.New( constructor ) ) );
 
       throw new NotSupportedException( string.Format( "不支持 {0} 类型的实体转换，因为该类型没有公开的无参或 IDataRecord 类型的构造函数，也没有指定了自定义实体类型转换器。", typeof( T ).AssemblyQualifiedName ) );
+
+
+      IEntityConverter<T> CreateConverter( Expression body )
+      {
+        var func = Expression.Lambda<Func<IDataRecord, T>>( body, parameter );
+        return new EntityConverter( func.Compile() );
+      }
+
     }
 
     private static IEntityConverter<T> CreateConverter( MethodInfo method )
@@ -213,22 +207,7 @@ namespace Ivony.Data
 
 
 
-    private static IEntityConverter<T> CreateConverter( ConstructorInfo constructorInfo, bool withDataRecord )
-    {
 
-      Expression body;
-      var parameter = Expression.Parameter( typeof( DataRow ), "dataItem" );
-
-      if ( withDataRecord )
-        body = Expression.New( constructorInfo, parameter );
-
-      else
-        body = Expression.Call( thisFillMethod, parameter, Expression.New( constructorInfo ) );
-
-
-      var func = Expression.Lambda<Func<IDataRecord, T>>( body, parameter );
-      return new EntityConverter( func.Compile() );
-    }
 
 
 
