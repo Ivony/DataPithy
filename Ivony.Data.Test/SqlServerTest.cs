@@ -61,7 +61,7 @@ CREATE TABLE [dbo].[Test1]
       Assert.IsNull( Db.T( $"SELECT ID FROM Test1" ).ExecuteFirstRow(), "空数据表查询测试失败" );
       Assert.AreEqual( Db.T( $"SELECT COUNT(*) FROM Test1" ).ExecuteScalar<int>(), 0, "空数据表查询测试失败" );
       Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1L, "插入数据后查询测试失败" );
       Assert.IsNotNull( Db.T( $"SELECT ID FROM Test1" ).ExecuteFirstRow(), "插入数据后查询测试失败" );
 
       var dataItem = Db.T( $"SELECT * FROM Test1" ).ExecuteDynamicObject();
@@ -84,7 +84,7 @@ CREATE TABLE [dbo].[Test1]
       Assert.IsNull( await Db.T( $"SELECT ID FROM Test1" ).ExecuteFirstRowAsync(), "空数据表查询测试失败" );
       Assert.AreEqual( await Db.T( $"SELECT COUNT(*) FROM Test1" ).ExecuteScalarAsync<int>(), 0, "空数据表查询测试失败" );
       Assert.AreEqual( await Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
-      Assert.AreEqual( (await Db.T( $"SELECT * FROM Test1" ).ExecuteDynamicsAsync()).Length, 1, "插入数据后查询测试失败" );
+      Assert.AreEqual( (await Db.T( $"SELECT * FROM Test1" ).ExecuteDynamicsAsync()).Length, 1L, "插入数据后查询测试失败" );
       Assert.IsNotNull( await Db.T( $"SELECT ID FROM Test1" ).ExecuteFirstRowAsync(), "插入数据后查询测试失败" );
 
     }
@@ -98,32 +98,32 @@ CREATE TABLE [dbo].[Test1]
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1})" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1L, "插入数据后查询测试失败" );
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 0, "自动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 0L, "自动回滚事务测试失败" );
 
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1L, "插入数据后查询测试失败" );
 
         transaction.Rollback();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 0, "手动回滚事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 0L, "手动回滚事务测试失败" );
 
 
 
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO Test1 ( Name, Content, [Index] ) VALUES ( {"Ivony"}, {"Test"}, {1} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "插入数据后查询测试失败" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1L, "插入数据后查询测试失败" );
 
         transaction.Commit();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1, "手动提交事务测试失败" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM Test1" ).ExecuteDynamics().Length, 1L, "手动提交事务测试失败" );
 
 
 

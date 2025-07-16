@@ -71,24 +71,4 @@ namespace Ivony.Data
     }
 
   }
-
-  /// <summary>
-  /// 定义实体转换器类型
-  /// </summary>
-  /// <typeparam name="T">实体类型</typeparam>
-  public interface IEntityConverter<T>
-  {
-    /// <summary>
-    /// 将数据写入实体
-    /// </summary>
-    /// <param name="dataItem">数据行</param>
-    /// <returns>转换的实体对象</returns>
-    T Convert( IDataRecord dataItem );
-
-    /// <summary>
-    /// 是否可重用
-    /// </summary>
-    bool IsReusable { get; }
-
-  }
 }

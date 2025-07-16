@@ -53,14 +53,7 @@ namespace Ivony.Data
     /// <param name="property">要获取字段名的属性</param>
     /// <returns></returns>
     private static string GetFieldname( PropertyInfo property )
-    {
-      var attribute = GetAttributes( property ).OfType<FieldNameAttribute>().FirstOrDefault();
-
-      if ( attribute != null )
-        return attribute.FieldName;
-
-      return property.Name;
-    }
+      => property.GetCustomAttribute<FieldNameAttribute>()?.FieldName ?? property.Name;
 
 
 
@@ -76,78 +69,32 @@ namespace Ivony.Data
 
       lock ( sync )
       {
-        return fillMethod ?? (fillMethod = CreateFillMethod());
+        return fillMethod ??= CreateFillMethod();
       }
 
     }
 
     private static Action<IDataRecord, T> CreateFillMethod()
     {
-      var type = typeof( T );
+      var entityType = typeof( T );
 
-      var properties = type.GetProperties()
-        .Where( p => !GetAttributes( p ).OfType<NonFieldAttribute>().Any() );
+      var dataRecord = Expression.Parameter( typeof( IDataRecord ), "dataRecord" );
+      var entity = Expression.Parameter( entityType, "entity" );
 
-      var methodName = type.GUID.ToString( "N" ) + "_DataConverter";
-      var dynamicMethod = new DynamicMethod( methodName, null, new[] { typeof( DataRow ), type }, typeof( EntityExtensions ) );
-      var il = dynamicMethod.GetILGenerator();
+      var valueMethod = typeof( DataRecordExtensions ).GetMethod( nameof( DataRecordExtensions.FieldValue ), 0, new[] { typeof( IDataRecord ), typeof( string ) } );
 
-      /*
-      .maxstack  3
-      .locals init ([0] class [System.Data]System.Data.DataColumnCollection columns)
-      IL_0000:  ldarg.0
-      IL_0001:  callvirt   instance class [System.Data]System.Data.DataTable [System.Data]System.Data.DataRow::get_Table()
-      IL_0006:  callvirt   instance class [System.Data]System.Data.DataColumnCollection [System.Data]System.Data.DataTable::get_Columns()
-      IL_000b:  stloc.0
-      */
+      var setters =
+        from property in entityType.GetProperties()
+        where property.GetCustomAttribute<NonFieldAttribute>() is null
+        where property.CanWrite
+        let name = GetFieldname( property )
+        let set = property.GetSetMethod()
+        let value = Expression.Call( valueMethod, dataRecord, Expression.Constant( name ) )
+        select Expression.Call( entity, set, value );
 
-      il.DeclareLocal( typeof( DataColumnCollection ) );
-      il.Emit( OpCodes.Ldarg_0 );
-      il.Emit( OpCodes.Callvirt, typeof( DataRow ).GetProperty( "Table" ).GetGetMethod() );
-      il.Emit( OpCodes.Callvirt, typeof( DataTable ).GetProperty( "Columns" ).GetGetMethod() );
-      il.Emit( OpCodes.Stloc_0 );
+      return Expression.Lambda<Action<IDataRecord, T>>( Expression.Block( setters.ToArray() ), dataRecord, entity ).Compile();
 
-
-      foreach ( var p in properties )
-      {
-        var name = GetFieldname( p );
-        var setMethod = p.GetSetMethod();
-
-        if ( setMethod == null )
-          continue;
-
-        /*
-        IL_000c:  ldloc.0
-        IL_000d:  ldstr      "Name"
-        IL_0012:  callvirt   instance bool [System.Data]System.Data.DataColumnCollection::Contains(string)
-        IL_0017:  brfalse.s  IL_002a
-        IL_0019:  ldarg.1
-        IL_001a:  ldarg.0
-        IL_001b:  ldstr      "Name"
-        IL_0020:  call       !!0 [System.Data.DataSetExtensions]System.Data.DataRowExtensions::Field<string>(class [System.Data]System.Data.DataRow, string)
-        IL_0025:  callvirt   instance void Ivony.Data.EntityExtensions/TestEntity::set_Name(string)
-        IL_002a:  ret
-        */
-
-        var label = il.DefineLabel();
-
-        il.Emit( OpCodes.Ldloc_0 );
-        il.Emit( OpCodes.Ldstr, name );
-        il.Emit( OpCodes.Callvirt, typeof( DataColumnCollection ).GetMethod( "Contains" ) );
-        il.Emit( OpCodes.Brfalse_S, label );
-        il.Emit( OpCodes.Ldarg_1 );
-        il.Emit( OpCodes.Ldarg_0 );
-        il.Emit( OpCodes.Ldstr, name );
-        il.Emit( OpCodes.Call, typeof( EntityExtensions ).GetMethod( "FieldValue", new[] { typeof( IDataRecord ), typeof( string ) } ).MakeGenericMethod( p.PropertyType ) );
-        il.Emit( OpCodes.Callvirt, setMethod );
-        il.MarkLabel( label );
-      }
-
-      il.Emit( OpCodes.Ret );
-
-      return (Action<IDataRecord, T>) dynamicMethod.CreateDelegate( typeof( Action<IDataRecord, T> ) );
     }
-
 
 
     /// <summary>
@@ -232,7 +179,7 @@ namespace Ivony.Data
       {
         var methods = from i in type.GetMethods( BindingFlags.Static | BindingFlags.Public )
                       where string.Equals( i.Name, "CreateInstance", StringComparison.OrdinalIgnoreCase )
-                      where CheckMethodSignature( i, typeof( DataRow ) )
+                      where CheckMethodSignature( i, typeof( IDataRecord ) )
                       where i.ReturnType == typeof( T )
                       select i;
 
@@ -245,7 +192,7 @@ namespace Ivony.Data
 
 
 
-        var constructor = type.GetConstructor( new[] { typeof( DataRow ) } );
+        var constructor = type.GetConstructor( new[] { typeof( IDataRecord ) } );
         if ( constructor != null )
           return CreateConverter( constructor, true );
 
@@ -255,7 +202,7 @@ namespace Ivony.Data
 
       }
 
-      throw new NotSupportedException( string.Format( "不支持 {0} 类型的实体转换，因为该类型没有公开的无参或 DataRow 类型的构造函数，也没有指定了自定义实体类型转换器。", typeof( T ).AssemblyQualifiedName ) );
+      throw new NotSupportedException( string.Format( "不支持 {0} 类型的实体转换，因为该类型没有公开的无参或 IDataRecord 类型的构造函数，也没有指定了自定义实体类型转换器。", typeof( T ).AssemblyQualifiedName ) );
     }
 
     private static IEntityConverter<T> CreateConverter( MethodInfo method )

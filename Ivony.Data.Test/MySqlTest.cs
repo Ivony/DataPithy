@@ -19,7 +19,7 @@ namespace Ivony.Data.Test
     public void Enter()
     {
 
-      scope = Db.UseDatabase( MySqlDb.Connect( "10.168.95.112", "test_wangling", "wangling", "a135246A" ) );
+      scope = Db.UseDatabase( MySqlDb.Connect( "127.0.0.1", "test", "Ivony", "752x6x5toZzBPH3XbO02" ) );
 
       Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
       Db.T( $@"
@@ -48,7 +48,7 @@ PRIMARY KEY (Id)
 
       Assert.AreEqual( Db.T( $"SELECT COUNT(*) FROM testTable" ).ExecuteScalar<int>(), 0, "空数据表查询" );
       Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "插入数据后查询" );
       Assert.IsNotNull( Db.T( $"SELECT ID FROM testTable" ).ExecuteFirstRow(), "插入数据后查询" );
 
       var dataItem = Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicObject();
@@ -62,32 +62,32 @@ PRIMARY KEY (Id)
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "插入数据后查询" );
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "自动回滚事务" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0L, "自动回滚事务" );
 
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "插入数据后查询" );
 
         transaction.Rollback();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0L, "手动回滚事务" );
 
 
 
       using ( var transaction = Db.EnterTransaction() )
       {
         Assert.AreEqual( Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery(), 1, "插入数据测试失败" );
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "插入数据后查询" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "插入数据后查询" );
 
         transaction.Commit();
       }
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "手动提交事务" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "手动提交事务" );
 
       Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
 
@@ -141,12 +141,12 @@ PRIMARY KEY (Id)
       Db.Transaction( () =>
       {
         Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQuery();
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "直接运行事务" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "直接运行事务" );
 
         Db.Rollback();
       } );
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0L, "直接运行事务回滚" );
 
 
       Db.Transaction( () =>
@@ -195,22 +195,22 @@ PRIMARY KEY (Id)
       await Db.AsyncTransaction( async () =>
       {
         Assert.AreEqual( await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
-        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1, "插入数据后查询" );
+        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1L, "插入数据后查询" );
 
         Db.Rollback();
       } );
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "手动回滚事务" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0L, "手动回滚事务" );
 
 
 
       await Db.AsyncTransaction( async () =>
       {
         Assert.AreEqual( await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync(), 1, "插入数据测试失败" );
-        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1, "插入数据后查询" );
+        Assert.AreEqual( (await Db.T( $"SELECT * FROM testTable" ).ExecuteDynamicsAsync()).Length, 1L, "插入数据后查询" );
       } );
 
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "自动提交事务" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "自动提交事务" );
 
       Db.T( $"TRUNCATE TABLE testTable" ).ExecuteNonQuery();
 
@@ -244,7 +244,7 @@ PRIMARY KEY (Id)
       var result = await Db.AsyncTransaction( async () =>
       {
         await Db.T( $"INSERT INTO testTable ( Name, Content ) VALUES ( {"Ivony"}, {"Test"} )" ).ExecuteNonQueryAsync();
-        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1, "直接运行事务" );
+        Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 1L, "直接运行事务" );
 
         Db.Rollback( 1 );
 
@@ -252,7 +252,7 @@ PRIMARY KEY (Id)
       } );
 
       Assert.AreEqual( result, 1, "事务回滚返回值" );
-      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0, "直接运行事务回滚" );
+      Assert.AreEqual( Db.T( $"SELECT * FROM testTable" ).ExecuteDynamics().Length, 0L, "直接运行事务回滚" );
 
 
       await Db.AsyncTransaction( async () =>

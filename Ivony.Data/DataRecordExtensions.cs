@@ -3,77 +3,35 @@ using System.Data;
 
 namespace Ivony.Data
 {
+
+  /// <summary>
+  /// 提供 IDataRecord 的扩展方法
+  /// </summary>
   public static class DataRecordExtensions
   {
-
-    public static IDataRecord AsDataRecord( this DataRow dataRow )
+    /// <summary>
+    /// 获取指定字段的值
+    /// </summary>
+    /// <typeparam name="T">字段值类型</typeparam>
+    /// <param name="fieldName">字段名称</param>
+    /// <param name="record">数据记录</param>
+    /// <returns>字段值</returns>
+    public static T FieldValue<T>( this IDataRecord record, string fieldName )
     {
-      return new DataRecord( dataRow );
+      return FieldValue<T>( record, record.GetOrdinal( fieldName ) );
     }
 
-
-    private class DataRecord : IDataRecord
+    /// <summary>
+    /// 获取指定字段的值
+    /// </summary>
+    /// <typeparam name="T">字段值类型</typeparam>
+    /// <param name="ordinal">字段索引</param>
+    /// <param name="record">数据记录</param>
+    /// <returns>字段值</returns>
+    private static T FieldValue<T>( IDataRecord record, int ordinal )
     {
-      private DataRow _dataRow;
-
-      public DataRecord( DataRow dataRow )
-      {
-        _dataRow = dataRow;
-      }
-
-      public object this[int i] => _dataRow[i];
-      public object this[string name] => _dataRow[name];
-
-      public int FieldCount => _dataRow.Table.Columns.Count;
-
-      public bool GetBoolean( int i ) => _dataRow.FieldValue<bool>( i );
-
-      public byte GetByte( int i ) => _dataRow.FieldValue<byte>( i );
-
-      public long GetBytes( int i, long fieldOffset, byte[] buffer, int bufferoffset, int length ) => throw new NotSupportedException();
-
-      public char GetChar( int i ) => _dataRow.FieldValue<char>( i );
-
-      public long GetChars( int i, long fieldoffset, char[] buffer, int bufferoffset, int length ) => throw new NotSupportedException();
-
-      public IDataReader GetData( int i ) => null;
-
-      public string GetDataTypeName( int i ) => throw new NotSupportedException();
-
-      public DateTime GetDateTime( int i ) => _dataRow.FieldValue<DateTime>( i );
-
-      public decimal GetDecimal( int i ) => _dataRow.FieldValue<decimal>( i );
-
-      public double GetDouble( int i ) => _dataRow.FieldValue<double>( i );
-
-      public Type GetFieldType( int i ) => _dataRow.Table.Columns[i].DataType;
-
-      public float GetFloat( int i ) => _dataRow.FieldValue<float>( i );
-
-      public Guid GetGuid( int i ) => _dataRow.FieldValue<Guid>( i );
-
-      public short GetInt16( int i ) => _dataRow.FieldValue<short>( i );
-
-      public int GetInt32( int i ) => _dataRow.FieldValue<int>( i );
-
-      public long GetInt64( int i ) => _dataRow.FieldValue<long>( i );
-
-      public string GetName( int i ) => _dataRow.FieldValue<string>( i );
-
-      public int GetOrdinal( string name ) => _dataRow.Table.Columns[name].Ordinal;
-
-      public string GetString( int i ) => _dataRow.FieldValue<string>( i );
-
-      public object GetValue( int i ) => _dataRow.ItemArray[i];
-
-      public int GetValues( object[] values )
-      {
-        _dataRow.ItemArray.CopyTo( values, 0 );
-        return Math.Min( _dataRow.ItemArray.Length, values.Length );
-
-      }
-
-      public bool IsDBNull( int i ) => _dataRow.IsNull( i );
+      var value = record.GetValue( ordinal );
+      return DbValueConverter.ConvertFrom<T>( value, record.GetDataTypeName( ordinal ) );
     }
   }
 }

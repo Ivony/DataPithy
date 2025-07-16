@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Common;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -206,7 +207,7 @@ namespace Ivony.Data
           result = _dataRow[0];
 
         else
-          result = EntityExtensions.ToEntity( _dataRow, binder.ReturnType );
+          result = EntityExtensions.ToEntity( _dataRow.AsDataRecord(), binder.ReturnType );
 
         return true;
       }
