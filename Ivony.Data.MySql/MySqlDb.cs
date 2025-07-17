@@ -156,9 +156,9 @@ namespace Ivony.Data
     /// <param name="connectionString">连接字符串</param>
     /// <param name="serviceProvider">服务提供程序</param>
     /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string connectionString, IServiceProvider serviceProvider = null )
+    public static MySqlDb Connect( string connectionString, IServiceProvider? serviceProvider = null )
     {
-      return new MySqlDb( connectionString, serviceProvider );
+      return new MySqlDb( connectionString, serviceProvider ?? FallbackServiceProvider.Empty );
     }
 
 

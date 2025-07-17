@@ -1,12 +1,16 @@
-﻿using Ivony.Data.Queries;
-
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Ivony.Data.Queries;
+
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ivony.Data
 {
@@ -114,7 +118,8 @@ namespace Ivony.Data
     /// <param name="queries">要连接的部分查询对象列表</param>
     /// <returns></returns>
     /// <remarks>如果第一个对象是查询对象，则会从这个对象拷贝查询配置</remarks>
-    public static ParameterizedQuery Join( string separator, params IParameterizedQueryPartial[] queries )
+    [return: NotNullIfNotNull( nameof( queries ) )]
+    public static ParameterizedQuery? Join( string separator, params IParameterizedQueryPartial[] queries )
     {
       if ( queries == null )
         return null;
@@ -135,7 +140,7 @@ namespace Ivony.Data
     /// <param name="partial">要转换的 IParameterizedQueryPartial 对象</param>
     /// <param name="configures">要使用的查询配置对象</param>
     /// <returns></returns>
-    public static ParameterizedQuery AsQuery( this IParameterizedQueryPartial partial, DbQueryConfigures configures = null )
+    public static ParameterizedQuery AsQuery( this IParameterizedQueryPartial partial, DbQueryConfigures? configures = null )
     {
       var builder = ParameterizedQueryService.CreateQueryBuild();
       builder.AppendPartial( partial );
@@ -152,7 +157,8 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">参数化模板</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery T( ParameterizedQuery query )
+    [return: NotNullIfNotNull( nameof( query ) )]
+    public static ParameterizedQuery? T( ParameterizedQuery? query )
     {
       return query;
     }
@@ -162,7 +168,8 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="template">参数查询对象</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery T( FormattableString template )
+    [return: NotNullIfNotNull( nameof( template ) )]
+    public static ParameterizedQuery? T( FormattableString? template )
     {
       return Template( template );
     }
@@ -175,7 +182,8 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="template">参数化模板</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery Template( FormattableString template )
+    [return: NotNullIfNotNull( nameof( template ) )]
+    public static ParameterizedQuery? Template( FormattableString? template )
     {
       if ( template == null )
         return null;
@@ -187,7 +195,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取参数化查询服务
     /// </summary>
-    public static IParameterizedQueryService ParameterizedQueryService => ServiceProvider.GetService<IParameterizedQueryService>() ?? Queries.ParameterizedQueryService.Instance;
+    public static IParameterizedQueryService ParameterizedQueryService => ServiceProvider?.GetService<IParameterizedQueryService>() ?? Queries.ParameterizedQueryService.Instance;
 
 
     /// <summary>
@@ -195,7 +203,8 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="text">查询文本</param>
     /// <returns>参数化查询</returns>
-    public static ParameterizedQuery Text( string text )
+    [return: NotNullIfNotNull( nameof( text ) )]
+    public static ParameterizedQuery? Text( string? text )
     {
       if ( text == null )
         return null;

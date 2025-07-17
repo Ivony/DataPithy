@@ -20,7 +20,7 @@ public static class DataTableExtensions
 
 
 
-  private static readonly MethodInfo fieldValueMethod = typeof( DataTableExtensions ).GetMethod( nameof( FieldValue ), 1, new[] { typeof( DataRow ), typeof( DataColumn ) } );
+  private static readonly MethodInfo fieldValueMethod = typeof( DataTableExtensions ).GetMethod( nameof( FieldValue ), 1, new[] { typeof( DataRow ), typeof( DataColumn ) } )!;
 
   private static Func<DataRow, DataColumn, object> GetFieldValueMethod( Type valueType )
   {
@@ -145,7 +145,7 @@ public static class DataTableExtensions
 
     public long GetChars( int i, long fieldoffset, char[]? buffer, int bufferoffset, int length ) => throw new NotSupportedException();
 
-    public IDataReader GetData( int i ) => null;
+    public IDataReader GetData( int i ) => throw new NotSupportedException();
 
     public string GetDataTypeName( int i ) => throw new NotSupportedException();
 

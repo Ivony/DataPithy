@@ -9,6 +9,8 @@ internal class MySqlConnectionFactory : IDbConnectionFactory<MySqlConnection>
 {
   public MySqlConnection CreateConnection( string connectionString )
   {
-    return new MySqlConnection();
+    var connection = new MySqlConnection( connectionString );
+    connection.Open();
+    return connection;
   }
 }
