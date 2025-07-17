@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <RootNamespace>Ivony.Data</RootNamespace>
-    <VersionPrefix>5.0.0-alpha-0716a</VersionPrefix>
+    <VersionPrefix>5.0.0-alpha-0717</VersionPrefix>
     <Description>DataPithy for MySQL</Description>
     <Connector>MySQL.Connector</Connector>
     <Platforms>AnyCPU</Platforms>
