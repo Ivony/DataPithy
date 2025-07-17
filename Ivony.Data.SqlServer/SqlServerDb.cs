@@ -1,14 +1,8 @@
-﻿using Ivony.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System;
+
+using Ivony.Data.SqlClient;
+
 using Microsoft.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ivony.Data.Common;
-using System.IO;
-using Ivony.Data.Queries;
 
 namespace Ivony.Data
 {
@@ -139,10 +133,7 @@ namespace Ivony.Data
       return Connect( builder.ConnectionString );
     }
 
-
-
-
-
+    internal SqlConnection? CreateConnection() => ServiceProvider.GetService<IDbConnectionFactory<SqlConnection>>()?.CreateConnection( ConnectionString );
 
     static SqlServerDb()
     {

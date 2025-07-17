@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net6;net7;net8</TargetFrameworks>
+    <AssetTargetFallback>netstandard2.0</AssetTargetFallback>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
 

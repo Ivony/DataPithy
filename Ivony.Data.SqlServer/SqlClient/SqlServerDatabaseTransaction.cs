@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
-using System.Text;
+﻿using System.Data;
+
 using Ivony.Data.Common;
+
+using Microsoft.Data.SqlClient;
 
 namespace Ivony.Data.SqlClient
 {
@@ -15,7 +14,7 @@ namespace Ivony.Data.SqlClient
   {
     internal SqlServerDatabaseTransaction( SqlServerDb database ) : base( database )
     {
-      Connection = new SqlConnection( database.ConnectionString );
+      Connection = database.CreateConnection();
     }
 
     /// <summary>

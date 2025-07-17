@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
-using System.Collections;
-using System.Configuration;
+using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
+
+using Ivony.Data.Common;
 using Ivony.Data.Queries;
 
-using System.Linq;
-using System.Threading;
-using System.Data.Common;
-using Ivony.Data.Common;
+using Microsoft.Data.SqlClient;
 
 namespace Ivony.Data.SqlClient
 {

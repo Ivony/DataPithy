@@ -7,7 +7,7 @@ using System.Data;
 using Ivony.Data.SqlClient;
 using System.Xml.Linq;
 using Ivony.Data.Common;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace Ivony.Data.Test
 {

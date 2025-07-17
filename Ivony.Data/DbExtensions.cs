@@ -1,4 +1,5 @@
 ﻿using Ivony.Data.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,9 +23,20 @@ namespace Ivony.Data
     /// <typeparam name="TService">服务类型</typeparam>
     /// <param name="serviceProvider">服务提供程序</param>
     /// <returns></returns>
-    public static TService GetService<TService>( this IServiceProvider serviceProvider )
+    public static TService? GetService<TService>( this IServiceProvider serviceProvider )
     {
-      return (TService) serviceProvider.GetService( typeof( TService ) );
+      return (TService?) serviceProvider.GetService( typeof( TService ) );
+    }
+
+    /// <summary>
+    /// 获取系统服务
+    /// </summary>
+    /// <typeparam name="TService">服务类型</typeparam>
+    /// <param name="serviceProvider">服务提供程序</param>
+    /// <returns></returns>
+    public static TService GetRequiredService<TService>( this IServiceProvider serviceProvider )
+    {
+      return (TService?) serviceProvider.GetService( typeof( TService ) ) ?? throw new InvalidOperationException( $"resolve service of type \"{typeof( TService ).FullName}\" failed." );
     }
 
 
