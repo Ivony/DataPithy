@@ -45,7 +45,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="database">数据库提供程序</param>
     /// <returns>异步数据库查询执行器</returns>
-    public static IAsyncDbExecutor GetAsyncDbExecutor( this IDatabase database )
+    public static IAsyncDbExecutor? GetAsyncDbExecutor( this IDatabase database )
     {
       var executor = database?.GetDbExecutor();
       if ( executor == null )

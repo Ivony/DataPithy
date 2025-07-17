@@ -12,7 +12,7 @@ namespace Ivony.Data;
 /// <summary>
 /// 数据库查询结果集流式处理扩展方法
 /// </summary>
-public static class FlowExecuteExtensions
+public static partial class ExecuteExtensions
 {
 
 
@@ -66,10 +66,10 @@ public static class FlowExecuteExtensions
   /// <param name="query">查询对象</param>
   /// <returns>实体对象枚举</returns>
 
-  public static IEnumerable<T> EnumerateEntities<T>( this IDbExecutable query )
+  public static IEnumerable<T> EnumerateEntities<T>( this IDbExecutable query, IEntityConverter<T>? converter = null )
   {
     foreach ( var record in query.EnumerateDataRecords() )
-      yield return record.ToEntity<T>();
+      yield return record.ToEntity<T>( converter );
   }
 
 
@@ -80,10 +80,10 @@ public static class FlowExecuteExtensions
   /// <param name="query">查询对象</param>
   /// <param name="cancellationToken">取消令牌</param>
   /// <returns>实体对象枚举</returns>
-  public static async IAsyncEnumerable<T> EnumerateEntitiesAsync<T>( this IDbExecutable query, [EnumeratorCancellation] CancellationToken cancellationToken = default )
+  public static async IAsyncEnumerable<T> EnumerateEntitiesAsync<T>( this IDbExecutable query, IEntityConverter<T>? converter = null, [EnumeratorCancellation] CancellationToken cancellationToken = default )
   {
     await foreach ( var record in query.EnumerateDataRecordsAsync( cancellationToken ) )
-      yield return record.ToEntity<T>();
+      yield return record.ToEntity<T>( converter );
   }
 
 }

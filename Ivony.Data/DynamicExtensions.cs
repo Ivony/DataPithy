@@ -45,56 +45,6 @@ namespace Ivony.Data
     }
 
 
-    /// <summary>
-    /// 执行查询并将第一个结果集填充动态对象列表
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <returns>查询结果</returns>
-    public static dynamic[] ExecuteDynamics( this IDbExecutable query )
-    {
-      var data = Data.DataTableExecuteExtensions.ExecuteDataTable( query );
-      return ToDynamics( data );
-    }
-
-    /// <summary>
-    /// 异步执行查询并将第一个结果集填充动态对象列表
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <param name="token">取消指示</param>
-    /// <returns>查询结果</returns>
-    public static async Task<dynamic[]> ExecuteDynamicsAsync( this IDbExecutable query, CancellationToken token = default( CancellationToken ) )
-    {
-      var data = await Data.DataTableExecuteExtensions.ExecuteDataTableAsync( query, token );
-      return ToDynamics( data );
-    }
-
-
-
-    /// <summary>
-    /// 执行查询并将第一个结果集的第一条记录填充动态对象
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <returns>查询结果</returns>
-    public static dynamic ExecuteDynamicObject( this IDbExecutable query )
-    {
-      var dataItem = Data.DataTableExecuteExtensions.ExecuteFirstRow( query );
-      return ToDynamic( dataItem );
-    }
-
-
-    /// <summary>
-    /// 异步执行查询并将第一个结果集的第一条记录填充动态对象
-    /// </summary>
-    /// <param name="query">要执行的查询</param>
-    /// <returns>查询结果</returns>
-    public static async Task<dynamic> ExecuteDynamicObjectAsync( this IDbExecutable query )
-    {
-      var dataItem = await Data.DataTableExecuteExtensions.ExecuteFirstRowAsync( query );
-      return ToDynamic( dataItem );
-    }
-
-
-
 
 
     private class DynamicDataRow : DynamicObject
@@ -207,7 +157,7 @@ namespace Ivony.Data
           result = _dataRow[0];
 
         else
-          result = EntityExtensions.ToEntity( _dataRow.AsDataRecord(), binder.ReturnType );
+          result = _dataRow.AsDataRecord().ToEntity( binder.ReturnType );
 
         return true;
       }

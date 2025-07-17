@@ -14,7 +14,7 @@ namespace Ivony.Data
   /// <summary>
   /// 提供 DataTable 相关的查询执行扩展方法
   /// </summary>
-  public static class DataTableExecuteExtensions
+  public static partial class ExecuteExtensions
   {
 
     /// <summary>

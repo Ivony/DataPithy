@@ -37,7 +37,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 获取在追踪数据库查询过程的追踪服务
     /// </summary>
-    protected IDbTraceService TraceService
+    protected IDbTraceService? TraceService
     {
       get;
       private set;
@@ -46,7 +46,7 @@ namespace Ivony.Data.Common
     /// <summary>
     /// 获取异常筛选器
     /// </summary>
-    protected IDbExceptionFilter ExceptionFilter { get; }
+    protected IDbExceptionFilter? ExceptionFilter { get; }
 
 
     /// <summary>
