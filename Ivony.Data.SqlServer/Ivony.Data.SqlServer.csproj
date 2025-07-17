@@ -12,7 +12,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="*" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.*" />
   </ItemGroup>
 
   <ItemGroup>
