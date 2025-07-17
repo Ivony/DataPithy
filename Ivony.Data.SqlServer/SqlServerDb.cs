@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,22 +20,16 @@ namespace Ivony.Data
   {
 
 
-    /// <summary>
-    /// 创建 <see cref="SqlServerDb"/> 对象
-    /// </summary>
-    /// <param name="connectionString">SQL Server 连接字符串</param>
-    public SqlServerDb( string connectionString )
-      : this( Ivony.Data.ServiceProvider.Empty, connectionString ) { }
 
     /// <summary>
     /// 创建 SqlServerDbProvider 对象
     /// </summary>
     /// <param name="serviceProvider">系统服务提供程序</param>
     /// <param name="connectionString">SQL Server 连接字符串</param>
-    public SqlServerDb( IServiceProvider serviceProvider, string connectionString )
+    public SqlServerDb( string connectionString, IServiceProvider? serviceProvider = null )
     {
-      ServiceProvider = serviceProvider;
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
+      ServiceProvider = new SqlServerServiceProvider( this, serviceProvider ?? FallbackServiceProvider.Empty );
     }
 
     /// <summary>

@@ -1,13 +1,13 @@
 <Project>
   <PropertyGroup>
-    <TargetFrameworks>net6;net7;net8</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net6;net7;net8</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
 
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeSource>true</IncludeSource>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedAllSources>true</EmbedAllSources>
-
-
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Ivony</Authors>
