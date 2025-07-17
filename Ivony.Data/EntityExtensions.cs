@@ -47,7 +47,7 @@ namespace Ivony.Data
     /// <returns>实体集</returns>
     public static T[] ExecuteEntities<T>( this IDbExecutable query, IEntityConverter<T> converter )
     {
-      var data = DataRecordExtensions.EnumerateDataRecords( query );
+      var data = FlowExecuteExtensions.EnumerateDataRecords( query );
       return data.Select( dataItem => dataItem.ToEntity( converter ) ).ToArray();
     }
 
@@ -64,7 +64,7 @@ namespace Ivony.Data
     {
       var result = new List<T>();
 
-      await foreach ( var item in DataRecordExtensions.EnumerateDataRecordsAsync( query, token ) )
+      await foreach ( var item in FlowExecuteExtensions.EnumerateDataRecordsAsync( query, token ) )
         result.Add( item.ToEntity( converter ) );
 
       return result.ToArray();
@@ -99,7 +99,7 @@ namespace Ivony.Data
     /// <param name="converter">实体转换方法</param>
     /// <returns>实体</returns>
     public static T ExecuteEntity<T>( this IDbExecutable query, IEntityConverter<T> converter )
-      => DataRecordExtensions.EnumerateDataRecords( query ).Select( item => item.ToEntity<T>() ).FirstOrDefault();
+      => FlowExecuteExtensions.EnumerateDataRecords( query ).Select( item => item.ToEntity<T>() ).FirstOrDefault();
 
 
     /// <summary>
@@ -112,7 +112,7 @@ namespace Ivony.Data
     /// <returns>实体</returns>
     public async static Task<T> ExecuteEntityAsync<T>( this IDbExecutable query, IEntityConverter<T> converter, CancellationToken token = default )
     {
-      await foreach ( var item in DataRecordExtensions.EnumerateDataRecordsAsync( query ) )
+      await foreach ( var item in FlowExecuteExtensions.EnumerateDataRecordsAsync( query ) )
       {
         return item.ToEntity( converter );
       }
@@ -147,7 +147,7 @@ namespace Ivony.Data
       {
 
         if ( typeof( T ).IsValueType )
-          throw new ArgumentNullException( "dataItem" );
+          throw new ArgumentNullException( nameof( record ) );
 
         else
           return default( T );//等同于return null
@@ -176,12 +176,6 @@ namespace Ivony.Data
 
     internal static object ToEntity( this IDataRecord dataItem, Type entityType )
     {
-      return GetToEntityMethod( entityType )( dataItem );
-    }
-
-
-    private static Func<IDataRecord, object> GetToEntityMethod( Type entityType )
-    {
       lock ( sync )
       {
         if ( entityConverterDictionary.ContainsKey( entityType ) )
@@ -189,12 +183,14 @@ namespace Ivony.Data
 
 
         var method = typeof( EntityExtensions )
-          .GetMethod( "ToEntity", new[] { typeof( IDataRecord ) } )
+          .GetMethod( nameof( ToEntity ), new[] { typeof( IDataRecord ) } )
           .MakeGenericMethod( entityType );
 
         return entityConverterDictionary[entityType] = (Func<IDataRecord, object>) Delegate.CreateDelegate( typeof( Func<IDataRecord, object> ), method );
       }
     }
+
+
 
 
 

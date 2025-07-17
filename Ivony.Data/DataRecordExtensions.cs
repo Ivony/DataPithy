@@ -40,46 +40,4 @@ public static class DataRecordExtensions
   }
 
 
-
-  /// <summary>
-  /// 异步枚举查询结果集
-  /// </summary>
-  /// <param name="query">要执行的查询</param>
-  /// <param name="token">取消标志</param>
-  /// <returns>异步查询结果</returns>
-  public static async IAsyncEnumerable<IDataRecord> EnumerateDataRecordsAsync( this IDbExecutable query, [EnumeratorCancellation] CancellationToken token = default )
-  {
-    using ( var context = await query.ExecuteAsync( token ) )
-    {
-      while ( true )
-      {
-        var record = await context.ReadRecordAsync( token );
-        if ( record == null )
-          yield break;
-
-        yield return record;
-      }
-    }
-  }
-
-
-  /// <summary>
-  /// 枚举查询结果集
-  /// </summary>
-  /// <param name="query">要执行的查询</param>
-  /// <returns>异步查询结果</returns>
-  public static IEnumerable<IDataRecord> EnumerateDataRecords( this IDbExecutable query )
-  {
-    using ( var context = query.Execute() )
-    {
-      while ( true )
-      {
-        var record = context.ReadRecord();
-        if ( record == null )
-          yield break;
-
-        yield return record;
-      }
-    }
-  }
 }
