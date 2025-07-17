@@ -25,7 +25,7 @@ namespace Ivony.Data
     /// <summary>
     /// 当前的数据库访问提供程序
     /// </summary>
-    public static IDatabase CurrentDatabase => databaseHost.Value ?? Database( null );
+    public static IDatabase? CurrentDatabase => databaseHost.Value ?? Database( null );
 
 
 
@@ -36,7 +36,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="name">数据库名称</param>
     /// <returns>是否成功获取</returns>
-    public static IDatabase Database( string name )
+    public static IDatabase? Database( string? name )
     {
 
       foreach ( var factory in providers )
@@ -56,11 +56,7 @@ namespace Ivony.Data
     /// <summary>
     /// 获取默认的服务提供程序
     /// </summary>
-    public static IServiceProvider ServiceProvider => CurrentDatabase?.ServiceProvider ?? defaultServiceProvider;
-
-
-    private static readonly IServiceProvider defaultServiceProvider = Ivony.Data.ServiceProvider.Empty;
-
+    public static IServiceProvider? ServiceProvider => CurrentDatabase?.ServiceProvider;
 
 
     /// <summary>

@@ -1,6 +1,10 @@
 ﻿using System;
+
 using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
+
+using Microsoft.Extensions.DependencyInjection;
+
 #if MySqlConnector
 using MySqlConnector;
 #else
@@ -20,16 +24,6 @@ namespace Ivony.Data
     #region Connect
 
 
-    /// <summary>
-    /// 通过指定的连接字符串并创建 MySql 数据库访问器
-    /// </summary>
-    /// <param name="connectionString">连接字符串</param>
-    /// <param name="serviceProvider">服务提供程序</param>
-    /// <returns>MySql 数据库访问器</returns>
-    public static MySqlDb Connect( string connectionString, IServiceProvider serviceProvider = null )
-    {
-      return new MySqlDb( Data.ServiceProvider.Create( BuildServices, serviceProvider ), connectionString );
-    }
 
 
     /// <summary>
@@ -156,6 +150,19 @@ namespace Ivony.Data
     }
 
 
+    /// <summary>
+    /// 通过指定的连接字符串并创建 MySql 数据库访问器
+    /// </summary>
+    /// <param name="connectionString">连接字符串</param>
+    /// <param name="serviceProvider">服务提供程序</param>
+    /// <returns>MySql 数据库访问器</returns>
+    public static MySqlDb Connect( string connectionString, IServiceProvider serviceProvider = null )
+    {
+      return new MySqlDb( connectionString, serviceProvider );
+    }
+
+
+
     #endregion Connect
 
 
@@ -166,11 +173,13 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="serviceProvider">系统服务提供程序</param>
     /// <param name="connectionString">连接字符串</param>
-    private MySqlDb( IServiceProvider serviceProvider, string connectionString )
+    private MySqlDb( string connectionString, IServiceProvider serviceProvider )
     {
       ConnectionString = connectionString ?? throw new ArgumentNullException( nameof( connectionString ) );
-      ServiceProvider = serviceProvider;
+      ServiceProvider = CreateServiceProvider( serviceProvider );
     }
+
+    private IServiceProvider CreateServiceProvider( IServiceProvider serviceProvider ) => new MySqlDbServiceProvider( this, serviceProvider );
 
 
     /// <summary>
@@ -200,12 +209,15 @@ namespace Ivony.Data
     /// <returns>查询执行器</returns>
     public IDbExecutor GetDbExecutor()
     {
-      return new MySqlDbExecutor( this, ConnectionString );
+      return new MySqlDbExecutor( this );
     }
 
-    private static void BuildServices( ServiceProvider.ServiceRegistration registration )
-    {
-      registration.AddService<IParameterizedQueryParser<MySqlCommand>>( new MySqlParameterizedQueryParser() );
-    }
+
+
+    /// <summary>
+    /// 创建 MySQL 数据库连接
+    /// </summary>
+    /// <returns>MySQL 数据库连接对象</returns>
+    public MySqlConnection CreateConnection() => ServiceProvider.GetRequiredService<IDbConnectionFactory<MySqlConnection>>().CreateConnection( ConnectionString );
   }
 }
