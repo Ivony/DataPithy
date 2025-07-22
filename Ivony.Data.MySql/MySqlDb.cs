@@ -1,9 +1,6 @@
 ﻿using System;
 
-using Ivony.Data.Common;
 using Ivony.Data.MySqlClient;
-
-using Microsoft.Extensions.DependencyInjection;
 
 #if MySqlConnector
 using MySqlConnector;

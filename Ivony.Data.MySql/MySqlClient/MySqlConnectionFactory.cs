@@ -13,4 +13,9 @@ internal class MySqlConnectionFactory : IDbConnectionFactory<MySqlConnection>
     connection.Open();
     return connection;
   }
+
+  public void ReleaseConnection( MySqlConnection connection )
+  {
+    connection.Dispose();
+  }
 }

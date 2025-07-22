@@ -23,7 +23,7 @@ namespace Ivony.Data.MySqlClient
     /// <param name="connection">MySql 数据库连接</param>
     /// <param name="dataReader">MySql 数据读取器</param>
     /// <param name="tracing">用于当前查询的追踪器</param>
-    public MySqlExecuteContext( MySqlConnection connection, MySqlDataReader dataReader, IDbTracing tracing )
+    public MySqlExecuteContext( IDisposable connection, MySqlDataReader dataReader, IDbTracing tracing )
       : base( dataReader, tracing )
     {
       MySqlDataReader = dataReader;
@@ -59,7 +59,7 @@ namespace Ivony.Data.MySqlClient
     /// <summary>
     /// 数据库事务上下文，如果有的话
     /// </summary>
-    public MySqlDbTransaction TransactionContext
+    public MySqlDbTransaction? TransactionContext
     {
       get;
       private set;

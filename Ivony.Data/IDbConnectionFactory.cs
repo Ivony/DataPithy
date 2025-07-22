@@ -16,5 +16,5 @@ public interface IDbConnectionFactory<T> where T : IDbConnection
   /// <param name="connectionString">数据库连接字符串</param>
   /// <returns>数据库连接</returns>
   T CreateConnection( string connectionString );
-
+  void ReleaseConnection( T connection );
 }

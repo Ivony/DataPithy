@@ -18,28 +18,30 @@ namespace Ivony.Data.MySqlClient;
 
 
 
-internal class MySqlDbExecutor( MySqlDb provider ) : MySqlDbExecutorBase( provider )
+internal class MySqlDbExecutor( MySqlDb database ) : MySqlDbExecutorBase( database )
 {
 
 
 
 
-  protected override MySqlCommand ApplyConnection( MySqlCommand command )
+  protected override IDisposable ApplyConnection( MySqlCommand command )
   {
     if ( command is null )
       throw new ArgumentNullException( nameof( command ) );
 
-    command.Connection = provider.CreateConnection();
-    return command;
+    var factory = database.ServiceProvider.GetRequiredService<IDbConnectionFactory<MySqlConnection>>();
+    var connection = factory.CreateConnection( database.ConnectionString );
+    command.Connection = connection;
+    return new ConnectionReleaseProxy( factory, connection );
   }
 
 
-  protected override MySqlExecuteContext CreateExecuteContext( MySqlCommand command, IDbTracing tracing )
+  protected override MySqlExecuteContext CreateExecuteContext( IDisposable connection, MySqlCommand command, IDbTracing tracing )
   {
     if ( command is null ) throw new ArgumentNullException( nameof( command ) );
     try
     {
-      return new MySqlExecuteContext( command.Connection, command.ExecuteReader(), tracing );
+      return new MySqlExecuteContext( connection, command.ExecuteReader(), tracing );
     }
     catch
     {
@@ -47,21 +49,32 @@ internal class MySqlDbExecutor( MySqlDb provider ) : MySqlDbExecutorBase( provid
       throw;
     }
   }
-  protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( MySqlCommand command, IDbTracing tracing )
+  protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( IDisposable connection, MySqlCommand command, IDbTracing tracing )
   {
     if ( command is null ) throw new ArgumentNullException( nameof( command ) );
     try
     {
 #if MySqlConnector
-      return new MySqlExecuteContext( command.Connection, await command.ExecuteReaderAsync(), tracing );
+      return new MySqlExecuteContext( connection, await command.ExecuteReaderAsync(), tracing );
 #else
-      return new MySqlExecuteContext( command.Connection, (MySqlDataReader) await command.ExecuteReaderAsync(), tracing );
+      return new MySqlExecuteContext( connection, (MySqlDataReader) await command.ExecuteReaderAsync(), tracing );
 #endif
     }
     catch
     {
       command.Connection.Dispose();
       throw;
+    }
+  }
+
+  private class ConnectionReleaseProxy( IDbConnectionFactory<MySqlConnection> factory, MySqlConnection connection ) : IDisposable
+  {
+
+    public MySqlConnection Connection => connection;
+
+    public void Dispose()
+    {
+      factory.ReleaseConnection( connection );
     }
   }
 }
@@ -79,23 +92,31 @@ internal class MySqlDbExecutorWithTransaction : MySqlDbExecutorBase
   public MySqlDbTransaction Transaction { get; }
 
 
-  protected override MySqlCommand ApplyConnection( MySqlCommand command )
+  protected override IDisposable ApplyConnection( MySqlCommand command )
   {
     command.Connection = Transaction.Connection;
     command.Transaction = Transaction.Transaction;
 
-    return command;
+    return new EmptyDisposable();
   }
 
 
-  protected override MySqlExecuteContext CreateExecuteContext( MySqlCommand command, IDbTracing tracing )
+  private class EmptyDisposable : IDisposable
+  {
+    public void Dispose()
+    {
+    }
+  }
+
+
+  protected override MySqlExecuteContext CreateExecuteContext( IDisposable connection, MySqlCommand command, IDbTracing tracing )
   {
     if ( command is null ) throw new ArgumentNullException( nameof( command ) );
 
     return new MySqlExecuteContext( Transaction, command.ExecuteReader(), tracing );
   }
 
-  protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( MySqlCommand command, IDbTracing tracing )
+  protected override async Task<MySqlExecuteContext> CreateExecuteContextAsync( IDisposable connection, MySqlCommand command, IDbTracing tracing )
   {
     if ( command is null ) throw new ArgumentNullException( nameof( command ) );
 
@@ -138,8 +159,8 @@ internal abstract class MySqlDbExecutorBase( IDatabase database ) : DbExecutorBa
     {
       TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
-      var flag = ApplyConnection( command );
-      var context = CreateExecuteContext( command, tracing );
+      var conncetion = ApplyConnection( command );
+      var context = CreateExecuteContext( conncetion, command, tracing );
       TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
       return context;
@@ -154,13 +175,13 @@ internal abstract class MySqlDbExecutorBase( IDatabase database ) : DbExecutorBa
 
 
 
-  protected abstract MySqlExecuteContext CreateExecuteContext( MySqlCommand command, IDbTracing tracing );
+  protected abstract MySqlExecuteContext CreateExecuteContext( IDisposable connection, MySqlCommand command, IDbTracing tracing );
 
-  protected abstract Task<MySqlExecuteContext> CreateExecuteContextAsync( MySqlCommand command, IDbTracing tracing );
+  protected abstract Task<MySqlExecuteContext> CreateExecuteContextAsync( IDisposable connection, MySqlCommand command, IDbTracing tracing );
 
 
 
-  protected abstract MySqlCommand ApplyConnection( MySqlCommand command );
+  protected abstract IDisposable ApplyConnection( MySqlCommand command );
 
 
   private static ParameterizedQuery AsParameterizedQuery( DbQuery query )
@@ -209,9 +230,10 @@ internal abstract class MySqlDbExecutorBase( IDatabase database ) : DbExecutorBa
     try
     {
       TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
-      command = ApplyConnection( command );
+      var connection = ApplyConnection( command );
 
-      var context = await CreateExecuteContextAsync( command, tracing );
+      var context = await CreateExecuteContextAsync( connection, command, tracing );
+      context.RegisterDispose( connection );
 
       TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
 
