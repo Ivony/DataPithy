@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "props", "props", "{D1215914
 		Project.props = Project.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ivony.Data.Core", "Ivony.Data.Core\Ivony.Data.Core.csproj", "{F55CD4DC-24FA-B663-9D72-C09D53836AAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{0D3DA624-F3AA-47A0-AE33-1E9999140BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D3DA624-F3AA-47A0-AE33-1E9999140BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D3DA624-F3AA-47A0-AE33-1E9999140BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F55CD4DC-24FA-B663-9D72-C09D53836AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F55CD4DC-24FA-B663-9D72-C09D53836AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F55CD4DC-24FA-B663-9D72-C09D53836AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F55CD4DC-24FA-B663-9D72-C09D53836AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

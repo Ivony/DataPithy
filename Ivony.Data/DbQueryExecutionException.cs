@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+
 using Ivony.Data.Queries;
 
 namespace Ivony.Data
@@ -17,7 +18,7 @@ namespace Ivony.Data
     /// </summary>
     /// <param name="query">正在执行的查询</param>
     /// <param name="innerException">内部异常</param>
-    internal DbQueryExecutionException( DbQuery query, Exception innerException ) : base( $"exception in executing query:\n{query}", innerException )
+    public DbQueryExecutionException( DbQuery query, Exception innerException ) : base( $"exception in executing query:\n{query}", innerException )
     {
       DbQuery = query;
     }
