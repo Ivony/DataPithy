@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Ivony.Data.Common;
+using Ivony.Data.Core;
 using Ivony.Data.MySqlClient;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Ivony.Data
   /// <summary>
   /// 提供 MySql 数据库支持
   /// </summary>
-  public partial class MySqlDb : IDatabase
+  public partial class MySqlDb : Database
   {
 
 
@@ -185,39 +186,12 @@ namespace Ivony.Data
     /// <summary>
     /// MySQL 数据库连接字符串
     /// </summary>
-    public string ConnectionString { get; }
+    public override string ConnectionString { get; }
 
 
     /// <summary>
     /// 系统服务提供程序
     /// </summary>
     public IServiceProvider ServiceProvider { get; }
-
-
-    /// <summary>
-    /// 创建事务
-    /// </summary>
-    /// <returns>事务上下文</returns>
-    public IDatabaseTransaction CreateTransaction()
-    {
-      return new MySqlDbTransaction( this );
-    }
-
-    /// <summary>
-    /// 获取查询执行器
-    /// </summary>
-    /// <returns>查询执行器</returns>
-    public IDbExecutor GetDbExecutor()
-    {
-      return new MySqlDbExecutor( this );
-    }
-
-
-
-    /// <summary>
-    /// 创建 MySQL 数据库连接
-    /// </summary>
-    /// <returns>MySQL 数据库连接对象</returns>
-    public MySqlConnection CreateConnection() => ServiceProvider.GetRequiredService<IDbConnectionFactory<MySqlConnection>>().CreateConnection( ConnectionString );
   }
 }

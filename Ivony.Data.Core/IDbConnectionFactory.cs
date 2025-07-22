@@ -6,7 +6,7 @@ namespace Ivony.Data;
 /// 数据库连接工厂
 /// </summary>
 /// <typeparam name="T">数据库连接类型</typeparam>
-public interface IDbConnectionFactory<T> where T : IDbConnection
+public interface IDbConnectionFactory
 {
 
   /// <summary>
@@ -14,12 +14,12 @@ public interface IDbConnectionFactory<T> where T : IDbConnection
   /// </summary>
   /// <param name="connectionString">数据库连接字符串</param>
   /// <returns>数据库连接</returns>
-  T CreateConnection( string connectionString );
+  IDbConnection CreateConnection( string connectionString );
 
   /// <summary>
   /// 释放数据库连接
   /// </summary>
   /// <param name="connection">数据库连接</param>
-  void ReleaseConnection( T connection );
+  void ReleaseConnection( IDbConnection connection );
 }
 

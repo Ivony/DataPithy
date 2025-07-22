@@ -4,17 +4,10 @@ using System.Data;
 using Ivony.Data.Common;
 using Ivony.Data.Queries;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Ivony.Data.Core;
-internal class DbCommandFactory<Command>( IDatabase database ) : IDbCommandFactory<Command> where Command : IDbCommand
+internal class DbCommandFactory( IDatabase database ) : IDbCommandFactory
 {
-  public Command CreateCommand( DbQuery query )
-  {
-    var parameterizedQuery = query as ParameterizedQuery;
-    if ( parameterizedQuery is not null )
-      return database.ServiceProvider.GetRequiredService<IParameterizedQueryParser<Command>>().Parse( parameterizedQuery );
-
-
-    throw new NotSupportedException();
-
-  }
+  public IDbCommand CreateCommand( DbQuery query ) => database.ServiceProvider.GetRequiredKeyedService<IDbQueryResolver>( database ).ResolveCommand( query );
 }

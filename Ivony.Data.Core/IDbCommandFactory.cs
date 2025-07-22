@@ -3,9 +3,9 @@
 using Ivony.Data.Queries;
 
 namespace Ivony.Data.Core;
-public interface IDbCommandFactory<Command> where Command : IDbCommand
+public interface IDbCommandFactory
 {
 
-  Command CreateCommand( DbQuery query );
+  IDbCommand CreateCommand( DbQuery query );
 
 }

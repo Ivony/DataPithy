@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Ivony.Data.Common;
 
 namespace Ivony.Data
 {

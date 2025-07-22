@@ -7,4 +7,9 @@
     <Version>5.0.0-alpha-0717</Version>
     <Description>DataPithy is a light database accesser</Description>
   </PropertyGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Common\" />
+  </ItemGroup>
 </Project>

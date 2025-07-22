@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 using Ivony.Data.Queries;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Ivony.Data.Core;
 
-public class DbExecutor<Command, Connection>( Database<Command, Connection> database ) : IDbExecutor
-  where Connection : IDbConnection
-  where Command : IDbCommand
+public class DbExecutor( Database database ) : IDbExecutor
 {
 
 
@@ -29,17 +29,18 @@ public class DbExecutor<Command, Connection>( Database<Command, Connection> data
     }
   }
 
-  protected virtual IDbExecuteContext Execute( Command command, IDbTracing tracing )
+  protected virtual IDbExecuteContext Execute( IDbCommand command, IDbTracing tracing )
   {
     if ( command == null )
       throw new ArgumentNullException( nameof( command ) );
 
+    var factory = database.ServiceProvider.GetRequiredKeyedService<IDbConnectionFactory>( this );
+    var connection = factory.CreateConnection( database.ConnectionString );
     try
     {
       TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
 
 
-      var connection = database.ServiceProvider.GetRequiredService<IDbConnectionFactory<Connection>>().CreateConnection( database.ConnectionString );
       command.Connection = connection;
       var context = CreateExecuteContext( command, tracing );
       TryExecuteTracing( tracing, t => t.OnLoadingData( context ) );
@@ -52,20 +53,24 @@ public class DbExecutor<Command, Connection>( Database<Command, Connection> data
       TryExecuteTracing( tracing, t => t.OnException( exception ) );
       throw;
     }
+    finally
+    {
+      factory.ReleaseConnection( connection );
+    }
   }
 
 
 
-  protected DbExecuteContext<Command, Connection> CreateExecuteContext( Command command, IDbTracing tracing ) => new DbExecuteContext<Command, Connection>( command, tracing );
+  protected DbExecuteContext CreateExecuteContext( IDbCommand command, IDbTracing tracing ) => new DbExecuteContext( command, tracing );
 
-  protected Task<DbExecuteContext<Command, Connection>> CreateAsyncExecuteContext( Command command, IDbTracing tracing ) => Task.FromResult( new DbExecuteContext<Command, Connection>( command, tracing ) );
-
-
+  protected Task<DbExecuteContext> CreateAsyncExecuteContext( IDbCommand command, IDbTracing tracing ) => Task.FromResult( new DbExecuteContext( command, tracing ) );
 
 
-  protected virtual Command CreateCommand( DbQuery query ) => database.ServiceProvider.GetService<IDbCommandFactory<Command>>().CreateCommand( query );
 
-  protected virtual IDbConnection CreateConnection() => database.ServiceProvider.GetRequiredService<IDbConnectionFactory<Connection>>().CreateConnection( database.ConnectionString );
+
+  protected virtual IDbCommand CreateCommand( DbQuery query ) => database.ServiceProvider.GetService<IDbCommandFactory>().CreateCommand( query );
+
+  protected virtual IDbConnection CreateConnection() => database.ServiceProvider.GetRequiredService<IDbConnectionFactory>().CreateConnection( database.ConnectionString );
 
 
   public async Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token )
@@ -84,7 +89,7 @@ public class DbExecutor<Command, Connection>( Database<Command, Connection> data
     }
   }
 
-  protected virtual async Task<IAsyncDbExecuteContext> ExecuteAsync( Command command, IDbTracing tracing )
+  protected virtual async Task<IAsyncDbExecuteContext> ExecuteAsync( IDbCommand command, IDbTracing tracing )
   {
 
     if ( command == null )

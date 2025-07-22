@@ -4,9 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ivony.Data.Core;
-public class DbExecuteContext<Command, Connection>( Command command, IDbTracing tracing ) : IDbExecuteContext, IAsyncDbExecuteContext
-  where Command : IDbCommand
-  where Connection : IDbConnection
+public class DbExecuteContext( IDbCommand command, IDbTracing tracing ) : IDbExecuteContext, IAsyncDbExecuteContext
 {
   public int RecordsAffected { get; }
   public object SyncRoot { get; }

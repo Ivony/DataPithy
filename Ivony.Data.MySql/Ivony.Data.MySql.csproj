@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ivony.Data.Core\Ivony.Data.Core.csproj" />
     <ProjectReference Include="..\Ivony.Data\Ivony.Data.csproj" />
   </ItemGroup>
 

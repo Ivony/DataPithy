@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Data;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Ivony.Data.Core;
 
-public abstract class Database<Command, Connection>( IServiceProvider serviceProvider ) : IDatabase
-  where Connection : IDbConnection
-  where Command : IDbCommand
+public abstract class Database : IDatabase
 {
-  public IServiceProvider ServiceProvider => serviceProvider;
+
+  protected Database( IServiceProvider serviceProvider )
+  {
+    ServiceProvider = serviceProvider;
+    transactionFactory = serviceProvider.GetRequiredKeyedService<IDatabaseTransactionFactory>( this );
+  }
+
+  public IServiceProvider ServiceProvider { get; }
+
+
+  protected IDatabaseTransactionFactory transactionFactory;
 
 
   /// <summary>
@@ -15,9 +25,9 @@ public abstract class Database<Command, Connection>( IServiceProvider servicePro
   /// </summary>
   public abstract string ConnectionString { get; }
 
-  public virtual IDatabaseTransaction CreateTransaction() => throw new NotSupportedException();
+  public virtual IDatabaseTransaction CreateTransaction() => transactionFactory.CreateTransaction();
 
-  public virtual IDbExecutor GetDbExecutor() => ServiceProvider.GetRequiredService<IDbExecutorFactory<Command, Connection>>().GetExecutor();
+  public virtual IDbExecutor GetDbExecutor() => ServiceProvider.GetRequiredKeyedService<IDbExecutorFactory>( this ).GetExecutor();
 
 
 

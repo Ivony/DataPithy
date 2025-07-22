@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ivony.Data.Common
+namespace Ivony.Data
 {
   /// <summary>
   /// 定义可销毁对象的容器，当容器销毁时，所有子对象将一并销毁。
