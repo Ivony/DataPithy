@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/props/">
+    <File Path="Project.props" />
+  </Folder>
+  <Project Path="DynamicTest/DynamicTest.csproj" />
+  <Project Path="Ivony.Data.Core/Ivony.Data.Core.csproj" />
+  <Project Path="Ivony.Data.MySql/Ivony.Data.MySql.csproj" />
+  <Project Path="Ivony.Data.SqlQueries/Ivony.Data.SqlQueries.csproj" />
+  <Project Path="Ivony.Data.SqlServer/Ivony.Data.SqlServer.csproj" />
+  <Project Path="Ivony.Data.Test/Ivony.Data.Test.csproj" />
+  <Project Path="Ivony.Data.Tracing/Ivony.Data.Tracing.csproj" />
+  <Project Path="Ivony.Data/Ivony.Data.csproj" />
+</Solution>
