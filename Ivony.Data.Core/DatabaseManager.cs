@@ -66,22 +66,15 @@ public class DatabaseManager : IDatabaseProvider
     /// <returns>数据库实例，若未找到则返回 null</returns>
     public IDatabase? GetDatabase(string? name)
     {
-        if (name is null)
-            return _defaultDatabase;
+        lock (_lock)
+        {
+            if (name is null)
+                return _defaultDatabase;
 
-        if (_databases.TryGetValue(name, out var database))
-            return database;
-        else
-            return null;
-    }
-
-    /// <summary>
-    /// 实现 IDatabaseProvider 接口，获取数据库实例
-    /// </summary>
-    /// <param name="databaseName">数据库名称，null 表示默认数据库</param>
-    /// <returns>数据库实例，若未找到则返回 null</returns>
-    IDatabase? IDatabaseProvider.GetDatabase(string? databaseName)
-    {
-        return GetDatabase(databaseName);
+            if (_databases.TryGetValue(name, out var database))
+                return database;
+            else
+                return null;
+        }
     }
 }
