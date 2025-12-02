@@ -16,9 +16,8 @@ public class DatabaseManager : IDatabaseProvider
     /// </summary>
     /// <param name="name">数据库名称</param>
     /// <param name="database">数据库实例</param>
-    /// <param name="isDefault">是否设置为默认数据库</param>
     /// <returns>当前数据库管理器实例，支持链式调用</returns>
-    public DatabaseManager AddDatabase(string name, IDatabase database, bool isDefault = false)
+    public DatabaseManager AddDatabase(string name, IDatabase database)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
@@ -28,7 +27,8 @@ public class DatabaseManager : IDatabaseProvider
 
         _databases[name] = database;
 
-        if (isDefault)
+        // 如果是第一个数据库，自动设为默认数据库
+        if (_defaultDatabase == null)
             _defaultDatabase = database;
 
         return this;
@@ -53,28 +53,19 @@ public class DatabaseManager : IDatabaseProvider
     }
 
     /// <summary>
-    /// 获取默认数据库
-    /// </summary>
-    /// <returns>默认数据库实例</returns>
-    public IDatabase GetDefaultDatabase()
-    {
-        return _defaultDatabase ?? throw new InvalidOperationException("No default database has been set.");
-    }
-
-    /// <summary>
     /// 获取指定名称的数据库
     /// </summary>
-    /// <param name="name">数据库名称</param>
-    /// <returns>数据库实例</returns>
-    public IDatabase GetDatabase(string name)
+    /// <param name="name">数据库名称，null 表示默认数据库</param>
+    /// <returns>数据库实例，若未找到则返回 null</returns>
+    public IDatabase? GetDatabase(string? name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
+        if (name is null)
+            return _defaultDatabase;
 
         if (_databases.TryGetValue(name, out var database))
             return database;
         else
-            throw new KeyNotFoundException($"Database with name '{name}' not found.");
+            return null;
     }
 
     /// <summary>
@@ -84,10 +75,6 @@ public class DatabaseManager : IDatabaseProvider
     /// <returns>数据库实例，若未找到则返回 null</returns>
     IDatabase? IDatabaseProvider.GetDatabase(string? databaseName)
     {
-        if (string.IsNullOrEmpty(databaseName))
-            return _defaultDatabase;
-
-        _databases.TryGetValue(databaseName, out var database);
-        return database;
+        return GetDatabase(databaseName);
     }
 }

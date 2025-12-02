@@ -16,19 +16,6 @@ public static class MySqlDatabaseManagerExtensions
     /// <returns>当前数据库管理器实例，支持链式调用</returns>
     public static DatabaseManager AddMySql(this DatabaseManager manager, string name, Action<MySqlDbBuilder> configure)
     {
-        return AddMySql(manager, name, false, configure);
-    }
-
-    /// <summary>
-    /// 为 DatabaseManager 添加 MySQL 数据库，并可选择是否设置为默认数据库
-    /// </summary>
-    /// <param name="manager">数据库管理器</param>
-    /// <param name="name">数据库名称</param>
-    /// <param name="isDefault">是否设置为默认数据库</param>
-    /// <param name="configure">配置 MySQL 数据库构建器的委托</param>
-    /// <returns>当前数据库管理器实例，支持链式调用</returns>
-    public static DatabaseManager AddMySql(this DatabaseManager manager, string name, bool isDefault, Action<MySqlDbBuilder> configure)
-    {
         if (manager == null)
             throw new ArgumentNullException(nameof(manager));
 
@@ -46,8 +33,10 @@ public static class MySqlDatabaseManagerExtensions
         var database = builder.Build();
 
         // 添加到数据库管理器
-        return manager.AddDatabase(name, database, isDefault);
+        return manager.AddDatabase(name, database);
     }
+
+
 
     /// <summary>
     /// 为 DatabaseManager 添加 MySQL 数据库，使用连接字符串配置
@@ -58,19 +47,8 @@ public static class MySqlDatabaseManagerExtensions
     /// <returns>当前数据库管理器实例，支持链式调用</returns>
     public static DatabaseManager AddMySql(this DatabaseManager manager, string name, string connectionString)
     {
-        return AddMySql(manager, name, false, connectionString);
+        return AddMySql(manager, name, builder => builder.WithConnection(connectionString));
     }
 
-    /// <summary>
-    /// 为 DatabaseManager 添加 MySQL 数据库，使用连接字符串配置，并可选择是否设置为默认数据库
-    /// </summary>
-    /// <param name="manager">数据库管理器</param>
-    /// <param name="name">数据库名称</param>
-    /// <param name="isDefault">是否设置为默认数据库</param>
-    /// <param name="connectionString">MySQL 连接字符串</param>
-    /// <returns>当前数据库管理器实例，支持链式调用</returns>
-    public static DatabaseManager AddMySql(this DatabaseManager manager, string name, bool isDefault, string connectionString)
-    {
-        return AddMySql(manager, name, isDefault, builder => builder.WithConnection(connectionString));
-    }
+
 }
