@@ -12,7 +12,7 @@ namespace Ivony.Data.Common
   /// 辅助实现 IParameterizedQueryParser 的基类
   /// </summary>
   /// <typeparam name="TCommand">解析完成的命令对象的类型</typeparam>
-  public abstract class ParameterizedQueryLiteralValueParser<TCommand> : IParameterizedQueryParser<TCommand>
+  public abstract class ParameterizedQueryLiteralValueParser<TCommand> 
   {
 
 

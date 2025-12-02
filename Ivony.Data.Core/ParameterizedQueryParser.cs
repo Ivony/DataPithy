@@ -12,7 +12,7 @@ namespace Ivony.Data.Common
   /// </summary>
   /// <typeparam name="TCommand">解析完成的命令对象的类型</typeparam>
   /// <typeparam name="TParameter">命令参数对象的类型</typeparam>
-  public abstract class ParameterizedQueryParser<TCommand, TParameter> : IParameterizedQueryParser<TCommand>
+  public abstract class ParameterizedQueryParser<TCommand, TParameter> 
   {
 
 

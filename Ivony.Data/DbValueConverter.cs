@@ -115,7 +115,7 @@ namespace Ivony.Data
     /// <param name="value">所需要转换的值对象</param>
     /// <param name="dataTypeName">数据库类型名称</param>
     /// <returns>数据库可接受的类型</returns>
-    internal static object ConvertTo( object value, string dataTypeName = null )
+    public static object ConvertTo( object value, string dataTypeName = null )
     {
       if ( value == null )
         return DBNull.Value;
