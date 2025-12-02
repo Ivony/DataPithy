@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data;
 
@@ -9,30 +10,41 @@ namespace Ivony.Data;
 public class DatabaseManager : IDatabaseProvider
 {
     private readonly Dictionary<string, IDatabase> _databases = new();
-    private IDatabase? _defaultDatabase;
+    private string? _defaultDatabaseName;
     private readonly object _lock = new();
 
     /// <summary>
-    /// 添加数据库到管理器
+    /// 内部服务集合，用于注册公共服务
+    /// </summary>
+    private readonly IServiceCollection _services = new ServiceCollection();
+
+    /// <summary>
+    /// 注册数据库到管理器
     /// </summary>
     /// <param name="name">数据库名称</param>
-    /// <param name="database">数据库实例</param>
+    /// <param name="databaseBuilder">用于创建数据库实例的委托</param>
     /// <returns>当前数据库管理器实例，支持链式调用</returns>
-    public DatabaseManager AddDatabase(string name, IDatabase database)
+    public DatabaseManager RegisterDatabase(string name, Func<IServiceCollection, IDatabase> databaseBuilder)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
 
-        if (database == null)
-            throw new ArgumentNullException(nameof(database));
+        if (databaseBuilder == null)
+            throw new ArgumentNullException(nameof(databaseBuilder));
 
         lock (_lock)
         {
+            // 在注册时创建数据库实例，创建_services的副本，避免databaseBuilder修改影响其他数据库实例
+            IServiceCollection servicesCopy = new ServiceCollection();
+            foreach (var service in _services)
+                servicesCopy.Add(service);
+
+            var database = databaseBuilder(servicesCopy);
             _databases[name] = database;
 
             // 如果是第一个数据库，自动设为默认数据库
-            if (_defaultDatabase == null)
-                _defaultDatabase = database;
+            if (_defaultDatabaseName == null)
+                _defaultDatabaseName = name;
         }
 
         return this;
@@ -50,11 +62,26 @@ public class DatabaseManager : IDatabaseProvider
 
         lock (_lock)
         {
-            if (_databases.TryGetValue(name, out var database))
-                _defaultDatabase = database;
+            if (_databases.ContainsKey(name))
+                _defaultDatabaseName = name;
             else
                 throw new KeyNotFoundException($"Database with name '{name}' not found.");
         }
+
+        return this;
+    }
+
+    /// <summary>
+    /// 配置公共服务
+    /// </summary>
+    /// <param name="configure">用于配置服务的委托</param>
+    /// <returns>当前数据库管理器实例，支持链式调用</returns>
+    public DatabaseManager ConfigureGlobalServices(Action<IServiceCollection> configure)
+    {
+        if (configure == null)
+            throw new ArgumentNullException(nameof(configure));
+
+        configure(_services);
 
         return this;
     }
@@ -68,10 +95,13 @@ public class DatabaseManager : IDatabaseProvider
     {
         lock (_lock)
         {
-            if (name is null)
-                return _defaultDatabase;
+            // 确定要使用的数据库名称
+            var databaseName = name ?? _defaultDatabaseName;
+            if (databaseName == null)
+                return null;
 
-            if (_databases.TryGetValue(name, out var database))
+            // 直接返回存储的数据库实例
+            if (_databases.TryGetValue(databaseName, out var database))
                 return database;
             else
                 return null;

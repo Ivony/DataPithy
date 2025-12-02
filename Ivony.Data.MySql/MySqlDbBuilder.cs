@@ -14,16 +14,15 @@ namespace Ivony.Data;
 /// </summary>
 public class MySqlDbBuilder
 {
-    private readonly MySqlConnectionStringBuilder _connectionStringBuilder;
+    private readonly MySqlConnectionStringBuilder _connectionStringBuilder = new();
     private readonly IServiceCollection _serviceCollection;
 
     /// <summary>
     /// 创建 <see cref="MySqlDbBuilder"/> 实例
     /// </summary>
-    public MySqlDbBuilder()
+    internal MySqlDbBuilder(IServiceCollection services)
     {
-        _connectionStringBuilder = new MySqlConnectionStringBuilder();
-        _serviceCollection = new ServiceCollection();
+        _serviceCollection = services;
     }
 
     /// <summary>
@@ -128,7 +127,7 @@ public class MySqlDbBuilder
             throw new InvalidOperationException("Connection string is not configured.");
         }
 
-        // 创建 MySqlDb 对象
+        // 直接使用内部服务集合创建服务提供程序
         return new MySqlDb(connectionString, _serviceCollection.BuildServiceProvider());
     }
 }

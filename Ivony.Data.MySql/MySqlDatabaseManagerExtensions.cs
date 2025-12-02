@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data;
 
@@ -25,18 +26,19 @@ public static class MySqlDatabaseManagerExtensions
         if (configure == null)
             throw new ArgumentNullException(nameof(configure));
 
-        // 创建并配置 MySqlDbBuilder
-        var builder = new MySqlDbBuilder();
-        configure(builder);
+        // 注册数据库，使用委托创建数据库实例
+        return manager.RegisterDatabase(name, services =>
+        {
+            // 利用DatabaseManager给出的IServiceCollection对象实例创建MySqlDbBuilder对象
+            var builder = new MySqlDbBuilder(services);
 
-        // 构建数据库实例
-        var database = builder.Build();
+            // 调用configure参数给出的方法对MySqlDbBuilder对象做修饰
+            configure(builder);
 
-        // 添加到数据库管理器
-        return manager.AddDatabase(name, database);
+            // 最后调用MySqlDbBuilder对象的Build方法
+            return builder.Build();
+        });
     }
-
-
 
     /// <summary>
     /// 为 DatabaseManager 添加 MySQL 数据库，使用连接字符串配置
@@ -47,8 +49,27 @@ public static class MySqlDatabaseManagerExtensions
     /// <returns>当前数据库管理器实例，支持链式调用</returns>
     public static DatabaseManager AddMySql(this DatabaseManager manager, string name, string connectionString)
     {
-        return AddMySql(manager, name, builder => builder.WithConnection(connectionString));
-    }
+        if (manager == null)
+            throw new ArgumentNullException(nameof(manager));
 
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("Connection string cannot be null or whitespace.", nameof(connectionString));
+
+        // 注册数据库，使用委托创建数据库实例
+        return manager.RegisterDatabase(name, services =>
+        {
+            // 利用DatabaseManager给出的IServiceCollection对象实例创建MySqlDbBuilder对象
+            var builder = new MySqlDbBuilder(services);
+
+            // 配置连接字符串
+            builder.WithConnection(connectionString);
+
+            // 最后调用MySqlDbBuilder对象的Build方法
+            return builder.Build();
+        });
+    }
 
 }
