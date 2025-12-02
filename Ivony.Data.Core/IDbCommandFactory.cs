@@ -1,8 +1,8 @@
-﻿using System.Data;
+using System.Data;
 
 using Ivony.Data.Queries;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 public interface IDbCommandFactory
 {
 

@@ -6,7 +6,7 @@ using System.Linq;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 internal class DatabaseTransaction( Database database ) : Database( database.ServiceProvider ), IDatabaseTransaction
 {
 

@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\Project.props" />
+  <PropertyGroup>
+    <DefaultNamespace>Ivony.Data</DefaultNamespace>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Ivony.Data\Ivony.Data.csproj" />

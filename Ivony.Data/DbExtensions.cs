@@ -33,12 +33,7 @@ namespace Ivony.Data
     /// <returns>异步数据库查询执行器</returns>
     public static IAsyncDbExecutor? GetAsyncDbExecutor( this IDatabase database )
     {
-      var executor = database?.GetDbExecutor();
-      if ( executor == null )
-        return null;
-
-      return executor as IAsyncDbExecutor ?? new AsyncExecutorWrapper( executor );
-
+      return database?.GetDbExecutor() as IAsyncDbExecutor;
     }
 
 

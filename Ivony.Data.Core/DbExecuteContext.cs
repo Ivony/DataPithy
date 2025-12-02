@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 public class DbExecuteContext( IDbCommand command, IDbTracing tracing ) : IDbExecuteContext, IAsyncDbExecuteContext
 {
   public int RecordsAffected { get; }

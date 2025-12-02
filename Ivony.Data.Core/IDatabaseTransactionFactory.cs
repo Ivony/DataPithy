@@ -1,9 +1,9 @@
-﻿
+
 using System.Data;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 
 public interface IDatabaseTransactionFactory
 {

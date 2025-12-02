@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 public interface IDbExecutorFactory
 {
 

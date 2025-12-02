@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Data;
 using System.Data.Common;
@@ -9,7 +9,7 @@ using Ivony.Data.Queries;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ivony.Data.Core;
+namespace Ivony.Data;
 
 public class DbExecutor( Database database ) : IDbExecutor
 {

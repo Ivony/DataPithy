@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ivony.Data.Core
+namespace Ivony.Data
 {
   /// <summary>
   /// 定义用于填充 DataTable 的 DataAdapter
