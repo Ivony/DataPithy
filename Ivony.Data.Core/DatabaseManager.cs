@@ -10,6 +10,7 @@ public class DatabaseManager : IDatabaseProvider
 {
     private readonly Dictionary<string, IDatabase> _databases = new();
     private IDatabase? _defaultDatabase;
+    private readonly object _lock = new();
 
     /// <summary>
     /// 添加数据库到管理器
@@ -25,11 +26,14 @@ public class DatabaseManager : IDatabaseProvider
         if (database == null)
             throw new ArgumentNullException(nameof(database));
 
-        _databases[name] = database;
+        lock (_lock)
+        {
+            _databases[name] = database;
 
-        // 如果是第一个数据库，自动设为默认数据库
-        if (_defaultDatabase == null)
-            _defaultDatabase = database;
+            // 如果是第一个数据库，自动设为默认数据库
+            if (_defaultDatabase == null)
+                _defaultDatabase = database;
+        }
 
         return this;
     }
@@ -44,10 +48,13 @@ public class DatabaseManager : IDatabaseProvider
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
 
-        if (_databases.TryGetValue(name, out var database))
-            _defaultDatabase = database;
-        else
-            throw new KeyNotFoundException($"Database with name '{name}' not found.");
+        lock (_lock)
+        {
+            if (_databases.TryGetValue(name, out var database))
+                _defaultDatabase = database;
+            else
+                throw new KeyNotFoundException($"Database with name '{name}' not found.");
+        }
 
         return this;
     }
