@@ -8,6 +8,7 @@
   <Project Path="Ivony.Data.SqlQueries/Ivony.Data.SqlQueries.csproj" />
   <Project Path="Ivony.Data.SqlServer/Ivony.Data.SqlServer.csproj" />
   <Project Path="Ivony.Data.Test/Ivony.Data.Test.csproj" />
+  <Project Path="Ivony.Data.MySql.Test/Ivony.Data.MySql.Test.csproj" />
   <Project Path="Ivony.Data.Tracing/Ivony.Data.Tracing.csproj" />
   <Project Path="Ivony.Data/Ivony.Data.csproj" />
 </Solution>
