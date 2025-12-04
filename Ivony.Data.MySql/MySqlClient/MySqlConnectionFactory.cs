@@ -1,4 +1,5 @@
 ﻿#if MySqlConnector
+using System.Data;
 using MySqlConnector;
 #else
 using MySql.Data.MySqlClient;
@@ -7,10 +8,11 @@ using MySql.Data.MySqlClient;
 namespace Ivony.Data.MySqlClient;
 internal class MySqlConnectionFactory : IDbConnectionFactory<MySqlConnection>
 {
-  public MySqlConnection CreateConnection( string connectionString )
+  public MySqlConnection CreateConnection(string connectionString)
   {
-    var connection = new MySqlConnection( connectionString );
+    var connection = new MySqlConnection(connectionString);
     connection.Open();
     return connection;
   }
+
 }

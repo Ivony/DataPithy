@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -28,12 +28,5 @@ public abstract class Database : IDatabase
   public virtual IDatabaseTransaction CreateTransaction() => transactionFactory.CreateTransaction();
 
   public virtual IDbExecutor GetDbExecutor() => ServiceProvider.GetRequiredKeyedService<IDbExecutorFactory>( this ).GetExecutor();
-
-
-
-
-
-
-
 
 }

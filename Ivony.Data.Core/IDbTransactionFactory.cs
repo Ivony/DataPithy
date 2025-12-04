@@ -5,7 +5,6 @@ namespace Ivony.Data;
 /// <summary>
 /// 数据库事务工厂
 /// </summary>
-/// <typeparam name="T">数据库事务类型</typeparam>
 public interface IDbTransactionFactory
 {
   /// <summary>

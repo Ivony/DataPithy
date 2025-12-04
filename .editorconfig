@@ -1,0 +1,67 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+# General settings for all files
+indent_style = space
+indent_size = 2
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+# Markdown files
+trim_trailing_whitespace = false
+
+[*.{cs,csx,cake}]
+# C# specific settings
+indent_size = 2
+indent_style = space
+
+[*.{json,xml,yml,yaml}]
+# Configuration files
+indent_size = 2
+
+# C# code style settings
+[*.cs]
+# New line preferences - Allman style (brace on new line)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Spacing preferences
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_after_for_statement_semicolons = true
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = true
+csharp_space_around_declaration_statements_equals_sign = true
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = true
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_in_empty_argument_list = false
+csharp_space_in_empty_method_call_parentheses = false
+csharp_space_in_empty_method_declaration_parentheses = false
+csharp_space_in_empty_square_brackets = false
+csharp_space_after_function_keyword_in_lambda_expression = false
+
+# Wrapping preferences
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
+
+
+# Documentation comment settings
+dotnet_sort_system_directives_first = true
+

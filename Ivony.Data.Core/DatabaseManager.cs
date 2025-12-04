@@ -82,7 +82,6 @@ public class DatabaseManager : IDatabaseProvider
             throw new ArgumentNullException(nameof(configure));
 
         configure(_services);
-
         return this;
     }
 

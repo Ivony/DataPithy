@@ -55,8 +55,10 @@ public static class MySqlDatabaseManagerExtensions
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Database name cannot be null or whitespace.", nameof(name));
 
+        if (connectionString is null)
+            throw new ArgumentNullException(nameof(connectionString), "Connection string cannot be null.");
         if (string.IsNullOrWhiteSpace(connectionString))
-            throw new ArgumentException("Connection string cannot be null or whitespace.", nameof(connectionString));
+            throw new ArgumentException("Connection string cannot be empty or whitespace.", nameof(connectionString));
 
         // 注册数据库，使用委托创建数据库实例
         return manager.RegisterDatabase(name, services =>
