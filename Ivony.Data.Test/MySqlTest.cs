@@ -19,7 +19,7 @@ public class MySqlTest
   public void Enter()
   {
 
-    scope = Db.UseDatabase( MySqlDb.Connect( "127.0.0.1", "test", "Ivony", "752x6x5toZzBPH3XbO02" ) );
+    scope = Db.UseDatabase( MySqlDatabase.Connect( "127.0.0.1", "test", "Ivony", "752x6x5toZzBPH3XbO02" ) );
 
     Db.T( $"DROP TABLE IF EXISTS testTable" ).ExecuteNonQuery();
     Db.T( $@"

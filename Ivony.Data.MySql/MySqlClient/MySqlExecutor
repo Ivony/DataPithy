@@ -1,0 +1,11 @@
+using System;
+using System.Data;
+using System.Data.Common;
+
+namespace Ivony.Data.MySqlClient
+{
+  /// <summary>
+  /// MySQL 数据库执行器，直接继承自 DbExecutor
+  /// </summary>
+  public class MySqlExecutor(IDbConnectionFactory connectionFactory, IDbCommandFactory commandFactory) : DbExecutor(connectionFactory, commandFactory) { }
+}

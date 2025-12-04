@@ -14,7 +14,7 @@ public interface IDbConnectionFactory
   /// </summary>
   /// <param name="connectionString">数据库连接字符串</param>
   /// <returns>数据库连接</returns>
-  IDbConnection CreateConnection( string connectionString );
+  IDbConnection CreateConnection();
 
   /// <summary>
   /// 释放数据库连接

@@ -7,26 +7,15 @@ namespace Ivony.Data;
 
 public abstract class Database : IDatabase
 {
-
-  protected Database( IServiceProvider serviceProvider )
+  protected Database(IServiceProvider serviceProvider)
   {
     ServiceProvider = serviceProvider;
-    transactionFactory = serviceProvider.GetRequiredKeyedService<IDatabaseTransactionFactory>( this );
   }
 
   public IServiceProvider ServiceProvider { get; }
 
+  public virtual IDatabaseTransaction CreateTransaction() => ServiceProvider.GetRequiredService<IDatabaseTransactionFactory>().CreateTransaction();
 
-  protected IDatabaseTransactionFactory transactionFactory;
-
-
-  /// <summary>
-  /// 数据库连接字符串
-  /// </summary>
-  public abstract string ConnectionString { get; }
-
-  public virtual IDatabaseTransaction CreateTransaction() => transactionFactory.CreateTransaction();
-
-  public virtual IDbExecutor GetDbExecutor() => ServiceProvider.GetRequiredKeyedService<IDbExecutorFactory>( this ).GetExecutor();
+  public virtual IDbExecutor GetDbExecutor() => ServiceProvider.GetRequiredService<IDbExecutorFactory>().GetExecutor();
 
 }

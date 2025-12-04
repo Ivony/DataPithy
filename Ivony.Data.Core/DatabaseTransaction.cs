@@ -11,7 +11,6 @@ internal class DatabaseTransaction( Database database ) : Database( database.Ser
 {
 
 
-  public override string ConnectionString => database.ConnectionString;
 
   /// <summary>
   /// 数据库事务对象
@@ -81,7 +80,7 @@ internal class DatabaseTransaction( Database database ) : Database( database.Ser
   /// 派生类实现此方法创建数据库事务
   /// </summary>
   /// <returns></returns>
-  protected virtual IDbTransaction CreateDbTransaction() => factory.CreateTransaction( ConnectionString );
+  protected virtual IDbTransaction CreateDbTransaction() => factory.CreateTransaction();
 
   protected virtual void ReleaseDbTransaction( IDbTransaction transaction ) => factory.ReleaseTransaction( transaction );
 

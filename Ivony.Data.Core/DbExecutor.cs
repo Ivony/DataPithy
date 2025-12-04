@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data;
 
-public class DbExecutor( Database database ) : IDbExecutor
+public class DbExecutor( IDbConnectionFactory connectionFactory, IDbCommandFactory commandFactory ) : IDbExecutor
 {
 
 
@@ -34,8 +34,7 @@ public class DbExecutor( Database database ) : IDbExecutor
     if ( command == null )
       throw new ArgumentNullException( nameof( command ) );
 
-    var factory = database.ServiceProvider.GetRequiredKeyedService<IDbConnectionFactory>( this );
-    var connection = factory.CreateConnection( database.ConnectionString );
+    var connection = CreateConnection();
     try
     {
       TryExecuteTracing( tracing, t => t.OnExecuting( command ) );
@@ -55,7 +54,7 @@ public class DbExecutor( Database database ) : IDbExecutor
     }
     finally
     {
-      factory.ReleaseConnection( connection );
+      connectionFactory.ReleaseConnection( connection );
     }
   }
 
@@ -68,9 +67,9 @@ public class DbExecutor( Database database ) : IDbExecutor
 
 
 
-  protected virtual IDbCommand CreateCommand( DbQuery query ) => database.ServiceProvider.GetService<IDbCommandFactory>().CreateCommand( query );
+  protected virtual IDbCommand CreateCommand( DbQuery query ) => commandFactory.CreateCommand( query );
 
-  protected virtual IDbConnection CreateConnection() => database.ServiceProvider.GetRequiredService<IDbConnectionFactory>().CreateConnection( database.ConnectionString );
+  protected virtual IDbConnection CreateConnection() => connectionFactory.CreateConnection();
 
 
   public async Task<IAsyncDbExecuteContext> ExecuteAsync( DbQuery query, CancellationToken token )

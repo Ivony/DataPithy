@@ -1,0 +1,18 @@
+using System;
+using System.Data;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Ivony.Data.MySqlClient
+{
+  /// <summary>
+  /// MySQL 数据库执行器工厂
+  /// </summary>
+  public class MySqlExecutorFactory(IDbConnectionFactory connectionFactory, IDbCommandFactory commandFactory) : IDbExecutorFactory
+  {
+
+    public IDbExecutor GetExecutor()
+    {
+      return new MySqlExecutor(connectionFactory, commandFactory);
+    }
+  }
+}

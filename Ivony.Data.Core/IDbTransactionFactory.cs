@@ -12,7 +12,7 @@ public interface IDbTransactionFactory
   /// </summary>
   /// <param name="connectionString">数据库连接字符串</param>
   /// <returns>数据库事务</returns>
-  IDbTransaction CreateTransaction( string connectionString );
+  IDbTransaction CreateTransaction();
 
   /// <summary>
   /// 释放数据库事务
