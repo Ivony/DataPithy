@@ -137,6 +137,6 @@ public class MySqlDbBuilder
       throw new InvalidOperationException("Connection string is not configured.");
 
     // 直接使用内部服务集合创建服务提供程序
-    return new Database(connectionString, _services.BuildServiceProvider());
+    return new Database(_services.BuildServiceProvider());
   }
 }
