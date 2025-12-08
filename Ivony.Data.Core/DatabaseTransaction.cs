@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data;
-internal class DatabaseTransaction( Database database ) : Database( database.ServiceProvider ), IDatabaseTransaction
+public class DatabaseTransaction( Database database ) : Database( database.ServiceProvider ), IDatabaseTransaction
 {
 
 
@@ -74,7 +74,7 @@ internal class DatabaseTransaction( Database database ) : Database( database.Ser
 
 
 
-  private IDbTransactionFactory factory = database.ServiceProvider.GetRequiredKeyedService<IDbTransactionFactory>( database );
+  private IDbTransactionFactory factory = database.ServiceProvider.GetRequiredService<IDbTransactionFactory>();
 
   /// <summary>
   /// 派生类实现此方法创建数据库事务
@@ -188,7 +188,7 @@ internal class DatabaseTransaction( Database database ) : Database( database.Ser
   /// 派生类实现此方法以获取查询执行器
   /// </summary>
   /// <returns>查询执行器</returns>
-  protected virtual IDbExecutor GetDbExecutorCore() => database.ServiceProvider.GetRequiredKeyedService<IDbExecutorFactory>( this ).GetExecutor();
+  protected virtual IDbExecutor GetDbExecutorCore() => database.ServiceProvider.GetRequiredService<IDbExecutorFactory>().GetExecutor();
 
 
 

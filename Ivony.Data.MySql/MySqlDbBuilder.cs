@@ -33,8 +33,7 @@ public class MySqlDbBuilder
   {
     _services.AddSingleton<MySqlConnectionFactory>();
     _services.AddSingleton<IDbConnectionFactory<MySqlConnection>>(serviceProvider => serviceProvider.GetRequiredService<MySqlConnectionFactory>());
-    _services.AddSingleton<IDatabaseTransactionFactory<MySqlConnection>>(serviceProvider => serviceProvider.GetRequiredService<MySqlConnectionFactory>());
-    
+
   }
 
   /// <summary>
@@ -138,6 +137,6 @@ public class MySqlDbBuilder
       throw new InvalidOperationException("Connection string is not configured.");
 
     // 直接使用内部服务集合创建服务提供程序
-    return new MySqlDatabase(connectionString, _services.BuildServiceProvider());
+    return new Database(connectionString, _services.BuildServiceProvider());
   }
 }

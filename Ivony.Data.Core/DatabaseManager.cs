@@ -5,18 +5,27 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Ivony.Data;
 
 /// <summary>
-/// 数据库管理器，用于管理多个数据库连接
-/// </summary>
-public class DatabaseManager : IDatabaseProvider
-{
-    private readonly Dictionary<string, IDatabase> _databases = new();
-    private string? _defaultDatabaseName;
-    private readonly object _lock = new();
-
-    /// <summary>
-    /// 内部服务集合，用于注册公共服务
+    /// 数据库管理器，用于管理多个数据库连接
     /// </summary>
-    private readonly IServiceCollection _services = new ServiceCollection();
+    public class DatabaseManager : IDatabaseProvider
+    {
+        private readonly Dictionary<string, IDatabase> _databases = new();
+        private string? _defaultDatabaseName;
+        private readonly object _lock = new();
+
+        /// <summary>
+        /// 内部服务集合，用于注册公共服务
+        /// </summary>
+        private readonly IServiceCollection _services = new ServiceCollection();
+
+        /// <summary>
+        /// 初始化数据库管理器
+        /// </summary>
+        public DatabaseManager()
+        {
+            // 注册默认实现类
+            _services.AddSingleton<IDatabaseTransactionFactory, DefaultDatabaseTransactionFactory>();
+        }
 
     /// <summary>
     /// 注册数据库到管理器

@@ -5,14 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Ivony.Data;
 
-public abstract class Database : IDatabase
+public class Database(IServiceProvider serviceProvider) : IDatabase
 {
-  protected Database(IServiceProvider serviceProvider)
-  {
-    ServiceProvider = serviceProvider;
-  }
 
-  public IServiceProvider ServiceProvider { get; }
+  public IServiceProvider ServiceProvider  => serviceProvider;
 
   public virtual IDatabaseTransaction CreateTransaction() => ServiceProvider.GetRequiredService<IDatabaseTransactionFactory>().CreateTransaction();
 
